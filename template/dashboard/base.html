@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static  %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Corona Admin</title>
+    <link rel="stylesheet" href="{% static 'dashboard/vendors/mdi/css/materialdesignicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'dashboard/vendors/css/vendor.bundle.base.css'%}">
+    <link rel="stylesheet" href="{% static 'dashboard/vendors/jvectormap/jquery-jvectormap.css'%}">
+    <link rel="stylesheet" href="{% static 'dashboard/vendors/flag-icon-css/css/flag-icon.min.css'%}">
+    <link rel="stylesheet" href="{% static 'dashboard/vendors/owl-carousel-2/owl.carousel.min.css'%}">
+    <link rel="stylesheet" href="{% static 'dashboard/vendors/owl-carousel-2/owl.theme.default.min.css'%}">
+    <link rel="stylesheet" href="{% static 'dashboard/css/style.css'%}">
+    <link rel="shortcut icon" href="{% static 'css/dashboard/images/favicon.png'%}" />
+  </head>
+  <body>
+    <div class="container-scroller">
+        {% include 'dashboard/sidebar.html'  %}
+          <div class="container-fluid page-body-wrapper">
+            {% include 'dashboard/navbar.html'  %}
+            <div class="main-panel">
+              {% block content %}
+              {% endblock content %}
+              {% include 'dashboard/footer.html'  %}
+            </div>
+          </div>
+    </div>
+    <script src="{% static 'dashboard/vendors/js/vendor.bundle.base.js' %}"></script>
+    <script src="{% static 'dashboard/vendors/chart.js/Chart.min.js' %}"></script>
+    <script src="{% static 'dashboard/vendors/progressbar.js/progressbar.min.js' %}"></script>
+    <script src="{% static 'dashboard/vendors/jvectormap/jquery-jvectormap.min.js' %}"></script>
+    <script src="{% static 'dashboard/vendors/jvectormap/jquery-jvectormap-world-mill-en.js' %}"></script>
+    <script src="{% static 'dashboard/vendors/owl-carousel-2/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'dashboard/js/off-canvas.js' %}"></script>
+    <script src="{% static 'dashboard/js/hoverable-collapse.js' %}"></script>
+    <script src="{% static 'dashboard/js/misc.js' %}"></script>
+    <script src="{% static 'dashboard/js/settings.js' %}"></script>
+    <script src="{% static 'dashboard/js/todolist.js' %}"></script>
+    <script src="{% static 'dashboard/js/dashboard.js' %}"></script>
+  </body>
+</html>

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<style>
+.auth-wrapper {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.auth-box {
+    width: 350px;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+</style>
+
+<div class="auth-wrapper">
+<div class="auth-box">
+
+    <h3>Login with OTP</h3>
+
+    <!-- STEP 1 -->
+    <div id="step1">
+        <input type="text" id="email" placeholder="Enter Email or Phone">
+        <button onclick="sendOTP()">Send OTP</button>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="step2" style="display:none;">
+        <input type="text" id="otp" placeholder="Enter OTP">
+        <button onclick="verifyOTP()">Verify OTP</button>
+    </div>
+
+</div>
+</div>
+
+<script>
+function sendOTP(){
+
+    let email = document.getElementById("email").value;
+
+    if(!email){
+        alert("Enter email or phone");
+        return;
+    }
+
+    fetch('/api/send-otp/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email: email})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === "success"){
+            alert("OTP sent");
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+        }
+    });
+}
+
+function verifyOTP(){
+
+    let email = document.getElementById("email").value;
+    let otp = document.getElementById("otp").value;
+
+    fetch('/api/verify-otp/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email: email, otp: otp})
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if(data.status === "success"){
+            alert("Login success");
+            window.location.href = "/";
+        } else {
+            alert("Invalid OTP");
+        }
+
+    });
+}
+</script>
+
+{% endblock %}
