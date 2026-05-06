@@ -1,5 +1,6 @@
 from django.db import models
-
+from django.utils import timezone
+from django.contrib.auth.models import User
 class Category(models.Model):
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to='categories/', null=True, blank=True)
@@ -38,14 +39,25 @@ class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='products/')
 
-# models.py
-from django.db import models
-from django.utils import timezone
 
 class OTP(models.Model):
+    username = models.CharField(max_length=50)
     email = models.CharField(max_length=100)
     otp = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def is_expired(self):
-        return (timezone.now() - self.created_at).seconds > 300  # 5 min
+        return (timezone.now() - self.created_at).seconds > 300  
+    
+    def __str__(self):
+        return self.username
+    
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=10, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    bio = models.TextField(blank=True)
+    image = models.ImageField(upload_to="profile/", blank=True, null=True)
+    
+    def __str__(self):
+        return self.phone

@@ -11,16 +11,31 @@
             </div>
             <div class="col-lg-6 text-center text-lg-right">
                 <div class="d-inline-flex align-items-center">
-                    <div class="btn-group">
-    <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">
-        My Account
-    </button>
+                    <div id="authButtons"></div>
+                    <div class="d-flex align-items-center">
 
-    <div class="dropdown-menu dropdown-menu-right" id="authMenu">
-        <!-- JS will render here -->
-    </div>
+    {% if request.user.is_authenticated %}
+        <span class="mr-2 font-weight-bold">
+            Hello, {{ request.user.username }}
+        </span>
+
+        <!-- ✅ PROFILE BUTTON -->
+        <button class="btn btn-sm btn-info mr-2" onclick="goToProfile()">
+            Profile
+        </button>
+
+        <button class="btn btn-sm btn-danger" onclick="logout()">
+            Logout
+        </button>
+
+    {% else %}
+        <button class="btn btn-sm btn-primary" onclick="openLoginModal()">
+            Login
+        </button>
+    {% endif %}
+
 </div>
-                    <div class="btn-group mx-2">
+                    {% comment %} <div class="btn-group mx-2">
                         <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">USD</button>
                         <div class="dropdown-menu dropdown-menu-right">
                             <button class="dropdown-item" type="button">EUR</button>
@@ -35,7 +50,7 @@
                             <button class="dropdown-item" type="button">AR</button>
                             <button class="dropdown-item" type="button">RU</button>
                         </div>
-                    </div>
+                    </div> {% endcomment %}
                 </div>
                 <div class="d-inline-flex align-items-center d-block d-lg-none">
                     <a href="" class="btn px-0 ml-2">
@@ -146,29 +161,63 @@
     </div>
    <script>
 
-function renderAuthMenu() {
+// ==========================
+// AUTH UI RENDER
+// ==========================
+document.addEventListener("DOMContentLoaded", function () {
+    renderAuthUI();
+});
+
+// ==========================
+// MAIN FUNCTION
+// ==========================
+function renderAuthUI() {
 
     let menu = document.getElementById("authMenu");
+    let buttons = document.getElementById("authButtons");
+
+    if (!menu || !buttons) {
+        console.warn("Auth elements not found");
+        return;
+    }
+
     let username = localStorage.getItem("username");
     let role = localStorage.getItem("role");
 
+    // ==========================
+    // USER LOGGED IN
+    // ==========================
     if (username) {
+
+        buttons.innerHTML = `
+            <span class="font-weight-bold mr-2">${username}</span>
+            <button class="btn btn-sm btn-danger" onclick="logout()">Logout</button>
+        `;
 
         menu.innerHTML = `
             <a class="dropdown-item">Hello, ${username}</a>
+            <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#" onclick="logout()">Logout</a>
         `;
 
-        // Admin dashboard show logic
-        if (role === "admin") {
-            document.getElementById("dashboardLink").style.display = "block";
+        let dash = document.getElementById("dashboardLink");
+        if (dash && role === "admin") {
+            dash.style.display = "block";
         }
 
-    } else {
+    }
+
+    // ==========================
+    // NOT LOGGED IN
+    // ==========================
+    else {
+
+        buttons.innerHTML = `
+            <a class="btn btn-sm btn-primary" href="/auth/">Sign In</a>
+        `;
 
         menu.innerHTML = `
-            <a class="dropdown-item" href="/auth/">Sign in</a>
-            <a class="dropdown-item" href="/auth/">Sign up</a>
+            <span class="dropdown-item text-muted">Not logged in</span>
         `;
 
         let dash = document.getElementById("dashboardLink");
@@ -176,12 +225,28 @@ function renderAuthMenu() {
     }
 }
 
-// logout
-function logout() {
-    localStorage.clear();
-    location.reload();
+// ==========================
+// LOGOUT FUNCTION
+// ==========================
+function getCSRFToken() {
+    return document.cookie.split('; ')
+        .find(row => row.startsWith('csrftoken'))
+        ?.split('=')[1];
 }
 
-renderAuthMenu();
+function logout() {
 
+    fetch('/logout/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken()
+        }
+    })
+    .then(() => {
+        window.location.reload();
+    });
+}
+function goToProfile(){
+    window.location.href = "/profile/";
+}
 </script>

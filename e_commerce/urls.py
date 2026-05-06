@@ -29,8 +29,14 @@ urlpatterns = [
     path('products/list/', ProductlistView.as_view(), name='product_list'),
 
     path('auth/',AuthPageView.as_view(),name='auth'),
-    path('api/send-otp/', SendOTPView.as_view()),
-    path('api/verify-otp/', VerifyOTPView.as_view()),
+    path('api/send-otp/', SendOTPView.as_view(), name="send_otp"),
+    path('api/verify-otp/', VerifyOTPView.as_view(), name="verify_otp"),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('api/user-profile/', ProfileAPI.as_view(), name='user_profile'),
+    path('profile/', ProfilePageView.as_view(), name='profile'),
+    path("api/upload-image/", UploadImageView.as_view()),
+
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -8,7 +8,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: #ccc;
 }
 
 .auth-box {
@@ -18,23 +18,6 @@
     border-radius: 12px;
     text-align: center;
 }
-
-input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-}
-
-button {
-    width: 100%;
-    padding: 10px;
-    background: #667eea;
-    color: white;
-    border: none;
-    border-radius: 8px;
-}
 </style>
 
 <div class="auth-wrapper">
@@ -42,13 +25,11 @@ button {
 
     <h3>Login with OTP</h3>
 
-    <!-- STEP 1 -->
     <div id="step1">
         <input type="text" id="email" placeholder="Enter Email or Phone">
         <button onclick="sendOTP()">Send OTP</button>
     </div>
 
-    <!-- STEP 2 -->
     <div id="step2" style="display:none;">
         <input type="text" id="otp" placeholder="Enter OTP">
         <button onclick="verifyOTP()">Verify OTP</button>
@@ -58,6 +39,15 @@ button {
 </div>
 
 <script>
+// ✅ CSRF TOKEN FUNCTION
+function getCSRFToken() {
+    return document.cookie.split('; ')
+        .find(row => row.startsWith('csrftoken'))
+        ?.split('=')[1];
+}
+
+
+// ✅ SEND OTP
 function sendOTP(){
 
     let email = document.getElementById("email").value;
@@ -69,19 +59,28 @@ function sendOTP(){
 
     fetch('/api/send-otp/', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
         body: JSON.stringify({email: email})
     })
     .then(res => res.json())
     .then(data => {
+
         if(data.status === "success"){
-            alert("OTP sent");
+            alert("OTP: check console 😎"); 
             document.getElementById("step1").style.display = "none";
             document.getElementById("step2").style.display = "block";
+        } else {
+            alert(data.message);
         }
+
     });
 }
 
+
+// ✅ VERIFY OTP
 function verifyOTP(){
 
     let email = document.getElementById("email").value;
@@ -89,17 +88,23 @@ function verifyOTP(){
 
     fetch('/api/verify-otp/', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({email: email, otp: otp})
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            email: email,
+            otp: otp
+        })
     })
     .then(res => res.json())
     .then(data => {
 
         if(data.status === "success"){
-            alert("Login success");
+            alert("Login success 🎉");
             window.location.href = "/";
         } else {
-            alert("Invalid OTP");
+            alert(data.message);
         }
 
     });

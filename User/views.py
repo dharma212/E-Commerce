@@ -6,6 +6,14 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth import authenticate, login
 from .models import *
 from .serializers import *
+from django.contrib.auth import logout
+import json
+import random
+from django.http import JsonResponse
+from django.views import View
+from django.contrib.auth.models import User
+from django.contrib.auth import login
+from .models import OTP
 
 class IndexView(TemplateView):
     template_name = "index.html"
@@ -65,7 +73,7 @@ class ProductCreateAPI(APIView):
         try:
             serializer = ProductSerializer(data=request.data)
 
-            if serializers.is_valid():
+            if serializer.is_valid():
                 product = serializer.save()
 
                 images = request.FILES.getlist('images')
@@ -149,65 +157,175 @@ class ProductlistView(TemplateView):
 class AuthPageView(TemplateView):
     template_name = "login.html"
     
-# views.py
-import json, random
-from django.http import JsonResponse
-from django.views import View
-from .models import OTP
 
-
+# SEND OTP
 class SendOTPView(View):
 
     def post(self, request):
-        try:
-            data = json.loads(request.body)
-            email = data.get('email')
+        data = json.loads(request.body)
+        username = data.get('username')
+        email = data.get('email')
 
-            if not email:
-                return JsonResponse({"status": "error", "message": "Email required"})
-
-            otp_code = str(random.randint(100000, 999999))
-
-            OTP.objects.create(email=email, otp=otp_code)
-
-            print("OTP:", otp_code)  # dev mate
-
-            return JsonResponse({"status": "success", "message": "OTP sent"})
-
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)})
-        
-from django.contrib.auth.models import User
-from django.contrib.auth import login
+        if not username or not email:
+                    return JsonResponse({
+                        "status": "error",
+                        "message": "Username and Email required"
+                    })
 
 
+        otp_code = str(random.randint(100000, 999999))
+
+        OTP.objects.create(username=username,email=email, otp=otp_code)
+
+        print("OTP:", otp_code) 
+
+        return JsonResponse({
+            "status": "success",
+            "message": "OTP sent successfully"
+        })
+
+
+# VERIFY OTP
 class VerifyOTPView(View):
 
     def post(self, request):
+        data = json.loads(request.body)
+
+        email = data.get('email')
+        otp = data.get('otp')
+
+        if not email or not otp:
+            return JsonResponse({"status": "error", "message": "All fields required"})
+
+        record = OTP.objects.filter(email=email).last()
+
+        if not record:
+            return JsonResponse({"status": "error", "message": "OTP not found"})
+
+        if record.is_expired():
+            return JsonResponse({"status": "error", "message": "OTP expired"})
+
+        if record.otp != otp:
+            return JsonResponse({"status": "error", "message": "Invalid OTP"})
+
+        user, created = User.objects.get_or_create(
+            username=record.username,      
+            defaults={'email': record.email}
+        )
+
+        login(request, user)
+
+        return JsonResponse({
+            "status": "success",
+            "message": "Login successful"
+        })
+        
+class LogoutView(View):
+    def post(self, request):
+        logout(request)
+        return JsonResponse({"status": "success"})
+    
+from django.views import View
+from django.http import JsonResponse
+import json
+
+class ProfileAPI(View):
+
+    def get(self, request):
+
+        if not request.user.is_authenticated:
+            return JsonResponse({"error": "Login required"}, status=401)
+
+        user = request.user
+        profile, created = Profile.objects.get_or_create(user=user)
+
+        return JsonResponse({
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "phone": profile.phone,
+            "city": profile.city,
+            "bio": profile.bio,
+            "image": profile.image.url if profile.image else ""
+        })
+
+
+    def post(self, request):
+        return self.update_user(request)
+
+    def put(self, request):
+        return self.update_user(request)
+
+    def update_user(self, request):
+
+        if not request.user.is_authenticated:
+            return JsonResponse({"error": "Login required"}, status=401)
+
         try:
             data = json.loads(request.body)
+        except:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
 
-            email = data.get('email')
-            otp = data.get('otp')
+        user = request.user
 
-            if not email or not otp:
-                return JsonResponse({"status": "error", "message": "All fields required"})
+        # USER fields
+        if "username" in data:
+            if not data["username"]:
+                return JsonResponse({"username": ["Username required"]}, status=400)
+            user.username = data["username"]
 
-            record = OTP.objects.filter(email=email, otp=otp).last()
+        if "email" in data:
+            if data["email"] and "@" not in data["email"]:
+                return JsonResponse({"email": ["Invalid email"]}, status=400)
+            user.email = data["email"]
 
-            if record and not record.is_expired():
+        if "first_name" in data:
+            user.first_name = data["first_name"]
 
-                # 🔥 Auto create user (IMPORTANT)
-                user, created = User.objects.get_or_create(username=email)
+        if "last_name" in data:
+            user.last_name = data["last_name"]
 
-                login(request, user)  # session login
+        user.save()
 
-                return JsonResponse({
-                    "status": "success",
-                    "message": "Login successful"
-                })
+        # ✅ PROFILE PART (VERY IMPORTANT 🔥🔥)
+        profile, created = Profile.objects.get_or_create(user=user)
 
-            return JsonResponse({"status": "error", "message": "Invalid or expired OTP"})
+        if "phone" in data:
+            profile.phone = data["phone"]
 
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)})
+        if "city" in data:
+            profile.city = data["city"]
+
+        if "bio" in data:
+            profile.bio = data["bio"]
+
+        profile.save()
+
+        return JsonResponse({"status": "success"})
+    
+class ProfilePageView(TemplateView):
+    template_name = "profile.html"
+    
+from django.views import View
+from django.http import JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+class UploadImageView(View):
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return JsonResponse({"error": "Login required"}, status=403)
+
+        image = request.FILES.get("image")
+
+        if not image:
+            return JsonResponse({"error": "No image"}, status=400)
+
+        profile, created = Profile.objects.get_or_create(user=request.user)
+
+        profile.image = image  
+        profile.save()         
+
+        return JsonResponse({
+            "image": profile.image.url
+        })

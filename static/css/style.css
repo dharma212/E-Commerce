@@ -20691,7 +20691,7 @@ div.tagsinput {
         align-items: center;
         white-space: nowrap;
         padding: 0.8rem 10px 0.8rem 1.188rem;
-        color: #6c7293;
+        color: white;
         -webkit-transition-duration: 0.45s;
         -moz-transition-duration: 0.45s;
         -o-transition-duration: 0.45s;
@@ -20717,14 +20717,14 @@ div.tagsinput {
             line-height: 1;
             font-size: 1rem;
             margin-left: auto;
-            color: rgba(108, 114, 147, 0.36); }
+            color:white; }
             .rtl .sidebar .nav .nav-item .nav-link i.menu-arrow {
               margin-left: 0;
               margin-right: auto; }
             .sidebar .nav .nav-item .nav-link i.menu-arrow:before {
               content: "\f140";
               font-size: inherit;
-              color: inherit; }
+              color: white; }
         .sidebar .nav .nav-item .nav-link .menu-title {
           color: inherit;
           display: inline-block;
@@ -20894,7 +20894,7 @@ div.tagsinput {
       .sidebar .nav.sub-menu .nav-item {
         padding: 0; }
         .sidebar .nav.sub-menu .nav-item .nav-link {
-          color: #6c7293;
+          color: white;
           padding: 0.5rem 0.35rem;
           position: relative;
           font-size: 0.855rem;
@@ -20905,7 +20905,7 @@ div.tagsinput {
             color: #ffffff;
             background: transparent; }
           .sidebar .nav.sub-menu .nav-item .nav-link:hover {
-            color: #ffffff; }
+            color: #ffffff;}
         .sidebar .nav.sub-menu .nav-item:hover {
           background: transparent; }
     .sidebar .nav:not(.sub-menu) > .nav-item:hover:not(.nav-category):not(.account-dropdown) > .nav-link {
@@ -20946,7 +20946,7 @@ div.tagsinput {
     .sidebar-tinted .sidebar .nav .nav-item .nav-link .menu-icon i {
       color: white; }
     .sidebar-tinted .sidebar .nav .nav-item .nav-link i.menu-arrow {
-      color: rgba(255, 255, 255, 0.36); }
+      color:white; }
   .sidebar-tinted .sidebar .nav .nav-item.active > .nav-link {
     background: rgba(12, 14, 14, 0.1); }
   .sidebar-tinted .sidebar .nav .nav-item.active:before {

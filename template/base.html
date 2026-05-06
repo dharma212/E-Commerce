@@ -4,14 +4,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
-
-    <!-- CSS File -->
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Free HTML Templates" name="keywords">
+    <meta content="Free HTML Templates" name="description">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">  
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static "style.css" %}">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
     {% include "header.html" %}
 {% block content %}{% endblock content %}
+<div id="loginModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999;">
+    <div style="background:#fff; width:350px; margin:10% auto; padding:20px; border-radius:10px; text-align:center;">
+        
+        <h4>Login</h4>
 
+        <div id="popup_step1">
+            <input type="text" id="popup_username" placeholder="Enter Username" class="form-control mb-2"><br>
+            <input type="text" id="popup_email" placeholder="Enter Email or Phone" class="form-control mb-2">
+            <button onclick="sendOTP()" class="btn btn-primary mt-2 w-100">Send OTP</button>
+        </div>
+
+        <div id="popup_step2" style="display:none;">
+            <input type="text" id="popup_otp" placeholder="Enter OTP" class="form-control mt-2">
+            <button onclick="verifyOTP()" class="btn btn-success mt-2 w-100">Verify OTP</button>
+        </div>
+
+        <button onclick="closeLoginModal()" style="margin-top:10px;">Close</button>
+
+    </div>
+</div>
 </body>
+<script>
+
+// ================= CSRF =================
+function getCSRFToken() {
+    return document.cookie.split('; ')
+        .find(row => row.startsWith('csrftoken'))
+        ?.split('=')[1];
+}
+
+
+// ================= SEND OTP =================
+function sendOTP(){
+    let username = document.getElementById("popup_username").value;
+    let email = document.getElementById("popup_email").value;
+
+    if(!username || !email){
+        alert("Enter username and email");
+        return;
+    }
+
+    fetch('/api/send-otp/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({username: username , email: email})
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if(data.status === "success"){
+            alert("OTP sent (check console )");
+
+            document.getElementById("popup_step1").style.display = "none";
+            document.getElementById("popup_step2").style.display = "block";
+        } else {
+            alert(data.message);
+        }
+
+    });
+}
+
+
+// ================= VERIFY OTP =================
+function verifyOTP(){
+
+    let email = document.getElementById("popup_email").value;
+    let otp = document.getElementById("popup_otp").value;
+
+    if(!otp){
+        alert("Enter OTP");
+        return;
+    }
+
+    fetch('/api/verify-otp/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            email: email,
+            otp: otp
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if(data.status === "success"){
+            alert("Login success 🎉");
+
+            closeLoginModal();
+
+            window.location.reload();
+
+        } else {
+            alert(data.message);
+        }
+
+    });
+}
+
+
+// ================= MODAL =================
+function openLoginModal(){
+    document.getElementById("loginModal").style.display = "block";
+}
+
+function closeLoginModal(){
+    document.getElementById("loginModal").style.display = "none";
+}
+
+
+// ================= AUTO POPUP =================
+document.addEventListener("DOMContentLoaded", function () {
+
+    let shown = sessionStorage.getItem("loginPopupShown");
+
+    {% if not request.user.is_authenticated %}
+
+        if (!shown) {
+            setTimeout(() => {
+                openLoginModal();
+                sessionStorage.setItem("loginPopupShown", "true");
+            }, 5000);
+        }
+
+    {% endif %}
+
+});
+
+</script>
 </html>
