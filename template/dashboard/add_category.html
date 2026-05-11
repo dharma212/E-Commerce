@@ -1,88 +1,6 @@
 {% extends "dashboard/base.html" %}
 {% block content %}
 
-<style>
-/* =========================
-   PAGE STYLE
-========================= */
-body {
-  background: #f5f7fb;
-  font-family: "Segoe UI", sans-serif;
-}
-
-.content-wrapper {
-  padding: 20px;
-}
-
-/* =========================
-   CARD
-========================= */
-.card {
-  border-radius: 14px;
-  border: none;
-  background: #fff;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-  transition: 0.3s;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-}
-
-/* =========================
-   INPUT FIX 
-========================= */
-.form-control {
-  background: #fff !important;
-  color: #333 !important;
-  border: 1px solid #e0e0e0 !important;
-  border-radius: 10px;
-  padding: 10px 12px;
-}
-
-.form-control:focus {
-  border-color: #4a90e2 !important;
-  box-shadow: 0 0 0 0.15rem rgba(74,144,226,0.2) !important;
-  background: #fff !important;
-  color: #333 !important;
-  outline: none !important;
-}
-
-/* AUTOFILL FIX */
-input:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
-  -webkit-text-fill-color: #333 !important;
-}
-
-/* LABEL */
-label {
-  font-weight: 500;
-  margin-bottom: 5px;
-  color: #333;
-}
-
-/* BUTTON */
-.btn-primary {
-  background: linear-gradient(135deg, #4a90e2, #357abd);
-  border: none;
-  border-radius: 10px;
-  padding: 10px 15px;
-  font-weight: 500;
-  transition: 0.3s;
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, #357abd, #2c5ea8);
-  transform: scale(1.02);
-}
-
-/* TITLE */
-h4 {
-  font-weight: 700;
-  color: #2c3e50;
-}
-</style>
-
 <div class="content-wrapper">
 
   <div class="card p-4">
@@ -117,38 +35,5 @@ h4 {
   </div>
 </div>
 
-<script>
-
-function getCSRFToken() {
-    return document.querySelector('[name=csrfmiddlewaretoken]').value;
-}
-
-// ✅ FORM SUBMIT
-document.getElementById('categoryForm').addEventListener('submit', function(e){
-    e.preventDefault();
-
-    let name = document.getElementById('category_name').value;
-    let image = document.getElementById('category_image').files[0];
-
-    let formData = new FormData();
-    formData.append('name', name);
-
-    if(image){
-        formData.append('image', image);
-    }
-
-    fetch('/api/add-category/', {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': getCSRFToken()   // ✅ only this
-        },
-        body: formData                      // ✅ send FormData
-    })
-    .then(res => res.json())
-    .then(data => {
-        console.log(data);
-    });
-});
-</script>
 
 {% endblock %}

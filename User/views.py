@@ -32,6 +32,28 @@ class shopview(TemplateView):
 class detailview(TemplateView):
     template_name = 'detail.html'
     
+from django.shortcuts import render, get_object_or_404
+from django.views import View
+from .models import Product
+
+
+class ProductDetailView(View):
+
+    def get(self, request, id):
+
+        product = get_object_or_404(Product, id=id)
+
+        related_products = Product.objects.filter(
+            category=product.category
+        ).exclude(id=product.id)[:8]
+
+        context = {
+            "product": product,
+            "related_products": related_products
+        }
+
+        return render(request, "detail.html", context)
+
 class contactview(TemplateView):
     template_name = 'contact.html'
     
