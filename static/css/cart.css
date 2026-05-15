@@ -1,0 +1,153 @@
+
+/* =========================================
+DESKTOP DESIGN
+========================================= */
+
+.cart-table {
+    background: #fff;
+}
+
+.cart-table thead {
+    background: #3D464D;
+    color: #fff;
+}
+
+.cart-product {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.cart-product img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.cart-product h6 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.mobile-cart-wrapper {
+    display: none;
+}
+
+
+/* =========================================
+MOBILE DESIGN
+========================================= */
+
+@media (max-width: 768px) {
+
+    .px-xl-5 {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .table-responsive {
+        display: none;
+    }
+
+    .mobile-cart-wrapper {
+        display: block;
+    }
+
+    .mobile-cart-card {
+        background: #fff;
+        border-radius: 18px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        border: 1px solid #f1f1f1;
+    }
+
+    .mobile-product-top {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .mobile-product-top img {
+        width: 90px;
+        height: 90px;
+        object-fit: cover;
+        border-radius: 14px;
+    }
+
+    .mobile-product-info h6 {
+        font-size: 16px;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .mobile-product-info p {
+        margin: 0;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .mobile-cart-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+    }
+
+    .mobile-cart-row span:first-child {
+        font-weight: 600;
+        color: #555;
+    }
+
+    .mobile-quantity {
+        display: flex;
+        align-items: center;
+    }
+
+    .mobile-quantity .btn {
+        width: 35px;
+        height: 35px;
+        padding: 0;
+    }
+
+    .mobile-quantity input {
+        width: 45px;
+        height: 35px;
+        text-align: center;
+        border: none;
+        background: #f5f5f5;
+    }
+
+    .mobile-remove-btn {
+        width: 100%;
+        border-radius: 10px;
+        margin-top: 10px;
+    }
+
+    .coupon-mobile .input-group {
+        flex-direction: column;
+    }
+
+    .coupon-mobile input {
+        width: 100%;
+        margin-bottom: 10px;
+        border-radius: 10px !important;
+    }
+
+    .coupon-mobile .input-group-append {
+        width: 100%;
+    }
+
+    .coupon-mobile button {
+        width: 100%;
+        border-radius: 10px !important;
+    }
+
+    .summary-box {
+        border-radius: 15px;
+    }
+
+}

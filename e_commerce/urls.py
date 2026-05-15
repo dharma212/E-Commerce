@@ -11,7 +11,7 @@ urlpatterns = [
     path('detail/',detailview.as_view(),name="detail"),
     path('product/<int:id>/', ProductDetailView.as_view(), name='product_detail'),
     path('contact/',contactview.as_view(),name="contact"),
-    path('cart/',cartview.as_view(),name="cart"),
+    # path('cart/',cartview.as_view(),name="cart"),
     path('checkout/',checkoutview.as_view(),name="checkout"),
     
     path('dashboard/index/',Dashboardview.as_view(),name="dashboard"),
@@ -29,7 +29,7 @@ urlpatterns = [
     path('api/products/', ProductListAPI.as_view(), name='api_products'),
     path('products/list/', ProductlistView.as_view(), name='product_list'),
 
-    path('auth/',AuthPageView.as_view(),name='auth'),
+    path('auth/',LoginPageView.as_view(),name='auth'),
     path('api/send-otp/', SendOTPView.as_view(), name="send_otp"),
     path('api/verify-otp/', VerifyOTPView.as_view(), name="verify_otp"),
     path('logout/', LogoutView.as_view(), name='logout'),
@@ -37,7 +37,37 @@ urlpatterns = [
     path('profile/', ProfilePageView.as_view(), name='profile'),
     path("api/upload-image/", UploadImageView.as_view()),
 
+path("wishlist/", WishlistPageView.as_view(), name="wishlist"),
+path("api/wishlist/", WishlistAPIView.as_view(), name="wishlist_api"),
+path("api/wishlist-data/", WishlistDataAPIView.as_view(), name="wishlist_data"),
+ path(
+        "cart/",
+        CartView.as_view(),
+        name="cart"
+    ),
 
+    path(
+        "add-to-cart/<int:product_id>/",
+        AddToCartView.as_view(),
+        name="add_to_cart"
+    ),
+
+    path(
+        "update-cart/<int:cart_id>/",
+        UpdateCartView.as_view(),
+        name="update_cart"
+    ),
+
+    path(
+        "remove-cart/<int:cart_id>/",
+        RemoveCartView.as_view(),
+        name="remove_cart"
+    ),
+    path(
+        "search-product/",
+        SearchProductView.as_view(),
+        name="search_product"
+    ),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

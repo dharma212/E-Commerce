@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 {% load static %}
-    <!-- Carousel Start -->
+<input type="hidden"
+       name="csrfmiddlewaretoken"
+       value="{{ csrf_token }}">
+<!-- Carousel Start -->
     <div class="container-fluid mb-3">
         <div class="row px-xl-5">
             <div class="col-lg-8">
@@ -13,7 +16,7 @@
                     </ol>
                     <div class="carousel-inner">
                         <div class="carousel-item position-relative active" style="height: 430px;">
-                            <img class="position-absolute w-100 h-100" src="{% static 'img/ChatGPT Image May 6, 2026, 04_49_56 PM.png' %}" style="object-fit: cover;">
+                            <img class="position-absolute w-100 h-100" src="{% static 'img/apple.slider.jpeg' %}" style="object-fit: cover;">
                             <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
                                 <div class="p-3" style="max-width: 700px;">
                                    <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">
@@ -32,10 +35,10 @@
                             </div>
                         </div>
                         <div class="carousel-item position-relative" style="height: 430px;">
-                            <img class="position-absolute w-100 h-100" src="{% static 'img/carousel-2.jpg' %}" style="object-fit: cover;">
+                            <img class="position-absolute w-100 h-100" src="{% static 'img/banner-image.jpeg' %}" style="object-fit: cover;">
                             <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
                                 <div class="p-3" style="max-width: 700px;">
-                                    <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Women Fashion</h1>
+                                    <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Laptop Deals</h1>
                                     <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Lorem rebum magna amet lorem magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum diam</p>
                                     <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp" href="#">Shop Now</a>
                                 </div>
@@ -56,7 +59,7 @@
             </div>
             <div class="col-lg-4">
                 <div class="product-offer mb-30" style="height: 200px;">
-                    <img class="img-fluid" src="{% static 'img/offer-1.jpg' %}" alt="">
+                    <img class="img-fluid" src="{% static 'img/all-laptop.jpg' %}" alt="">
                     <div class="offer-text">
                         <h6 class="text-white text-uppercase">Save 20%</h6>
                         <h3 class="text-white mb-3">Special Offer</h3>
@@ -64,7 +67,7 @@
                     </div>
                 </div>
                 <div class="product-offer mb-30" style="height: 200px;">
-                    <img class="img-fluid" src="{% static 'img/offer-2.jpg' %}" alt="">
+                    <img class="img-fluid" src="{% static 'img/banner-image.jpeg' %}" alt="">
                     <div class="offer-text">
                         <h6 class="text-white text-uppercase">Save 20%</h6>
                         <h3 class="text-white mb-3">Special Offer</h3>
@@ -463,12 +466,28 @@
             <!-- ACTION BUTTONS -->
             <div class="product-action">
 
-                <a class="btn btn-outline-dark btn-square" href="">
+                <!-- =========================
+                ADD TO CART BUTTON
+                ========================= -->
+
+                <a class="btn btn-outline-dark btn-square add-to-cart
+
+                {% if product.id in cart_product_ids %}
+                active-cart-btn
+                {% endif %}
+
+                "
+                href="javascript:void(0)"
+                data-id="{{ product.id }}">
+
                     <i class="fa fa-shopping-cart"></i>
+
                 </a>
 
-                <a class="btn btn-outline-dark btn-square" href="">
-                    <i class="far fa-heart"></i>
+                <!-- WISHLIST BUTTON -->
+                <a class="btn btn-outline-dark btn-square wishlist-btn {% if product.id in wishlist_product_ids %}active{% endif %}"
+                    data-product-id="{{ product.id }}">
+                        <i class="{% if product.id in wishlist_product_ids %}fas{% else %}far{% endif %} fa-heart"></i>
                 </a>
 
                 <a class="btn btn-outline-dark btn-square" href="">
@@ -558,13 +577,102 @@
 
 </div>
 </div>
-<style>
-.product-name {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;   /* max 2 lines */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+<script>
+
+function getCSRFToken() {
+
+    return document.querySelector(
+        '[name=csrfmiddlewaretoken]'
+    ).value;
+
 }
-</style>
-</html>
+
+
+// ADD TO CART
+document.addEventListener("DOMContentLoaded", function () {
+
+    document.querySelectorAll(".add-to-cart").forEach(button => {
+
+        button.addEventListener("click", function () {
+
+            const productId = this.dataset.id;
+
+            fetch(`/add-to-cart/${productId}/`, {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type": "application/json",
+
+                    "X-CSRFToken": getCSRFToken()
+
+                }
+
+            })
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                // COUNT UPDATE
+                document.getElementById(
+                    "cart-count"
+                ).innerText = data.cart_count;
+
+
+                // BUTTON ACTIVE
+                if (data.status === "added") {
+
+                    this.classList.add(
+                        "active-cart-btn"
+                    );
+
+                    Toastify({
+
+                        text: "Added To Cart",
+
+                        duration: 2000,
+
+                        gravity: "top",
+
+                        position: "right",
+
+                        backgroundColor: "#28a745",
+
+                    }).showToast();
+
+                }
+
+                else {
+
+                    this.classList.remove(
+                        "active-cart-btn"
+                    );
+
+                    Toastify({
+
+                        text: "Removed From Cart",
+
+                        duration: 2000,
+
+                        gravity: "top",
+
+                        position: "right",
+
+                        backgroundColor: "#dc3545",
+
+                    }).showToast();
+
+                }
+
+            });
+
+        });
+
+    });
+
+});
+
+</script>
 {% endblock content %}

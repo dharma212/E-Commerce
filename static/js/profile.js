@@ -108,10 +108,6 @@ function enableEdit(id) {
     input.value = text.innerText === "--" ? "" : text.innerText;
     input.focus();
 
-    // 👇 Smart help if user confused
-    editTimer = setTimeout(() => {
-        showToast("Type and press Enter or click outside to save", "warning");
-    }, 3000);
 }
 
 /* ================= SAVE ================= */
@@ -337,12 +333,6 @@ imageInput.addEventListener("change", function () {
         popupImage.onload = () => URL.revokeObjectURL(previewURL);
     }
 });
-
-    // show help once
-    if (!localStorage.getItem("profile_help")) {
-        showToast("Tip: Double click any field to edit profile", "warning");
-        localStorage.setItem("profile_help", "true");
-    }
 
     loadUser();
 });
