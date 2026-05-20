@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, ProductType, Product, ProductImage
+from .models import *
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,7 +21,13 @@ class ProductSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
     type_name = serializers.CharField(source='type.name', read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
+    color = serializers.PrimaryKeyRelatedField(
+    queryset=Color.objects.all()
+    )
 
+    size = serializers.PrimaryKeyRelatedField(
+        queryset=Size.objects.all()
+    )
 
     class Meta:
         model = Product

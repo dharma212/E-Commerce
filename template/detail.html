@@ -199,30 +199,23 @@
                         </div>
 
                     </div>
+                    <!-- CART BUTTON -->
+                    {% if in_cart %}
 
-                   {% if in_cart %}
+                    <a class="btn btn-success px-3" href="{% url 'cart' %}">
+                        Added To Cart
+                    </a>
 
-<a class="btn btn-success px-3"
-   href="{% url 'cart' %}">
+                    {% else %}
 
-    <i class="fa fa-check mr-1"></i>
+                    <button class="btn btn-primary px-3 add-to-cart"
+                            data-id="{{ product.id }}">
 
-    Added To Cart
+                        Add To Cart
 
-</a>
+                    </button>
 
-{% else %}
-
-<button class="btn btn-primary px-3"
-        onclick="addToCart('{{ product.id }}')">
-
-    <i class="fa fa-shopping-cart mr-1"></i>
-
-    Add To Cart
-
-</button>
-
-{% endif %}
+                    {% endif %}
 
                 </div>
 
@@ -268,18 +261,59 @@
 
                     <div class="product-action">
 
-                        <a class="btn btn-outline-dark btn-square" href="#">
-                            <i class="fa fa-shopping-cart"></i>
-                        </a>
+    <!-- CART -->
+    <a
+        href="javascript:void(0)"
+        class="btn btn-square add-to-cart
 
-                        <a class="btn btn-outline-dark btn-square"
-                           href="{% url 'product_detail' item.id %}">
+        {% if item.id in cart_product_ids %}
+            btn-warning active-cart-btn
+        {% else %}
+            btn-outline-dark
+        {% endif %}
+        "
 
-                            <i class="fa fa-eye"></i>
+        data-id="{{ item.id }}"
+    >
 
-                        </a>
+        <i class="fa fa-shopping-cart"></i>
 
-                    </div>
+    </a>
+
+
+
+    <!-- WISHLIST -->
+    <a
+        href="javascript:void(0)"
+        class="btn btn-square wishlist-btn
+
+        {% if item.id in wishlist_product_ids %}
+            btn-danger active
+        {% else %}
+            btn-outline-dark
+        {% endif %}
+        "
+
+        data-product-id="{{ item.id }}"
+    >
+
+        <i class="{% if item.id in wishlist_product_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+
+    </a>
+
+
+
+    <!-- DETAIL -->
+    <a
+        class="btn btn-outline-dark btn-square"
+        href="{% url 'product_detail' item.id %}"
+    >
+
+        <i class="fa fa-eye"></i>
+
+    </a>
+
+</div>
 
                 </div>
 

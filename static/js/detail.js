@@ -102,40 +102,123 @@ function getCSRFToken(){
 }
 
 
-// ======================================
-// ADD TO CART
-// ======================================
+// =====================================
+// WISHLIST
+// =====================================
 
-function addToCart(productId){
+document.querySelectorAll(
+    ".wishlist-btn"
+).forEach(button => {
 
-    fetch(`/add-to-cart/${productId}/`, {
+    button.addEventListener(
+        "click",
+        function () {
 
-        method: "POST",
+            const btn = this;
 
-        headers: {
+            const productId =
+            btn.dataset.productId;
 
-            "X-CSRFToken": getCSRFToken()
+            fetch(`/wishlist-toggle/${productId}/`, {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                    "application/json",
+
+                    "X-CSRFToken":
+                    getCSRFToken()
+
+                }
+
+            })
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                const icon =
+                btn.querySelector("i");
+
+
+
+                if(data.status === "added"){
+
+                    btn.classList.remove(
+                        "btn-outline-dark"
+                    );
+
+                    btn.classList.add(
+                        "btn-danger"
+                    );
+
+                    icon.classList.remove(
+                        "far"
+                    );
+
+                    icon.classList.add(
+                        "fas"
+                    );
+
+
+
+                    Toastify({
+
+                        text: "Added To Wishlist",
+
+                        duration: 2000,
+
+                        gravity: "top",
+
+                        position: "right",
+
+                        backgroundColor: "#28a745",
+
+                    }).showToast();
+
+                }
+
+                else{
+
+                    btn.classList.remove(
+                        "btn-danger"
+                    );
+
+                    btn.classList.add(
+                        "btn-outline-dark"
+                    );
+
+                    icon.classList.remove(
+                        "fas"
+                    );
+
+                    icon.classList.add(
+                        "far"
+                    );
+
+
+
+                    Toastify({
+
+                        text: "Removed From Wishlist",
+
+                        duration: 2000,
+
+                        gravity: "top",
+
+                        position: "right",
+
+                        backgroundColor: "#dc3545",
+
+                    }).showToast();
+
+                }
+
+            });
 
         }
+    );
 
-    })
-
-    .then(response => response.json())
-
-    .then(data => {
-
-        if(data.status === "added"){
-
-            window.location.href = "/cart/";
-
-        }
-
-    })
-
-    .catch(error => {
-
-        console.log(error);
-
-    });
-
-}
+});

@@ -48,6 +48,33 @@ fetch('/api/products/')
 
             <td>${item.category_name}</td>
             <td>${item.type_name}</td>
+            <!-- COLOR -->
+            <td>
+                <span style="
+                    background:${item.color_name?.toLowerCase() || '#333'};
+                    color:white;
+                    padding:4px 10px;
+                    border-radius:20px;
+                    font-size:12px;
+                    font-weight:600;
+                ">
+                    ${item.color_name || 'N/A'}
+                </span>
+            </td>
+
+            <!-- SIZE -->
+            <td>
+                <span style="
+                    background:#f1f1f1;
+                    color:#333;
+                    padding:4px 10px;
+                    border-radius:6px;
+                    font-size:12px;
+                    font-weight:600;
+                ">
+                    ${item.size_name || 'N/A'}
+                </span>
+            </td>
 
             <!-- PRICE COLUMN -->
             <td class="price">

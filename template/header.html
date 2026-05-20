@@ -312,28 +312,6 @@ HEADER START
 
                             {% endif %}
 
-                            <!-- SHOP DETAIL -->
-                            {% if request.user.is_authenticated %}
-
-                                <a href="{% url 'detail' %}"
-                                class="nav-item nav-link">
-
-                                    Shop Detail
-
-                                </a>
-
-                            {% else %}
-
-                                <a href="javascript:void(0)"
-                                onclick="openLoginModal()"
-                                class="nav-item nav-link">
-
-                                    Shop Detail
-
-                                </a>
-
-                            {% endif %}
-
                             <!-- DROPDOWN -->
                             <div class="nav-item dropdown">
 
@@ -414,6 +392,28 @@ HEADER START
                                 class="nav-item nav-link">
 
                                     Contact
+
+                                </a>
+
+                            {% endif %}
+
+                            <!-- ORDER -->
+                            {% if request.user.is_authenticated %}
+
+                                <a href="{% url 'my_orders' %}"
+                                class="nav-item nav-link">
+
+                                    Orders
+
+                                </a>
+
+                            {% else %}
+
+                                <a href="javascript:void(0)"
+                                onclick="openLoginModal()"
+                                class="nav-item nav-link">
+
+                                    Orders
 
                                 </a>
 

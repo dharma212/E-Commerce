@@ -553,6 +553,43 @@
             </div>
 
             {% endif %}
+            <!-- COLOR & SIZE -->
+            <div class="mt-2 d-flex justify-content-center align-items-center flex-wrap gap-1">
+
+                <!-- COLOR -->
+                {% if product.color %}
+
+                <span style="
+                    background: {{ product.color.name|lower }};
+                    color: white;
+                    padding: 4px 12px;
+                    border-radius: 20px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    margin-right:5px;
+                ">
+                    {{ product.color.name }}
+                </span>
+
+                {% endif %}
+
+                <!-- SIZE -->
+                {% if product.size %}
+
+                <span style="
+                    background:#f1f1f1;
+                    color:#333;
+                    padding:4px 10px;
+                    border-radius:6px;
+                    font-size:11px;
+                    font-weight:600;
+                ">
+                    {{ product.size.name }}
+                </span>
+
+                {% endif %}
+
+            </div>
 
             <!-- STATIC RATING -->
             <div class="d-flex align-items-center justify-content-center mb-1">
@@ -586,93 +623,6 @@ function getCSRFToken() {
     ).value;
 
 }
-
-
-// ADD TO CART
-document.addEventListener("DOMContentLoaded", function () {
-
-    document.querySelectorAll(".add-to-cart").forEach(button => {
-
-        button.addEventListener("click", function () {
-
-            const productId = this.dataset.id;
-
-            fetch(`/add-to-cart/${productId}/`, {
-
-                method: "POST",
-
-                headers: {
-
-                    "Content-Type": "application/json",
-
-                    "X-CSRFToken": getCSRFToken()
-
-                }
-
-            })
-
-            .then(response => response.json())
-
-            .then(data => {
-
-                // COUNT UPDATE
-                document.getElementById(
-                    "cart-count"
-                ).innerText = data.cart_count;
-
-
-                // BUTTON ACTIVE
-                if (data.status === "added") {
-
-                    this.classList.add(
-                        "active-cart-btn"
-                    );
-
-                    Toastify({
-
-                        text: "Added To Cart",
-
-                        duration: 2000,
-
-                        gravity: "top",
-
-                        position: "right",
-
-                        backgroundColor: "#28a745",
-
-                    }).showToast();
-
-                }
-
-                else {
-
-                    this.classList.remove(
-                        "active-cart-btn"
-                    );
-
-                    Toastify({
-
-                        text: "Removed From Cart",
-
-                        duration: 2000,
-
-                        gravity: "top",
-
-                        position: "right",
-
-                        backgroundColor: "#dc3545",
-
-                    }).showToast();
-
-                }
-
-            });
-
-        });
-
-    });
-
-});
 
 </script>
 {% endblock content %}

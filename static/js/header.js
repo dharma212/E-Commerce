@@ -41,7 +41,7 @@ window.addEventListener("scroll", function(){
 
 function goToProfile(){
 
-    window.location.href = "/profile/";
+    window.location.href = "/user-profile/";
 
 }
 

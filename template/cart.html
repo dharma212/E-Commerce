@@ -13,15 +13,13 @@
 
             <nav class="breadcrumb bg-light mb-30">
 
-                <a class="breadcrumb-item text-dark"
-                   href="{% url 'index' %}">
+                <a class="breadcrumb-item text-dark" href="{% url 'index' %}">
 
                     Home
 
                 </a>
 
-                <a class="breadcrumb-item text-dark"
-                   href="{% url 'shop' %}">
+                <a class="breadcrumb-item text-dark" href="{% url 'shop' %}">
 
                     Shop
 
@@ -73,109 +71,109 @@
 
                     {% if cart_items %}
 
-                        {% for item in cart_items %}
+                    {% for item in cart_items %}
 
-                        <tr>
+                    <tr>
 
-                            <!-- PRODUCT -->
-                            <td class="align-middle text-left">
+                        <!-- PRODUCT -->
+                        <td class="align-middle text-left">
 
-                                <div class="cart-product">
+                            <div class="cart-product">
 
-                                    {% if item.product.images.first %}
+                                {% if item.product.images.first %}
 
-                                    <img src="{{ item.product.images.first.image.url }}">
+                                <img src="{{ item.product.images.first.image.url }}">
 
-                                    {% else %}
+                                {% else %}
 
-                                    <img src="{% static 'img/no-image.png' %}">
+                                <img src="{% static 'img/no-image.png' %}">
 
-                                    {% endif %}
+                                {% endif %}
 
-                                    <div>
+                                <div>
 
-                                        <h6>
-                                            {{ item.product.name }}
-                                        </h6>
+                                    <h6>
+                                        {{ item.product.name }}
+                                    </h6>
 
-                                        <small class="text-muted">
-                                            ₹{{ item.product.price }}
-                                        </small>
-
-                                    </div>
+                                    <small class="text-muted">
+                                        ₹{{ item.product.price }}
+                                    </small>
 
                                 </div>
 
-                            </td>
+                            </div>
 
-                            <!-- PRICE -->
-                            <td class="align-middle">
+                        </td>
 
-                                ₹{{ item.product.price }}
+                        <!-- PRICE -->
+                        <td class="align-middle">
 
-                            </td>
+                            ₹{{ item.product.price }}
 
-                            <!-- QUANTITY -->
-                            <td class="align-middle">
+                        </td>
 
-                                <div class="input-group quantity mx-auto"
-                                     style="width: 120px;">
+                        <!-- QUANTITY -->
+                        <td class="align-middle">
 
-                                    <div class="input-group-btn">
+                            <div class="input-group quantity mx-auto" style="width: 120px;">
 
-                                        <button class="btn btn-sm btn-primary update-cart"
-                                                data-id="{{ item.id }}"
-                                                data-action="decrease">
+                                <!-- MINUS -->
+                                <div class="input-group-btn">
 
-                                            <i class="fa fa-minus"></i>
+                                    <button class="btn btn-sm btn-primary update-cart" data-id="{{ item.id }}"
+                                        data-action="decrease" {% if item.quantity|add:0 <= 1 %} disabled {% endif %}>
 
-                                        </button>
+                                        <i class="fa fa-minus"></i>
 
-                                    </div>
-
-                                    <input type="text"
-                                           class="form-control form-control-sm bg-secondary border-0 text-center"
-                                           value="{{ item.quantity }}"
-                                           readonly>
-
-                                    <div class="input-group-btn">
-
-                                        <button class="btn btn-sm btn-primary update-cart"
-                                                data-id="{{ item.id }}"
-                                                data-action="increase">
-
-                                            <i class="fa fa-plus"></i>
-
-                                        </button>
-
-                                    </div>
+                                    </button>
 
                                 </div>
 
-                            </td>
+                                <!-- QUANTITY -->
+                                <input type="text"
+                                    class="form-control form-control-sm bg-secondary border-0 text-center"
+                                    value="{{ item.quantity }}" readonly>
 
-                            <!-- TOTAL -->
-                            <td class="align-middle">
+                                <!-- PLUS -->
+                                <div class="input-group-btn">
 
-                                ₹{{ item.total_price }}
+                                    <button class="btn btn-sm btn-primary update-cart" data-id="{{ item.id }}"
+                                        data-action="increase" {% if item.quantity >= item.product.stock %}
+                                        disabled
+                                        {% endif %} >
 
-                            </td>
+                                        <i class="fa fa-plus"></i>
 
-                            <!-- REMOVE -->
-                            <td class="align-middle">
+                                    </button>
 
-                                <button class="btn btn-danger btn-sm remove-cart"
-                                        data-id="{{ item.id }}">
+                                </div>
 
-                                    <i class="fa fa-trash"></i>
+                            </div>
 
-                                </button>
+                        </td>
 
-                            </td>
+                        <!-- TOTAL -->
+                        <td class="align-middle">
 
-                        </tr>
+                            ₹{{ item.total_price }}
 
-                        {% endfor %}
+                        </td>
+
+                        <!-- REMOVE -->
+                        <td class="align-middle">
+
+                            <button class="btn btn-danger btn-sm remove-cart" data-id="{{ item.id }}">
+
+                                <i class="fa fa-trash"></i>
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
 
                     {% else %}
 
@@ -185,8 +183,7 @@
 
                             <div class="py-5 text-center">
 
-                                <img src="{% static 'img/empty-cart.png' %}"
-                                     width="200">
+                                <img src="{% static 'img/empty-cart.png' %}" width="200">
 
                                 <h4 class="mt-3">
 
@@ -194,8 +191,7 @@
 
                                 </h4>
 
-                                <a href="{% url 'index' %}"
-                                   class="btn btn-primary mt-3">
+                                <a href="{% url 'index' %}" class="btn btn-primary mt-3">
 
                                     Continue Shopping
 
@@ -224,98 +220,100 @@
 
             {% if cart_items %}
 
-                {% for item in cart_items %}
+            {% for item in cart_items %}
 
-                <div class="mobile-cart-card">
+            <div class="mobile-cart-card">
 
-                    <div class="mobile-product-top">
+                <div class="mobile-product-top">
 
-                        {% if item.product.images.first %}
+                    {% if item.product.images.first %}
 
-                        <img src="{{ item.product.images.first.image.url }}">
+                    <img src="{{ item.product.images.first.image.url }}">
 
-                        {% else %}
+                    {% else %}
 
-                        <img src="{% static 'img/no-image.png' %}">
+                    <img src="{% static 'img/no-image.png' %}">
 
-                        {% endif %}
+                    {% endif %}
 
-                        <div class="mobile-product-info">
+                    <div class="mobile-product-info">
 
-                            <h6>
-                                {{ item.product.name }}
-                            </h6>
+                        <h6>
+                            {{ item.product.name }}
+                        </h6>
 
-                            <p>
-                                ₹{{ item.product.price }}
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                    <div class="mobile-cart-row">
-
-                        <span>Price</span>
-
-                        <span>
+                        <p>
                             ₹{{ item.product.price }}
-                        </span>
+                        </p>
 
                     </div>
-
-                    <div class="mobile-cart-row">
-
-                        <span>Quantity</span>
-
-                        <div class="mobile-quantity">
-
-                            <button class="btn btn-sm btn-primary update-cart"
-                                    data-id="{{ item.id }}"
-                                    data-action="decrease">
-
-                                <i class="fa fa-minus"></i>
-
-                            </button>
-
-                            <input type="text"
-                                   value="{{ item.quantity }}"
-                                   readonly>
-
-                            <button class="btn btn-sm btn-primary update-cart"
-                                    data-id="{{ item.id }}"
-                                    data-action="increase">
-
-                                <i class="fa fa-plus"></i>
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                    <div class="mobile-cart-row">
-
-                        <span>Total</span>
-
-                        <strong>
-                            ₹{{ item.total_price }}
-                        </strong>
-
-                    </div>
-
-                    <button class="btn btn-danger mobile-remove-btn remove-cart"
-                            data-id="{{ item.id }}">
-
-                        <i class="fa fa-trash"></i>
-
-                        Remove Item
-
-                    </button>
 
                 </div>
 
-                {% endfor %}
+                <div class="mobile-cart-row">
+
+                    <span>Price</span>
+
+                    <span>
+                        ₹{{ item.product.price }}
+                    </span>
+
+                </div>
+
+                <div class="mobile-cart-row">
+
+                    <span>Quantity</span>
+
+                    <div class="mobile-quantity">
+
+                        <!-- MINUS -->
+                        <button class="btn btn-sm btn-primary update-cart" data-id="{{ item.id }}"
+                            data-action="decrease" {% if item.quantity|add:0 <= 1 %} disabled {% endif %}>
+
+                            <i class="fa fa-minus"></i>
+
+                        </button>
+
+                        <!-- QUANTITY -->
+                        <input type="text" value="{{ item.quantity }}" readonly>
+
+                        <!-- PLUS -->
+                        <button class="btn btn-sm btn-primary update-cart" data-id="{{ item.id }}"
+                            data-action="increase" {% if item.quantity >= item.product.stock %}
+                            disabled
+                            {% endif %}
+                            >
+
+                            <i class="fa fa-plus"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="mobile-cart-row">
+
+                    <span>Total</span>
+
+                    <strong>
+                        ₹{{ item.total_price }}
+                    </strong>
+
+                </div>
+
+                <button class="btn btn-danger mobile-remove-btn remove-cart" data-id="{{ item.id }}">
+
+                    <i class="fa fa-trash"></i>
+
+                    Remove Item
+
+                </button>
+
+            </div>
+
+            {% endfor %}
 
             {% endif %}
 
@@ -333,9 +331,7 @@
 
                 <div class="input-group">
 
-                    <input type="text"
-                           class="form-control border-0 p-4"
-                           placeholder="Coupon Code">
+                    <input type="text" class="form-control border-0 p-4" placeholder="Coupon Code">
 
                     <div class="input-group-append">
 
@@ -411,8 +407,7 @@
 
                     </div>
 
-                    <a href="{% url 'checkout' %}"
-                       class="btn btn-block btn-primary font-weight-bold my-3 py-3">
+                    <a href="{% url 'checkout' %}" class="btn btn-block btn-primary font-weight-bold my-3 py-3">
 
                         Proceed To Checkout
 
@@ -434,98 +429,358 @@
 
 <script>
 
-function getCSRFToken() {
+function getCSRFToken(){
 
-    return document.querySelector(
-        '[name=csrfmiddlewaretoken]'
-    ).value;
+    const token =
+        document.querySelector(
+            '[name=csrfmiddlewaretoken]'
+        );
+
+    return token
+        ? token.value
+        : "";
 
 }
 
+/* =========================================
+UPDATE CART
+========================================= */
 
-// UPDATE CART
-document.querySelectorAll(".update-cart").forEach(button => {
+document
+.querySelectorAll(".update-cart")
+.forEach(button => {
 
-    button.addEventListener("click", function () {
+    button.addEventListener(
+        "click",
+        async function(){
 
-        const cartId = this.dataset.id;
+            if(this.disabled){
+                return;
+            }
 
-        const action = this.dataset.action;
+            const cartId =
+                this.dataset.id;
 
-        fetch(`/update-cart/${cartId}/`, {
+            const action =
+                this.dataset.action;
 
-            method: "POST",
+            try{
 
-            headers: {
+                const response =
+                    await fetch(
+                        `/cart/update/${cartId}/`,
+                        {
+                            method:"POST",
 
-                "Content-Type": "application/json",
+                            headers:{
+                                "Content-Type":
+                                "application/json",
 
-                "X-CSRFToken": getCSRFToken()
+                                "X-CSRFToken":
+                                getCSRFToken()
+                            },
 
-            },
+                            body:JSON.stringify({
 
-            body: JSON.stringify({
+                                action:action
 
-                action: action
+                            })
+                        }
+                    );
 
-            })
+                const data =
+                    await response.json();
 
-        })
+                if(response.ok){
 
-        .then(response => response.json())
+                    location.reload();
 
-        .then(data => {
+                }else{
 
-            if (data.success) {
+                    alert(
+                        data.message ||
+                        "Update failed"
+                    );
 
-                location.reload();
+                }
+
+            }catch(error){
+
+                console.log(error);
+
+                alert(
+                    "Something went wrong"
+                );
 
             }
 
-        });
-
-    });
+        }
+    );
 
 });
 
+/* =========================================
+REMOVE CART
+========================================= */
 
-// REMOVE CART
-document.querySelectorAll(".remove-cart").forEach(button => {
+document
+.querySelectorAll(".remove-cart")
+.forEach(button => {
 
-    button.addEventListener("click", function () {
+    button.addEventListener(
+        "click",
+        async function(){
 
-        const cartId = this.dataset.id;
+            const cartId =
+                this.dataset.id;
 
-        fetch(`/remove-cart/${cartId}/`, {
+            try{
 
-            method: "POST",
+                const response =
+                    await fetch(
+                        `/cart/remove/${cartId}/`,
+                        {
+                            method:"POST",
 
-            headers: {
+                            headers:{
+                                "Content-Type":
+                                "application/json",
 
-                "Content-Type": "application/json",
+                                "X-CSRFToken":
+                                getCSRFToken()
+                            }
+                        }
+                    );
 
-                "X-CSRFToken": getCSRFToken()
+                const data =
+                    await response.json();
+
+                if(response.ok){
+
+                    location.reload();
+
+                }else{
+
+                    alert(
+                        data.error ||
+                        "Remove failed"
+                    );
+
+                }
+
+            }catch(error){
+
+                console.log(error);
+
+                alert(
+                    "Something went wrong"
+                );
 
             }
 
-        })
-
-        .then(response => response.json())
-
-        .then(data => {
-
-            if (data.success) {
-
-                location.reload();
-
-            }
-
-        });
-
-    });
+        }
+    );
 
 });
+/* =========================================
+GLOBAL CART SYSTEM
+========================================= */
 
+console.log("GLOBAL CART JS LOADED");
+
+/* =========================================
+CSRF TOKEN
+========================================= */
+
+function getCSRFToken(){
+
+    const token = document.querySelector(
+        "[name=csrfmiddlewaretoken]"
+    );
+
+    return token ? token.value : "";
+
+}
+
+/* =========================================
+TOAST
+========================================= */
+
+function cartToast(message, type="success"){
+
+    const oldToast =
+        document.querySelector(".cart-toast");
+
+    if(oldToast){
+        oldToast.remove();
+    }
+
+    const toast =
+        document.createElement("div");
+
+    toast.className = "cart-toast";
+
+    toast.innerText = message;
+
+    toast.style.position = "fixed";
+    toast.style.top = "20px";
+    toast.style.right = "20px";
+    toast.style.padding = "14px 20px";
+    toast.style.borderRadius = "10px";
+    toast.style.color = "#fff";
+    toast.style.fontWeight = "600";
+    toast.style.zIndex = "999999";
+
+    toast.style.background =
+        type === "error"
+        ? "#dc3545"
+        : "#28a745";
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+
+        toast.remove();
+
+    }, 2500);
+
+}
+
+/* =========================================
+GLOBAL ADD TO CART
+========================================= */
+
+document.addEventListener(
+    "click",
+    async function(e){
+
+        const button = e.target.closest(
+            ".add-to-cart, .add-to-cart-btn, .cart-btn"
+        );
+
+        if(!button){
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        /* =====================================
+        PREVENT DOUBLE CLICK
+        ===================================== */
+
+        if(button.dataset.loading === "true"){
+            return;
+        }
+
+        button.dataset.loading = "true";
+
+        button.disabled = true;
+
+        const productId =
+            button.dataset.id ||
+            button.dataset.productId;
+
+        if(!productId){
+
+            console.log("Product ID missing");
+
+            button.dataset.loading = "false";
+            button.disabled = false;
+
+            return;
+        }
+
+        try{
+
+            const response =
+                await fetch(
+                    `/cart/add/${productId}/`,
+                    {
+                        method: "POST",
+
+                        headers: {
+
+                            "X-CSRFToken":
+                            getCSRFToken(),
+
+                            "X-Requested-With":
+                            "XMLHttpRequest"
+
+                        }
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            /* =====================================
+            UPDATE CART COUNT
+            ===================================== */
+
+            const cartCount =
+                document.getElementById(
+                    "cart-count"
+                );
+
+            if(
+                cartCount &&
+                data.cart_count !== undefined
+            ){
+
+                cartCount.innerText =
+                    data.cart_count;
+
+            }
+
+            /* =====================================
+            BUTTON UI
+            ===================================== */
+
+            if(
+                data.status === "added" ||
+                data.status === "exists"
+            ){
+
+                button.innerHTML =
+                    "Added In Cart";
+
+                button.classList.add(
+                    "active-cart-btn"
+                );
+
+                button.classList.add(
+                    "btn-warning"
+                );
+
+                cartToast(
+                    data.message ||
+                    "Added To Cart"
+                );
+
+            }
+            else{
+
+                button.disabled = false;
+
+            }
+
+        }catch(error){
+
+            console.log(error);
+
+            button.disabled = false;
+
+            cartToast(
+                "Cart Error",
+                "error"
+            );
+
+        }
+
+    },
+    true
+);
 </script>
 
 {% endblock %}

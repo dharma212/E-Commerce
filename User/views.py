@@ -9,6 +9,7 @@ from .serializers import *
 from django.contrib.auth import logout
 import json
 import random
+from django.db.models import F, DecimalField, ExpressionWrapper
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views import View
@@ -20,12 +21,12 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from django.shortcuts import render, get_object_or_404
-
 from django.http import JsonResponse
 from django.views.generic import View
-
+from django.shortcuts import redirect
 from .models import Product
-
+from django.core.paginator import Paginator
+from django.views.generic import ListView
 
 class SearchProductView(View):
 
@@ -161,17 +162,176 @@ class IndexView(TemplateView):
 # ====================================
 # Shop View
 # ====================================
-class shopview(TemplateView):
+class ShopView(TemplateView):
+
     template_name = "shop.html"
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        products = Product.objects.all().order_by("-id")
+
+        # =========================
+        # FILTERS
+        # =========================
+
+        category = self.request.GET.get("category")
+        type_id = self.request.GET.get("type")
+        color = self.request.GET.get("color")
+        size = self.request.GET.get("size")
+
+        min_price = self.request.GET.get("min")
+        max_price = self.request.GET.get("max")
+
+        sort = self.request.GET.get("sort")
+
+        # CATEGORY
+        if category:
+            products = products.filter(
+                category_id=category
+            )
+
+        # TYPE
+        if type_id:
+            products = products.filter(
+                type_id=type_id
+            )
+
+        # COLOR
+        if color:
+            products = products.filter(
+                color_id=color
+            )
+
+        # SIZE
+        if size:
+            products = products.filter(
+                size_id=size
+            )
+
+        # =========================
+        # PRICE FILTER
+        # =========================
+
+        filtered_products = []
+
+        for product in products:
+
+            final_price = product.final_price()
+
+            # MIN PRICE
+            if min_price:
+
+                if final_price < int(min_price):
+                    continue
+
+            # MAX PRICE
+            if max_price:
+
+                if final_price > int(max_price):
+                    continue
+
+            filtered_products.append(product)
+
+        products = filtered_products
+
+        # =========================
+        # SORTING
+        # =========================
+
+        if sort == "low":
+
+            products = sorted(
+                products,
+                key=lambda x: x.final_price()
+            )
+
+        elif sort == "high":
+
+            products = sorted(
+                products,
+                key=lambda x: x.final_price(),
+                reverse=True
+            )
+
+        # =========================
+        # PAGINATION
+        # =========================
+
+        paginator = Paginator(products, 9)
+
+        page_number = self.request.GET.get("page")
+
+        page_obj = paginator.get_page(page_number)
+
+        # =========================
+        # CART PRODUCTS
+        # =========================
+
+        cart_product_ids = []
+
+        wishlist_product_ids = []
+
+        if self.request.user.is_authenticated:
+
+            cart_product_ids = list(
+
+                CartItem.objects.filter(
+                    cart__user=self.request.user
+                ).values_list(
+                    "product_id",
+                    flat=True
+                )
+
+            )
+
+            wishlist_product_ids = list(
+
+                Wishlist.objects.filter(
+                    user=self.request.user
+                ).values_list(
+                    "product_id",
+                    flat=True
+                )
+
+            )
+
+        # =========================
+        # CONTEXT
+        # =========================
+
+        context["products"] = page_obj.object_list
+
+        context["page_obj"] = page_obj
+
+        context["categories"] = Category.objects.all()
+
+        context["types"] = ProductType.objects.all()
+
+        context["colors"] = Color.objects.all()
+
+        context["sizes"] = Size.objects.all()
+
+        context["cart_product_ids"] = cart_product_ids
+
+        context["wishlist_product_ids"] = wishlist_product_ids
+
+        return context
+
+    # =========================
+    # AJAX
+    # =========================
+
+    def get(self, request, *args, **kwargs):
+
+        context = self.get_context_data()
+
+        return self.render_to_response(context)
     
 # ====================================
 # Detail View
 # ====================================
-from .models import Wishlist
-from .models import CartItem
-from .models import Cart
-
-
 class detailview(TemplateView):
 
     template_name = "detail.html"
@@ -312,11 +472,168 @@ class contactview(TemplateView):
 # class cartview(TemplateView):
 #     template_name = 'cart.html'
     
-# ==================================== 
-# CheckOut View 
-# ==================================== 
-class checkoutview(TemplateView):
-    template_name = 'checkout.html'
+# ====================================
+# CHECKOUT VIEW
+# ====================================
+
+class checkoutview(LoginRequiredMixin, TemplateView):
+
+    template_name = "checkout.html"
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        cart, created = Cart.objects.get_or_create(
+            user=self.request.user
+        )
+
+        cart_items = CartItem.objects.filter(
+            cart=cart
+        ).select_related("product")
+
+        if not cart_items.exists():
+            return redirect("cart")
+
+        subtotal = sum(
+            item.total_price for item in cart_items
+        )
+
+        shipping = 100 if subtotal > 0 else 0
+
+        grand_total = subtotal + shipping
+
+        profile, created = Profile.objects.get_or_create(
+            user=self.request.user
+        )
+
+        context["cart_items"] = cart_items
+        context["subtotal"] = subtotal
+        context["shipping"] = shipping
+        context["grand_total"] = grand_total
+        context["profile"] = profile
+
+        return context
+
+
+    def post(self, request, *args, **kwargs):
+
+        # =========================
+        # UPDATE USER
+        # =========================
+
+        request.user.first_name = request.POST.get(
+            "first_name"
+        ) or ""
+
+        request.user.last_name = request.POST.get(
+            "last_name"
+        ) or ""
+
+        request.user.email = request.POST.get(
+            "email"
+        ) or ""
+
+        request.user.save()
+
+        # =========================
+        # UPDATE PROFILE
+        # =========================
+
+        profile, created = Profile.objects.get_or_create(
+            user=request.user
+        )
+
+        profile.phone = request.POST.get(
+            "phone"
+        ) or ""
+
+        profile.city = request.POST.get(
+            "city",
+            ""
+        ).strip()
+
+        profile.save()
+
+        # =========================
+        # PAYMENT
+        # =========================
+
+        payment_method = request.POST.get(
+            "payment"
+        )
+
+        # =========================
+        # GET CART
+        # =========================
+
+        cart = Cart.objects.get(
+            user=request.user
+        )
+
+        cart_items = CartItem.objects.filter(
+            cart=cart
+        )
+
+        # =========================
+        # TOTAL
+        # =========================
+
+        subtotal = sum(
+            item.total_price for item in cart_items
+        )
+
+        shipping = 100 if subtotal > 0 else 0
+
+        grand_total = subtotal + shipping
+
+        # =========================
+        # CREATE ORDER
+        # =========================
+
+        order = Order.objects.create(
+
+            user=request.user,
+
+            total_price=grand_total,
+
+            status="Pending"
+
+        )
+
+        # =========================
+        # CREATE ORDER ITEMS
+        # =========================
+
+        for item in cart_items:
+
+            OrderItem.objects.create(
+
+                order=order,
+
+                product=item.product,
+
+                quantity=item.quantity,
+
+                price=item.product.price
+
+            )
+
+        # =========================
+        # CLEAR CART
+        # =========================
+
+        cart_items.delete()
+
+        messages.success(
+
+            request,
+
+            f"Order placed successfully using {payment_method}"
+
+        )
+
+        return redirect("my_orders")
     
 # ====================================== 
 # Dashboard Views 
@@ -345,37 +662,84 @@ class TypeListAPI(APIView):
 # ====================================
 # Product Create API View
 # ====================================
+from .models import Color, Size
+
 class ProductCreateAPI(APIView):
+
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request):
+
         try:
+
+            # ================= GET COLOR & SIZE =================
+
+            color_id = request.POST.get("color")
+
+            size_id = request.POST.get("size")
+
+            # OPTIONAL DEBUG
+            print("COLOR:", color_id)
+            print("SIZE:", size_id)
+
             serializer = ProductSerializer(data=request.data)
 
             if serializer.is_valid():
+
+                # ================= SAVE PRODUCT =================
+
                 product = serializer.save()
+
+                # ================= SAVE IMAGES =================
 
                 images = request.FILES.getlist('images')
 
-                print("FILES:", images)   #  DEBUG
+                print("FILES:", images)
 
                 for img in images:
-                    ProductImage.objects.create(product=product, image=img)
 
-                return Response({"message": "Product added"}, status=201)
+                    ProductImage.objects.create(
+                        product=product,
+                        image=img
+                    )
 
-            print(serializer.errors)  #  DEBUG
-            return Response(serializer.errors, status=400)
+                return Response(
+                    {"message": "Product added"},
+                    status=201
+                )
+
+            print(serializer.errors)
+
+            return Response(
+                serializer.errors,
+                status=400
+            )
 
         except Exception as e:
+
             print("ERROR:", str(e))
-            return Response({"error": str(e)}, status=500)
+
+            return Response(
+                {"error": str(e)},
+                status=500
+            )
 
 # ====================================
 # Add Product Page View
 # ====================================
-class AddProductPageView(TemplateView):
+class AddProductView(TemplateView):
+
     template_name = "dashboard/add_product.html"
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        context["colors"] = Color.objects.all()
+
+        context["sizes"] = Size.objects.all()
+
+        return context
     
 # ====================================
 # Category Create API View
@@ -551,109 +915,348 @@ class LogoutView(View):
         messages.success(request, "Logout Successfully")
         return JsonResponse({"status": "success"})
     
-# ==================================== 
-# Profile API View 
-# ==================================== 
+# ====================================
+# PROFILE API VIEW
+# ====================================
+
 class ProfileAPI(View):
 
     def get(self, request):
 
         if not request.user.is_authenticated:
-            return JsonResponse({"error": "Login required"}, status=401)
+
+            return JsonResponse({
+                "error": "Login required"
+            }, status=401)
 
         user = request.user
-        profile, created = Profile.objects.get_or_create(user=user)
+
+        profile, created = Profile.objects.get_or_create(
+            user=user
+        )
 
         return JsonResponse({
+
             "username": user.username,
+
             "email": user.email,
+
             "first_name": user.first_name,
+
             "last_name": user.last_name,
+
             "phone": profile.phone,
+
             "city": profile.city,
+
             "bio": profile.bio,
-            "image": profile.image.url if profile.image else ""
+
+            "image": (
+                profile.image.url
+                if profile.image
+                else ""
+            )
+
         })
 
-
     def post(self, request):
+
         return self.update_user(request)
 
     def put(self, request):
+
         return self.update_user(request)
 
     def update_user(self, request):
 
         if not request.user.is_authenticated:
-            return JsonResponse({"error": "Login required"}, status=401)
+
+            return JsonResponse({
+                "error": "Login required"
+            }, status=401)
 
         try:
+
             data = json.loads(request.body)
+
         except:
-            return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+            return JsonResponse({
+                "error": "Invalid JSON"
+            }, status=400)
 
         user = request.user
 
-        # USER fields
+        # USERNAME
+
         if "username" in data:
+
             if not data["username"]:
-                return JsonResponse({"username": ["Username required"]}, status=400)
+
+                return JsonResponse({
+
+                    "username": [
+                        "Username required"
+                    ]
+
+                }, status=400)
+
             user.username = data["username"]
 
+        # EMAIL
+
         if "email" in data:
-            if data["email"] and "@" not in data["email"]:
-                return JsonResponse({"email": ["Invalid email"]}, status=400)
+
+            if (
+                data["email"]
+                and "@"
+                not in data["email"]
+            ):
+
+                return JsonResponse({
+
+                    "email": [
+                        "Invalid email"
+                    ]
+
+                }, status=400)
+
             user.email = data["email"]
 
+        # FIRST NAME
+
         if "first_name" in data:
+
             user.first_name = data["first_name"]
 
+        # LAST NAME
+
         if "last_name" in data:
+
             user.last_name = data["last_name"]
 
         user.save()
 
-        profile, created = Profile.objects.get_or_create(user=user)
+        # PROFILE
+
+        profile, created = Profile.objects.get_or_create(
+            user=user
+        )
 
         if "phone" in data:
+
             profile.phone = data["phone"]
 
         if "city" in data:
+
             profile.city = data["city"]
 
         if "bio" in data:
+
             profile.bio = data["bio"]
 
         profile.save()
 
-        return JsonResponse({"status": "success"})
-    
+        return JsonResponse({
+            "status": "success"
+        })
+
+
 # ====================================
-# Profile Page View
+# PROFILE VIEW
 # ====================================
-class ProfilePageView(TemplateView):
+
+class ProfileView(
+    LoginRequiredMixin,
+    TemplateView
+):
+
     template_name = "profile.html"
-    
+
+    def get_context_data(
+        self,
+        **kwargs
+    ):
+
+        context = super().get_context_data(
+            **kwargs
+        )
+
+        # PROFILE
+
+        profile, created = Profile.objects.get_or_create(
+            user=self.request.user
+        )
+
+        context["profile"] = profile
+
+        # WISHLIST
+
+        context["wishlist_items"] = Wishlist.objects.filter(
+            user=self.request.user
+        ).select_related("product")
+
+        # CART
+
+        cart, created = Cart.objects.get_or_create(
+            user=self.request.user
+        )
+
+        context["cart_items"] = CartItem.objects.filter(
+            cart=cart
+        ).select_related("product")
+
+        # CART PRODUCT IDS
+
+        context["cart_product_ids"] = CartItem.objects.filter(
+            cart__user=self.request.user
+        ).values_list(
+            "product_id",
+            flat=True
+        )
+
+        # ORDERS
+
+        context["orders"] = Order.objects.filter(
+            user=self.request.user
+        ).order_by("-id")
+
+        # ADDRESS
+
+        context["addresses"] = Address.objects.filter(
+            user=self.request.user
+        ).order_by("-id")
+
+        return context
+
 # ====================================
-# Upload Image View
+# UPLOAD IMAGE VIEW
 # ====================================
+
 class UploadImageView(View):
+
     def post(self, request):
+
         if not request.user.is_authenticated:
-            return JsonResponse({"error": "Login required"}, status=403)
+
+            return JsonResponse({
+                "error": "Login required"
+            }, status=403)
 
         image = request.FILES.get("image")
 
         if not image:
-            return JsonResponse({"error": "No image"}, status=400)
 
-        profile, created = Profile.objects.get_or_create(user=request.user)
+            return JsonResponse({
+                "error": "No image"
+            }, status=400)
 
-        profile.image = image  
-        profile.save()         
+        profile, created = Profile.objects.get_or_create(
+            user=request.user
+        )
+
+        profile.image = image
+
+        profile.save()
 
         return JsonResponse({
+
+            "status": "success",
+
             "image": profile.image.url
+
+        })
+        
+# ====================================
+# ADD ADDRESS
+# ====================================
+
+class AddAddressView(LoginRequiredMixin, View):
+
+    def post(self, request):
+
+        full_name = request.POST.get("full_name", "").strip()
+        phone = request.POST.get("phone", "").strip()
+        address = request.POST.get("address", "").strip()
+        city = request.POST.get("city", "").strip()
+        state = request.POST.get("state", "").strip()
+        pincode = request.POST.get("pincode", "").strip()
+
+        if not full_name:
+            return JsonResponse({
+                "error": "Full name is required"
+            }, status=400)
+
+        if not phone:
+            return JsonResponse({
+                "error": "Phone number is required"
+            }, status=400)
+
+        if not phone.isdigit() or len(phone) != 10:
+            return JsonResponse({
+                "error": "Phone number must be 10 digits"
+            }, status=400)
+
+        if not address:
+            return JsonResponse({
+                "error": "Address is required"
+            }, status=400)
+
+        if not city:
+            return JsonResponse({
+                "error": "City is required"
+            }, status=400)
+
+        if not state:
+            return JsonResponse({
+                "error": "State is required"
+            }, status=400)
+
+        if not pincode:
+            return JsonResponse({
+                "error": "Pincode is required"
+            }, status=400)
+
+        if not pincode.isdigit() or len(pincode) != 6:
+            return JsonResponse({
+                "error": "Invalid pincode"
+            }, status=400)
+
+        Address.objects.create(
+            user=request.user,
+            full_name=full_name,
+            phone=phone,
+            address=address,
+            city=city,
+            state=state,
+            pincode=pincode
+        )
+
+        return JsonResponse({
+            "success": True,
+            "message": "Address added successfully"
+        })
+
+
+# ====================================
+# DELETE ADDRESS
+# ====================================
+
+class DeleteAddressView(LoginRequiredMixin, View):
+
+    def post(self, request, id):
+
+        address = get_object_or_404(
+            Address,
+            id=id,
+            user=request.user
+        )
+
+        address.delete()
+
+        return JsonResponse({
+            "success": True,
+            "message": "Address deleted successfully"
         })
         
 # ====================================
@@ -834,23 +1437,6 @@ class WishlistPageView(TemplateView):
             context["wishlist_count"] = 0
 
         return context
-    
-import json
-
-from django.views.generic import TemplateView
-from django.views import View
-
-from django.http import JsonResponse
-
-from django.shortcuts import get_object_or_404
-
-from django.contrib.auth.mixins import LoginRequiredMixin
-
-
-from .models import Cart
-from .models import CartItem
-from .models import Product
-
 
 # =========================================
 # CART PAGE
@@ -912,7 +1498,10 @@ class AddToCartView(LoginRequiredMixin, View):
             product=product
         ).first()
 
+        # =========================
         # REMOVE
+        # =========================
+
         if cart_item:
 
             cart_item.delete()
@@ -924,15 +1513,21 @@ class AddToCartView(LoginRequiredMixin, View):
             return JsonResponse({
 
                 "status": "removed",
+
                 "cart_count": cart_count
 
             })
 
+        # =========================
         # ADD
+        # =========================
+
         CartItem.objects.create(
 
             cart=cart,
+
             product=product,
+
             quantity=1
 
         )
@@ -944,6 +1539,7 @@ class AddToCartView(LoginRequiredMixin, View):
         return JsonResponse({
 
             "status": "added",
+
             "cart_count": cart_count
 
         })
@@ -951,55 +1547,79 @@ class AddToCartView(LoginRequiredMixin, View):
 # =========================================
 # UPDATE CART
 # =========================================
+class UpdateCartView(View):
 
-class UpdateCartView(LoginRequiredMixin, View):
+    def post(self, request, pk):
 
-    def post(self, request, cart_id):
+        try:
 
-        data = json.loads(request.body)
+            cart_item = get_object_or_404(
+                CartItem,
+                id=pk,
+                cart__user=request.user
+            )
 
-        action = data.get("action")
+            body = request.body.decode("utf-8")
 
-        cart_item = get_object_or_404(
+            data = json.loads(body)
 
-            CartItem,
+            action = data.get("action")
 
-            id=cart_id,
+            product_stock = int(cart_item.product.stock)
 
-            cart__user=request.user
+            # =====================
+            # INCREASE
+            # =====================
+            if action == "increase":
 
-        )
+                if cart_item.quantity < product_stock:
 
-        if action == "increase":
+                    cart_item.quantity += 1
 
-            cart_item.quantity += 1
+                    cart_item.save()
 
-            cart_item.save()
+                    return JsonResponse({
+                        "success": True
+                    })
 
-        elif action == "decrease":
+                else:
 
-            if cart_item.quantity > 1:
+                    return JsonResponse({
+                        "success": False,
+                        "message": "Stock limit reached"
+                    })
 
-                cart_item.quantity -= 1
+           # =====================
+            # DECREASE
+            # =====================
+            elif action == "decrease":
 
-                cart_item.save()
+                # minimum quantity 1
+                if cart_item.quantity > 1:
 
-            else:
+                    cart_item.quantity -= 1
 
-                cart_item.delete()
+                    cart_item.save()
 
+                    return JsonResponse({
+                        "success": True
+                    })
 
-                return JsonResponse({
+                else:
 
-                    "success": True
+                    return JsonResponse({
+                        "success": False,
+                        "message": "Minimum quantity is 1"
+                    })
 
-                })
+        except Exception as e:
 
-        return JsonResponse({
+            print("ERROR =>", e)
 
-            "success": True
-
-        })
+            return JsonResponse({
+                "success": False,
+                "message": str(e)
+            })
 
 
 # =========================================
@@ -1028,3 +1648,83 @@ class RemoveCartView(LoginRequiredMixin, View):
             "message": "Removed"
 
         })
+
+# ================= ADD COLOR =================
+class AddColorView(View):
+
+    def post(self, request):
+
+        data = json.loads(request.body)
+
+        color = Color.objects.create(
+            name=data.get("name")
+        )
+
+        return JsonResponse({
+            "id": color.id,
+            "name": color.name
+        })
+
+
+# ================= ADD SIZE =================
+class AddSizeView(View):
+
+    def post(self, request):
+
+        data = json.loads(request.body)
+
+        size = Size.objects.create(
+            name=data.get("name")
+        )
+
+        return JsonResponse({
+            "id": size.id,
+            "name": size.name
+        })
+
+
+# ================= ADD CATEGORY =================
+class AddCategoryView(View):
+
+    def post(self, request):
+
+        data = json.loads(request.body)
+
+        category = Category.objects.create(
+            name=data.get("name")
+        )
+
+        return JsonResponse({
+            "id": category.id,
+            "name": category.name
+        })
+
+
+# ================= ADD TYPE =================
+class AddTypeView(View):
+
+    def post(self, request):
+
+        data = json.loads(request.body)
+
+        type_obj = Type.objects.create(
+            name=data.get("name")
+        )
+
+        return JsonResponse({
+            "id": type_obj.id,
+            "name": type_obj.name
+        })
+        
+
+class OrderListView(LoginRequiredMixin, TemplateView):
+    template_name = 'order-list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['orders'] = Order.objects.filter(
+            user=self.request.user
+        ).prefetch_related('items__product').order_by('-id')
+
+        return context

@@ -19,19 +19,148 @@
             <small class="error-text" id="error-name"></small>
         </div>
 
-        <!-- CATEGORY -->
-        <div class="col-md-3">
-            <label>Category</label>
-            <select id="category" class="form-control"></select>
-            <small class="error-text" id="error-category"></small>
+        <!-- COLOR -->
+<!-- COLOR -->
+<div class="col-md-3 position-relative">
+
+    <label>Color</label>
+
+    <input type="text"
+           id="colorInput"
+           class="form-control"
+           placeholder="Search Color">
+
+    <input type="hidden" id="color">
+
+    <div id="colorResult" class="search-result-box">
+
+        {% for color in colors %}
+
+        <div class="search-item"
+             data-id="{{ color.id }}"
+             data-name="{{ color.name|lower }}">
+
+            {{ color.name }}
+
         </div>
 
-        <!-- TYPE -->
-        <div class="col-md-3">
-            <label>Type</label>
-            <select id="type" class="form-control"></select>
-            <small class="error-text" id="error-type"></small>
+        {% endfor %}
+
+        <!-- ADD NEW -->
+        <div class="search-add-more"
+             data-type="color">
+
+            + Add New Color
+
         </div>
+
+    </div>
+
+    <small class="error-text" id="error-color"></small>
+
+</div>
+
+
+
+<!-- SIZE -->
+<div class="col-md-3 position-relative">
+
+    <label>Size</label>
+
+    <input type="text"
+           id="sizeInput"
+           class="form-control"
+           placeholder="Search Size">
+
+    <input type="hidden" id="size">
+
+    <div id="sizeResult" class="search-result-box">
+
+        {% for size in sizes %}
+
+        <div class="search-item"
+             data-id="{{ size.id }}"
+             data-name="{{ size.name|lower }}">
+
+            {{ size.name }}
+
+        </div>
+
+        {% endfor %}
+
+        <!-- ADD NEW -->
+        <div class="search-add-more"
+             data-type="size">
+
+            + Add New Size
+
+        </div>
+
+    </div>
+
+    <small class="error-text" id="error-size"></small>
+
+</div>
+
+
+
+<!-- CATEGORY -->
+<div class="col-md-3 position-relative">
+
+    <label>Category</label>
+
+    <input type="text"
+           id="categoryInput"
+           class="form-control"
+           placeholder="Search Category">
+
+    <input type="hidden" id="category">
+
+    <div id="categoryResult" class="search-result-box">
+
+        <!-- JS DATA -->
+
+        <div class="search-add-more"
+             onclick="openAddModal('category')">
+
+            + Add More Category
+
+        </div>
+
+    </div>
+
+    <small class="error-text" id="error-category"></small>
+
+</div>
+
+
+
+<!-- TYPE -->
+<div class="col-md-3 position-relative">
+
+    <label>Type</label>
+
+    <input type="text"
+           id="typeInput"
+           class="form-control"
+           placeholder="Search Type">
+
+    <input type="hidden" id="type">
+
+    <div id="typeResult" class="search-result-box">
+
+        <div class="search-add-more"
+             onclick="openAddModal('type')">
+
+            + Add More Type
+
+        </div>
+
+    </div>
+
+    <small class="error-text" id="error-type"></small>
+
+</div>
 
         <!-- MRP -->
         <div class="col-md-6">
@@ -104,4 +233,432 @@
   </div>
 
 </div>
+<style>
+.search-result-box{
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-top: none;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 9999;
+    display: none;
+    border-radius: 0 0 8px 8px;
+}
+
+.search-item{
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.search-item:hover{
+    background: #f5f5f5;
+}
+
+.search-add-more{
+    padding: 12px;
+    background: #f8f9fa;
+    color: #0d6efd;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.search-add-more:hover{
+    background: #f1f1f1;
+}
+</style>
+<script>
+
+// ================= CSRF =================
+function getCSRFToken() {
+
+    let name = "csrftoken=";
+
+    let cookies = document.cookie.split(";");
+
+    for(let i = 0; i < cookies.length; i++){
+
+        let c = cookies[i].trim();
+
+        if(c.startsWith(name)){
+
+            return c.substring(name.length);
+
+        }
+
+    }
+
+    return "";
+
+}
+
+
+// ================= SHOW ERROR =================
+function showFieldError(inputId, message){
+
+    const errorBox = document.getElementById(`error-${inputId}`);
+
+    if(errorBox){
+
+        errorBox.innerText = message;
+
+    }
+
+}
+
+
+// ================= CLEAR ERROR =================
+function clearFieldError(inputId){
+
+    const errorBox = document.getElementById(`error-${inputId}`);
+
+    if(errorBox){
+
+        errorBox.innerText = "";
+
+    }
+
+}
+
+
+// ================= SEARCH =================
+function setupSearch(inputId, resultId, hiddenId){
+
+    const input = document.getElementById(inputId);
+
+    const resultBox = document.getElementById(resultId);
+
+    const hiddenInput = document.getElementById(hiddenId);
+
+    let selected = false;
+
+    // ================= SHOW ALL =================
+    input.addEventListener("focus", function(){
+
+        resultBox.style.display = "block";
+
+        const items = resultBox.querySelectorAll(".search-item");
+
+        items.forEach(item => {
+
+            item.style.display = "block";
+
+        });
+
+    });
+
+    // ================= SEARCH =================
+    input.addEventListener("input", function(){
+
+        const value = this.value.toLowerCase().trim();
+
+        const items = resultBox.querySelectorAll(".search-item");
+
+        resultBox.style.display = "block";
+
+        hiddenInput.value = "";
+
+        selected = false;
+
+        clearFieldError(hiddenId);
+
+        let found = false;
+
+        items.forEach(item => {
+
+            const name = item.dataset.name;
+
+            if(name.includes(value)){
+
+                item.style.display = "block";
+
+                found = true;
+
+            }else{
+
+                item.style.display = "none";
+
+            }
+
+        });
+
+    });
+
+    // ================= CLICK EVENT =================
+    resultBox.addEventListener("click", function(e){
+
+        // ================= SELECT ITEM =================
+        const item = e.target.closest(".search-item");
+
+        if(item){
+
+            input.value = item.innerText.trim();
+
+            hiddenInput.value = item.dataset.id;
+
+            selected = true;
+
+            clearFieldError(hiddenId);
+
+            resultBox.style.display = "none";
+
+            return;
+
+        }
+
+        // ================= ADD NEW =================
+        const addBtn = e.target.closest(".search-add-more");
+
+        if(addBtn){
+
+            const type = addBtn.dataset.type;
+
+            const value = input.value.trim();
+
+            // ERROR
+            if(!value){
+
+                showFieldError(
+                    hiddenId,
+                    `Please enter ${type} name`
+                );
+
+                return;
+
+            }
+
+            fetch(`/api/add-${type}/`, {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type": "application/json",
+
+                    "X-CSRFToken": getCSRFToken()
+
+                },
+
+                body: JSON.stringify({
+
+                    name: value
+
+                })
+
+            })
+
+            .then(res => res.json())
+
+            .then(data => {
+
+                // DUPLICATE ERROR
+                if(data.error){
+
+                    showFieldError(
+                        hiddenId,
+                        data.error
+                    );
+
+                    return;
+
+                }
+
+                // CREATE ITEM
+                const div = document.createElement("div");
+
+                div.className = "search-item";
+
+                div.setAttribute(
+                    "data-id",
+                    data.id
+                );
+
+                div.setAttribute(
+                    "data-name",
+                    data.name.toLowerCase()
+                );
+
+                div.innerText = data.name;
+
+                resultBox.insertBefore(
+                    div,
+                    addBtn
+                );
+
+                // AUTO SELECT
+                input.value = data.name;
+
+                hiddenInput.value = data.id;
+
+                selected = true;
+
+                clearFieldError(hiddenId);
+
+                resultBox.style.display = "none";
+
+            });
+
+        }
+
+    });
+
+    // ================= REQUIRED SELECT =================
+    input.addEventListener("blur", function(){
+
+        setTimeout(() => {
+
+            if(!selected){
+
+                input.value = "";
+
+                hiddenInput.value = "";
+
+            }
+
+        }, 200);
+
+    });
+
+    // ================= OUTSIDE CLICK =================
+    document.addEventListener("click", function(e){
+
+        if(
+            !resultBox.contains(e.target)
+            &&
+            e.target !== input
+        ){
+
+            resultBox.style.display = "none";
+
+        }
+
+    });
+
+}
+
+
+// ================= CATEGORY LOAD =================
+fetch('/api/categories/')
+.then(res => res.json())
+
+.then(data => {
+
+    const resultBox =
+        document.getElementById("categoryResult");
+
+    const addBtn = `
+        <div class="search-add-more"
+             data-type="category">
+
+            + Add New Category
+
+        </div>
+    `;
+
+    resultBox.innerHTML = "";
+
+    data.forEach(item => {
+
+        resultBox.innerHTML += `
+
+            <div class="search-item"
+                 data-id="${item.id}"
+                 data-name="${item.name.toLowerCase()}">
+
+                ${item.name}
+
+            </div>
+
+        `;
+
+    });
+
+    resultBox.innerHTML += addBtn;
+
+});
+
+
+// ================= TYPE LOAD =================
+document
+.getElementById("categoryResult")
+.addEventListener("click", function(e){
+
+    const item = e.target.closest(".search-item");
+
+    if(!item) return;
+
+    const categoryId = item.dataset.id;
+
+    fetch(`/api/types/${categoryId}/`)
+    .then(res => res.json())
+
+    .then(data => {
+
+        const typeResult =
+            document.getElementById("typeResult");
+
+        typeResult.innerHTML = "";
+
+        data.forEach(type => {
+
+            typeResult.innerHTML += `
+
+                <div class="search-item"
+                     data-id="${type.id}"
+                     data-name="${type.name.toLowerCase()}">
+
+                    ${type.name}
+
+                </div>
+
+            `;
+
+        });
+
+        typeResult.innerHTML += `
+
+            <div class="search-add-more"
+                 data-type="type">
+
+                + Add New Type
+
+            </div>
+
+        `;
+
+    });
+
+});
+
+
+// ================= INIT =================
+setupSearch(
+    "colorInput",
+    "colorResult",
+    "color"
+);
+
+setupSearch(
+    "sizeInput",
+    "sizeResult",
+    "size"
+);
+
+setupSearch(
+    "categoryInput",
+    "categoryResult",
+    "category"
+);
+
+setupSearch(
+    "typeInput",
+    "typeResult",
+    "type"
+);
+
+</script>
 {% endblock %}

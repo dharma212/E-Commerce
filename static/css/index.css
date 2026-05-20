@@ -177,3 +177,11 @@ MOBILE
         margin-bottom: 15px;
     }
 }
+
+.product-item{
+    transition:0.3s;
+}
+
+.product-item:hover{
+    transform:translateY(-5px);
+}

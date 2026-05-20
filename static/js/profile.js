@@ -1,338 +1,874 @@
-let currentField = null;
-let editTimer = null;
+/* =========================================
+TAB SYSTEM
+========================================= */
 
-/* ================= TOAST ================= */
-function showToast(msg, type = "success") {
-    const old = document.querySelector(".toast-box");
-    if (old) old.remove();
+function showTab(tabName, element){
 
-    const icons = {
-        success: '<i class="bi bi-check-circle-fill"></i>',
-        error: '<i class="bi bi-x-circle-fill"></i>',
-        warning: '<i class="bi bi-exclamation-triangle-fill"></i>'
-    };
+    document
+    .querySelectorAll(".tab-content-box")
+    .forEach(tab => {
 
-    const colors = {
-        success: "#2ecc71",
-        error: "#e74c3c",
-        warning: "#f39c12"
-    };
+        tab.classList.add("d-none");
 
-    const t = document.createElement("div");
-    t.className = "toast-box";
-
-    t.innerHTML = `
-        <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:18px">${icons[type]}</span>
-            <span>${msg}</span>
-        </div>
-    `;
-
-    Object.assign(t.style, {
-        position: "fixed",
-        top: "20px",
-        right: "20px",
-        background: colors[type],
-        color: "#fff",
-        padding: "12px 18px",
-        borderRadius: "10px",
-        boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
-        zIndex: "9999999",
-        fontSize: "14px",
-        animation: "slideIn 0.3s ease"
     });
 
-    document.body.appendChild(t);
+    const activeTab =
+        document.getElementById(
+            tabName + "Tab"
+        );
+
+    if(activeTab){
+
+        activeTab.classList.remove(
+            "d-none"
+        );
+
+    }
+
+    document
+    .querySelectorAll(".sidebar-link")
+    .forEach(btn => {
+
+        btn.classList.remove("active");
+
+    });
+
+    if(element){
+
+        element.classList.add("active");
+
+    }
+
+}
+
+/* =========================================
+TOAST
+========================================= */
+
+function showToast(
+    message,
+    type = "success"
+){
+
+    const oldToast =
+        document.querySelector(
+            ".custom-toast"
+        );
+
+    if(oldToast){
+
+        oldToast.remove();
+
+    }
+
+    const toast =
+        document.createElement("div");
+
+    toast.className =
+        "custom-toast";
+
+    toast.innerText =
+        message;
+
+    toast.style.position =
+        "fixed";
+
+    toast.style.top =
+        "20px";
+
+    toast.style.right =
+        "20px";
+
+    toast.style.padding =
+        "14px 20px";
+
+    toast.style.borderRadius =
+        "12px";
+
+    toast.style.color =
+        "#fff";
+
+    toast.style.fontWeight =
+        "600";
+
+    toast.style.zIndex =
+        "999999";
+
+    toast.style.background =
+        type === "error"
+        ? "#dc3545"
+        : "#28a745";
+
+    document.body.appendChild(
+        toast
+    );
 
     setTimeout(() => {
-        t.style.opacity = "0";
-        t.style.transform = "translateX(100%)";
-        t.style.transition = "0.3s";
-        setTimeout(() => t.remove(), 300);
+
+        toast.remove();
+
     }, 3000);
+
 }
 
-/* ================= CSRF ================= */
-function getCSRFToken() {
-    return document.cookie.split('; ')
-        .find(r => r.startsWith('csrftoken'))?.split('=')[1];
+/* =========================================
+CSRF TOKEN
+========================================= */
+
+function getCSRFToken(){
+
+    const token =
+        document.querySelector(
+            "[name=csrfmiddlewaretoken]"
+        );
+
+    return token
+        ? token.value
+        : "";
+
 }
 
-/* ================= LOAD USER ================= */
-async function loadUser() {
-    try {
-        const res = await fetch("/api/user-profile/", {
-            method: "GET",
-            credentials: "include"
-        });
+/* =========================================
+ENABLE EDIT
+========================================= */
 
-        if (!res.ok) throw new Error();
+function enableEdit(field){
 
-        const data = await res.json();
+    const input =
+        document.getElementById(field);
 
-        ["username","email","first_name","last_name","phone","city","bio"]
-        .forEach(f => {
-            const input = document.getElementById(f);
-            const text = document.getElementById(f + "Text");
+    const text =
+        document.getElementById(
+            field + "Text"
+        );
 
-            if (input) input.value = data[f] || "";
-            if (text) text.innerText = data[f] || "--";
-        });
-
-        if (data.image) {
-            profileImage.src = data.image;
-            profileImage.style.display = "block";
-            avatarText.style.display = "none";
-        }
-
-        updateName();
-        updateProgress();
-
-    } catch {
-        showToast("Failed to load profile", "error");
+    if(!input || !text){
+        return;
     }
-}
 
-/* ================= EDIT ================= */
-function enableEdit(id) {
-    if (currentField) return;
+    input.classList.remove(
+        "d-none"
+    );
 
-    currentField = id;
+    text.parentElement.classList.add(
+        "d-none"
+    );
 
-    const input = document.getElementById(id);
-    const text = document.getElementById(id + "Text");
+    input.value =
+        text.innerText.trim() === "--"
+        ? ""
+        : text.innerText.trim();
 
-    input.classList.remove("d-none");
-    text.parentElement.style.display = "none";
-
-    input.value = text.innerText === "--" ? "" : text.innerText;
     input.focus();
 
 }
 
-/* ================= SAVE ================= */
-async function saveField(id) {
-    const input = document.getElementById(id);
-    const errBox = document.getElementById(id + "Error");
+/* =========================================
+SAVE FIELD
+========================================= */
 
-    const fieldNames = {
-        username: "Username",
-        email: "Email",
-        first_name: "First name",
-        last_name: "Last name",
-        phone: "Phone number",
-        city: "City",
-        bio: "Bio"
-    };
+async function saveField(field){
 
-    const value = input.value.trim();
-    const label = fieldNames[id];
+    try{
 
-    if (!value) {
-        const msg = `${label} is required`;
-        errBox.innerText = msg;
-        input.classList.add("is-invalid");
-        showToast(msg, "warning");
-        return false;
-    }
+        const input =
+            document.getElementById(field);
 
-    if (id === "email" && !/^\S+@\S+\.\S+$/.test(value)) {
-        return error("Enter valid email");
-    }
-
-    if (id === "phone" && !/^[0-9]{10}$/.test(value)) {
-        return error("Phone must be 10 digits");
-    }
-
-    function error(msg){
-        errBox.innerText = msg;
-        input.classList.add("is-invalid");
-        showToast(msg, "warning");
-        return false;
-    }
-
-    errBox.innerText = "";
-    input.classList.remove("is-invalid");
-
-    try {
-        const res = await fetch("/api/user-profile/", {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": getCSRFToken()
-            },
-            body: JSON.stringify({ [id]: value })
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            const msg = data[id]?.[0] || "Update failed";
-            showToast(msg, "error");
-            return false;
+        if(!input){
+            return;
         }
 
-        showToast(`${label} updated successfully`, "success");
+        const value =
+            input.value
+            ? input.value.trim()
+            : "";
 
-        document.getElementById(id + "Text").innerText = value;
+        const errorBox =
+            document.getElementById(
+                field + "Error"
+            );
 
-        updateName();
-        updateProgress();
+        if(errorBox){
 
-        return true;
+            errorBox.innerText = "";
 
-    } catch {
-        showToast("Network error", "error");
-        return false;
+        }
+
+        if(!value){
+
+            if(errorBox){
+
+                errorBox.innerText =
+                    field + " is required";
+
+            }
+
+            showToast(
+                field + " is required",
+                "error"
+            );
+
+            return;
+
+        }
+
+        if(
+            field === "email" &&
+            !value.includes("@")
+        ){
+
+            if(errorBox){
+
+                errorBox.innerText =
+                    "Invalid email";
+
+            }
+
+            showToast(
+                "Invalid email",
+                "error"
+            );
+
+            return;
+
+        }
+
+        if(field === "phone"){
+
+            const regex =
+                /^[0-9]{10}$/;
+
+            if(!regex.test(value)){
+
+                if(errorBox){
+
+                    errorBox.innerText =
+                        "Phone must be 10 digits";
+
+                }
+
+                showToast(
+                    "Phone must be 10 digits",
+                    "error"
+                );
+
+                return;
+
+            }
+
+        }
+
+        const response =
+            await fetch(
+                "/api/user-profile/",
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":"application/json",
+                        "X-CSRFToken":
+                        getCSRFToken()
+                    },
+
+                    body:JSON.stringify({
+                        [field]:value
+                    })
+                }
+            );
+
+        if(!response.ok){
+
+            showToast(
+                "Update failed",
+                "error"
+            );
+
+            return;
+
+        }
+
+        const text =
+            document.getElementById(
+                field + "Text"
+            );
+
+        if(text){
+
+            text.innerText = value;
+
+            updateProfileProgress();
+
+            text.parentElement.classList.remove(
+                "d-none"
+            );
+
+        }
+
+        input.classList.add(
+            "d-none"
+        );
+
+        showToast(
+            field + " updated successfully"
+        );
+
+    }catch(error){
+
+        console.log(error);
+
+        showToast(
+            "Something went wrong",
+            "error"
+        );
+
     }
+
 }
 
-/* ================= CLICK OUTSIDE ================= */
-document.addEventListener("click", async (e) => {
-    if (!currentField) return;
+/* =========================================
+PROFILE AUTO SAVE
+========================================= */
 
-    const input = document.getElementById(currentField);
-    const text = document.getElementById(currentField + "Text");
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
 
-    if (!input || input.contains(e.target)) return;
+        const profileFields = [
 
-    const changed = input.value !== text.innerText;
+            "username",
+            "email",
+            "phone",
+            "city",
+            "bio"
 
-    if (changed) {
-        const ok = await saveField(currentField);
-        if (!ok) return;
+        ];
+
+        profileFields.forEach(field => {
+
+            const input =
+                document.getElementById(
+                    field
+                );
+
+            if(input){
+
+                input.addEventListener(
+                    "blur",
+                    function(){
+
+                        saveField(field);
+
+                    }
+                );
+
+            }
+
+        });
+
+    }
+);
+
+/* =========================================
+IMAGE UPLOAD
+========================================= */
+
+const profileImageInput =
+    document.getElementById(
+        "profileImageInput"
+    );
+
+if(profileImageInput){
+
+    profileImageInput.addEventListener(
+        "change",
+        async function(){
+
+            try{
+
+                const file =
+                    this.files[0];
+
+                if(!file){
+                    return;
+                }
+
+                const formData =
+                    new FormData();
+
+                formData.append(
+                    "image",
+                    file
+                );
+
+                const response =
+                    await fetch(
+                        "/api/upload-image/",
+                        {
+                            method:"POST",
+
+                            headers:{
+                                "X-CSRFToken":
+                                getCSRFToken()
+                            },
+
+                            body:formData
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if(response.ok){
+
+                    const preview1 =
+                        document.getElementById(
+                            "profilePreview"
+                        );
+
+                    const preview2 =
+                        document.getElementById(
+                            "modalPreviewImage"
+                        );
+
+                    if(preview1){
+
+                        preview1.src =
+                            data.image;
+
+                    }
+
+                    if(preview2){
+
+                        preview2.src =
+                            data.image;
+
+                    }
+
+                    updateProfileProgress();
+
+                    showToast(
+                        "Profile image updated"
+                    );
+
+                }
+                else{
+
+                    showToast(
+                        "Upload failed",
+                        "error"
+                    );
+
+                }
+
+            }catch(error){
+
+                console.log(error);
+
+                showToast(
+                    "Upload error",
+                    "error"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+/* =========================================
+ADDRESS FORM
+========================================= */
+
+const addressForm =
+    document.getElementById(
+        "addressForm"
+    );
+
+if(addressForm){
+
+    addressForm.addEventListener(
+        "submit",
+        async function(e){
+
+            e.preventDefault();
+
+            try{
+
+                const formData =
+                    new FormData(this);
+
+                const response =
+                    await fetch(
+                        "/address/add/",
+                        {
+                            method:"POST",
+
+                            headers:{
+                                "X-CSRFToken":
+                                getCSRFToken()
+                            },
+
+                            body:formData
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if(response.ok){
+
+                    showToast(
+                        data.message
+                    );
+
+                    setTimeout(() => {
+
+                        location.reload();
+
+                    }, 1000);
+
+                }
+                else{
+
+                    showToast(
+                        data.error ||
+                        "Address failed",
+                        "error"
+                    );
+
+                }
+
+            }catch(error){
+
+                console.log(error);
+
+                showToast(
+                    "Something went wrong",
+                    "error"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+/* =========================================
+DELETE ADDRESS
+========================================= */
+
+async function deleteAddress(id){
+
+    try{
+
+        const response =
+            await fetch(
+                `/address/delete/${id}/`,
+                {
+                    method:"POST",
+
+                    headers:{
+                        "X-CSRFToken":
+                        getCSRFToken()
+                    }
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if(response.ok){
+
+            showToast(
+                data.message
+            );
+
+            setTimeout(() => {
+
+                location.reload();
+
+            }, 1000);
+
+        }
+        else{
+
+            showToast(
+                data.error,
+                "error"
+            );
+
+        }
+
+    }catch(error){
+
+        console.log(error);
+
+        showToast(
+            "Delete failed",
+            "error"
+        );
+
     }
 
-    disableEdit();
-});
+}
 
-/* ================= ENTER KEY ================= */
-document.addEventListener("keydown", async (e) => {
-    if (e.key === "Enter" && currentField) {
-        e.preventDefault();
+/* =========================================
+REMOVE CART ITEM
+========================================= */
 
-        const ok = await saveField(currentField);
-        if (!ok) return;
+document.addEventListener(
+    "click",
+    async function(e){
 
-        disableEdit();
+        const button =
+            e.target.closest(
+                ".remove-cart-btn"
+            );
+
+        if(!button){
+            return;
+        }
+
+        const cartId =
+            button.dataset.cartId;
+
+        if(!cartId){
+
+            showToast(
+                "Cart ID missing",
+                "error"
+            );
+
+            return;
+
+        }
+
+        try{
+
+            const response =
+                await fetch(
+                    `/cart/remove/${cartId}/`,
+                    {
+                        method:"POST",
+
+                        headers:{
+                            "X-CSRFToken":
+                            getCSRFToken(),
+
+                            "X-Requested-With":
+                            "XMLHttpRequest"
+                        }
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if(response.ok){
+
+                showToast(
+                    data.message ||
+                    "Item removed"
+                );
+
+                setTimeout(() => {
+
+                    location.reload();
+
+                }, 800);
+
+            }
+            else{
+
+                showToast(
+                    data.error ||
+                    "Remove failed",
+                    "error"
+                );
+
+            }
+
+        }catch(error){
+
+            console.log(error);
+
+            showToast(
+                "Something went wrong",
+                "error"
+            );
+
+        }
+
     }
-});
+);
 
-/* ================= DISABLE ================= */
-function disableEdit() {
-    const input = document.getElementById(currentField);
-    const text = document.getElementById(currentField + "Text");
+/* =========================================
+PROFILE COMPLETION
+========================================= */
 
-    input.classList.add("d-none");
-    text.parentElement.style.display = "block";
+function updateProfileProgress(){
 
-    clearTimeout(editTimer);
-    currentField = null;
-}
+    const fields = [
 
-/* ================= NAME ================= */
-function updateName() {
-    const name = (first_name.value + " " + last_name.value).trim();
-    displayName.innerText = name || "Your Name";
-    avatarText.innerText = displayName.innerText.charAt(0).toUpperCase();
-}
+        document.getElementById(
+            "usernameText"
+        ),
 
-/* ================= PROGRESS ================= */
-function updateProgress() {
-    const fields = ["username","email","first_name","last_name","phone","city","bio"];
+        document.getElementById(
+            "emailText"
+        ),
 
-    const filled = fields.filter(f =>
-        document.getElementById(f).value.trim()
-    ).length;
+        document.getElementById(
+            "phoneText"
+        ),
 
-    const percent = Math.floor((filled / fields.length) * 100);
+        document.getElementById(
+            "cityText"
+        ),
 
-    progressBar.style.width = percent + "%";
-    progressText.innerText = percent + "%";
-}
+        document.getElementById(
+            "bioText"
+        ),
 
-/* ================= IMAGE ================= */
-function openImageModal() {
-    const modal = document.getElementById("imageModal");
-    const popupImage = document.getElementById("popupImage");
+        document.getElementById(
+            "profilePreview"
+        )
 
-    modal.style.display = "flex";
+    ];
 
-    if (profileImage && profileImage.src && profileImage.style.display !== "none") {
-        popupImage.src = profileImage.src;
-    } else {
-        popupImage.src = "/static/img/download.jpg";
-    }
-}
+    let filled = 0;
 
-function closeImageModal() {
-    document.getElementById("imageModal").style.display = "none";
-}
+    fields.forEach(field => {
 
-async function uploadImage() {
-    const input = document.getElementById("imageInput");
-    const file = input.files[0];
+        if(!field){
+            return;
+        }
 
-    if (!file) {
-        showToast("Select image", "warning");
-        return;
-    }
+        if(field.tagName === "IMG"){
 
-    const form = new FormData();
-    form.append("image", file);
+            if(
+                field.src &&
+                !field.src.includes(
+                    "default-user.png"
+                )
+            ){
 
-    const res = await fetch("/api/upload-image/", {
-        method: "POST",
-        credentials: "include",
-        headers: { "X-CSRFToken": getCSRFToken() },
-        body: form
+                filled++;
+
+            }
+
+        }
+        else{
+
+            const value =
+                field.innerText.trim();
+
+            if(
+                value !== "" &&
+                value !== "--"
+            ){
+
+                filled++;
+
+            }
+
+        }
+
     });
 
-    const data = await res.json();
+    const percent =
+        Math.round(
+            (filled / fields.length) * 100
+        );
 
-    if (res.ok) {
-        profileImage.src = data.image;
-        profileImage.style.display = "block";
-        avatarText.style.display = "none";
+    const progressBar =
+        document.getElementById(
+            "profileProgressBar"
+        );
 
-        // ✅ reset input (IMPORTANT)
-        input.value = "";
+    const progressText =
+        document.querySelector(
+            ".progress-text"
+        );
 
-        showToast("Image updated successfully");
-        closeImageModal();
-    } else {
-        showToast("Upload failed", "error");
+    if(progressBar){
+
+        progressBar.style.width =
+            percent + "%";
+
     }
+
+    if(progressText){
+
+        progressText.innerText =
+            percent +
+            "% Profile Completed";
+
+    }
+
 }
 
-/* ================= INIT ================= */
-document.addEventListener("DOMContentLoaded", () => {
-    window.profileImage = document.getElementById("profileImage");
-    window.avatarText = document.getElementById("avatarText");
-    window.displayName = document.getElementById("displayName");
-    window.progressBar = document.getElementById("progressBar");
-    window.progressText = document.getElementById("progressText");
-    window.first_name = document.getElementById("first_name");
-    window.last_name = document.getElementById("last_name");
+/* =========================================
+OPEN IMAGE MODAL
+========================================= */
 
-    // image preview
-    const imageInput = document.getElementById("imageInput");
-const popupImage = document.getElementById("popupImage");
+function openImageModal(){
 
-imageInput.addEventListener("change", function () {
-    const file = this.files[0];
+    document
+    .getElementById(
+        "imageModal"
+    )
+    .classList.add("active");
 
-    if (file) {
-        const previewURL = URL.createObjectURL(file);
+}
 
-        popupImage.src = previewURL;
-        popupImage.style.display = "block";
+/* =========================================
+CLOSE IMAGE MODAL
+========================================= */
 
-        // Optional: free memory
-        popupImage.onload = () => URL.revokeObjectURL(previewURL);
+function closeImageModal(){
+
+    document
+    .getElementById(
+        "imageModal"
+    )
+    .classList.remove("active");
+
+}
+
+/* =========================================
+CLOSE MODAL OUTSIDE CLICK
+========================================= */
+
+window.addEventListener(
+    "click",
+    function(e){
+
+        const modal =
+            document.getElementById(
+                "imageModal"
+            );
+
+        if(e.target === modal){
+
+            closeImageModal();
+
+        }
+
     }
-});
+);
 
-    loadUser();
-});
+/* =========================================
+PAGE LOAD
+========================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+        updateProfileProgress();
+
+    }
+);

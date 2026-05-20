@@ -1,430 +1,964 @@
 {% extends "base.html" %}
-{% block content %}
 {% load static %}
-    <!-- Breadcrumb Start -->
-    <div class="container-fluid">
-        <div class="row px-xl-5">
-            <div class="col-12">
-                <nav class="breadcrumb bg-light mb-30">
-                    <a class="breadcrumb-item text-dark" href="#">Home</a>
-                    <a class="breadcrumb-item text-dark" href="#">Shop</a>
-                    <span class="breadcrumb-item active">Shop List</span>
+{% block content %}
+
+<input type="hidden"
+       name="csrfmiddlewaretoken"
+       value="{{ csrf_token }}">
+
+<!-- BREADCRUMB -->
+<div class="container-fluid">
+    <div class="row px-xl-5">
+        <div class="col-12">
+
+            <nav class="breadcrumb bg-light mb-4">
+
+                <a class="breadcrumb-item text-dark" href="/">
+                    Home
+                </a>
+
+                <span class="breadcrumb-item active">
+                    Shop
+                </span>
+
+            </nav>
+
+        </div>
+    </div>
+</div>
+
+
+
+<!-- SHOP -->
+<div class="container-fluid">
+
+    <div class="row px-xl-5">
+
+        <!-- SIDEBAR -->
+        <div class="col-lg-3 col-md-4">
+
+            <div class="card mb-4">
+
+                <div class="card-body">
+
+                    <form method="GET" id="filterForm">
+
+                        <!-- CATEGORY -->
+                        <h5 class="mb-3">
+                            Categories
+                        </h5>
+
+                        {% for c in categories %}
+
+                        <div class="custom-control custom-radio mb-2">
+
+                            <input
+                                type="radio"
+                                class="custom-control-input filter-input"
+                                id="category{{ c.id }}"
+                                name="category"
+                                value="{{ c.id }}"
+                                {% if request.GET.category == c.id|stringformat:"s" %}
+                                checked
+                                {% endif %}
+                            >
+
+                            <label
+                                class="custom-control-label"
+                                for="category{{ c.id }}"
+                            >
+                                {{ c.name }}
+                            </label>
+
+                        </div>
+
+                        {% endfor %}
+
+                        <hr>
+
+
+
+                        <!-- TYPE -->
+                        <h5 class="mb-3">
+                            Product Type
+                        </h5>
+
+                        {% for t in types %}
+
+                        <div class="custom-control custom-radio mb-2">
+
+                            <input
+                                type="radio"
+                                class="custom-control-input filter-input"
+                                id="type{{ t.id }}"
+                                name="type"
+                                value="{{ t.id }}"
+                                {% if request.GET.type == t.id|stringformat:"s" %}
+                                checked
+                                {% endif %}
+                            >
+
+                            <label
+                                class="custom-control-label"
+                                for="type{{ t.id }}"
+                            >
+                                {{ t.name }}
+                            </label>
+
+                        </div>
+
+                        {% endfor %}
+
+                        <hr>
+
+
+
+                        <!-- COLOR -->
+                        {% if colors %}
+
+                        <h5 class="mb-3">
+                            Colors
+                        </h5>
+
+                        {% for color in colors %}
+
+                        <div class="custom-control custom-radio mb-2">
+
+                            <input
+                                type="radio"
+                                class="custom-control-input filter-input"
+                                id="color{{ color.id }}"
+                                name="color"
+                                value="{{ color.id }}"
+                                {% if request.GET.color == color.id|stringformat:"s" %}
+                                checked
+                                {% endif %}
+                            >
+
+                            <label
+                                class="custom-control-label"
+                                for="color{{ color.id }}"
+                            >
+                                {{ color.name }}
+                            </label>
+
+                        </div>
+
+                        {% endfor %}
+
+                        <hr>
+
+                        {% endif %}
+
+
+
+                        <!-- SIZE -->
+                        {% if sizes %}
+
+                        <h5 class="mb-3">
+                            Sizes
+                        </h5>
+
+                        {% for size in sizes %}
+
+                        <div class="custom-control custom-radio mb-2">
+
+                            <input
+                                type="radio"
+                                class="custom-control-input filter-input"
+                                id="size{{ size.id }}"
+                                name="size"
+                                value="{{ size.id }}"
+                                {% if request.GET.size == size.id|stringformat:"s" %}
+                                checked
+                                {% endif %}
+                            >
+
+                            <label
+                                class="custom-control-label"
+                                for="size{{ size.id }}"
+                            >
+                                {{ size.name }}
+                            </label>
+
+                        </div>
+
+                        {% endfor %}
+
+                        <hr>
+
+                        {% endif %}
+
+
+
+                        <!-- PRICE -->
+                        <h5 class="mb-3">
+                            Price
+                        </h5>
+
+                        <div class="mb-4">
+
+                            <div class="d-flex justify-content-between mb-2">
+
+                                <span>
+                                    ₹<span id="minPriceText">0</span>
+                                </span>
+
+                                <span>
+                                    ₹<span id="maxPriceText">100000</span>
+                                </span>
+
+                            </div>
+
+                            <!-- MIN -->
+                            <input
+                                type="range"
+                                id="minPrice"
+                                name="min"
+                                min="0"
+                                max="100000"
+                                step="100"
+                                value="{{ request.GET.min|default:'0' }}"
+                            >
+
+                            <input
+                                type="range"
+                                id="maxPrice"
+                                name="max"
+                                min="0"
+                                max="100000"
+                                step="100"
+                                value="{{ request.GET.max|default:'100000' }}"
+                            >
+
+                        </div>
+
+                        <hr>
+
+
+
+                        <!-- SORT -->
+                        <h5 class="mb-3">
+                            Sort By
+                        </h5>
+
+                        <select
+                            name="sort"
+                            class="form-control filter-input"
+                        >
+
+                            <option value="">
+                                Select
+                            </option>
+
+                            <option
+                                value="low"
+                                {% if request.GET.sort == "low" %}
+                                selected
+                                {% endif %}
+                            >
+                                Price Low To High
+                            </option>
+
+                            <option
+                                value="high"
+                                {% if request.GET.sort == "high" %}
+                                selected
+                                {% endif %}
+                            >
+                                Price High To Low
+                            </option>
+
+                        </select>
+
+
+
+                        <!-- RESET -->
+                        <a
+                            href="{% url 'shop' %}"
+                            class="btn btn-dark btn-block mt-4"
+                        >
+                            Reset Filters
+                        </a>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+        <!-- END SIDEBAR -->
+
+
+
+        <!-- PRODUCTS -->
+        <div class="col-lg-9 col-md-8">
+
+            <!-- TOP -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <h5 class="mb-0">
+
+                    Total Products :
+                    {{ page_obj.paginator.count }}
+
+                </h5>
+
+            </div>
+
+
+
+            <!-- PRODUCTS GRID -->
+            <div class="row">
+
+                {% for product in products %}
+
+                <div class="col-lg-4 col-md-6 col-sm-6 pb-4">
+
+                    <div class="product-item bg-light mb-4 h-100">
+
+                        <!-- IMAGE -->
+                        <div class="product-img position-relative overflow-hidden">
+
+                            <a href="{% url 'product_detail' product.id %}">
+
+                                {% if product.images.first %}
+
+                                <img class="img-fluid w-100"
+                                     src="{{ product.images.first.image.url }}"
+                                     alt="{{ product.name }}">
+
+                                {% else %}
+
+                                <img class="img-fluid w-100"
+                                     src="{% static 'img/default.jpg' %}"
+                                     alt="">
+
+                                {% endif %}
+
+                            </a>
+
+
+
+                            <!-- DISCOUNT -->
+                            {% if product.discount > 0 %}
+
+                            <div style="
+                                position:absolute;
+                                top:10px;
+                                left:10px;
+                                background:#28a745;
+                                color:#fff;
+                                padding:4px 10px;
+                                border-radius:5px;
+                                font-size:12px;
+                                font-weight:600;
+                            ">
+
+                                {{ product.discount_percent }}% OFF
+
+                            </div>
+
+                            {% endif %}
+
+
+
+                            <!-- ACTION -->
+                            <div class="product-action">
+
+                                <!-- CART -->
+                                <a
+                                    href="javascript:void(0)"
+                                    class="btn btn-square add-to-cart
+
+                                    {% if product.id in cart_product_ids %}
+                                        btn-warning active-cart-btn
+                                    {% else %}
+                                        btn-outline-dark
+                                    {% endif %}
+                                    "
+
+                                    data-id="{{ product.id }}"
+                                >
+
+                                    <i class="fa fa-shopping-cart"></i>
+
+                                </a>
+
+
+
+                                <!-- WISHLIST -->
+                                <a
+                                    href="javascript:void(0)"
+                                    class="btn btn-square wishlist-btn
+
+                                    {% if product.id in wishlist_product_ids %}
+                                        btn-danger active
+                                    {% else %}
+                                        btn-outline-dark
+                                    {% endif %}
+                                    "
+
+                                    data-product-id="{{ product.id }}"
+                                >
+
+                                    <i class="{% if product.id in wishlist_product_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+
+                                </a>
+
+
+
+                                <!-- DETAIL -->
+                                <a
+                                    class="btn btn-outline-dark btn-square"
+                                    href="{% url 'product_detail' product.id %}"
+                                >
+
+                                    <i class="fa fa-search"></i>
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- CONTENT -->
+                        <div class="text-center py-4 px-3">
+
+                            <!-- NAME -->
+                            <a
+                                class="h6 text-decoration-none text-truncate d-block"
+                                href="{% url 'product_detail' product.id %}"
+                            >
+
+                                {{ product.name }}
+
+                            </a>
+
+
+
+                            <!-- PRICE -->
+                            <div class="d-flex align-items-center justify-content-center mt-2">
+
+                                <h5>
+
+                                    ₹{% if product.discount > 0 %}
+                                        {{ product.final_price }}
+                                    {% else %}
+                                        {{ product.price }}
+                                    {% endif %}
+
+                                </h5>
+
+                                {% if product.discount > 0 %}
+
+                                <h6 class="text-muted ml-2">
+
+                                    <del>₹{{ product.mrp }}</del>
+
+                                </h6>
+
+                                {% endif %}
+
+                            </div>
+
+
+
+                            <!-- COLOR SIZE -->
+                            <div class="mt-2">
+
+                                {% if product.color %}
+
+                                <span class="badge badge-dark px-3 py-2">
+
+                                    {{ product.color.name }}
+
+                                </span>
+
+                                {% endif %}
+
+
+
+                                {% if product.size %}
+
+                                <span class="badge badge-light border px-3 py-2">
+
+                                    {{ product.size.name }}
+
+                                </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+
+                            <!-- RATING -->
+                            <div class="d-flex align-items-center justify-content-center mt-3">
+
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+
+                                <small class="ml-1">(99)</small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {% empty %}
+
+                <div class="col-12">
+
+                    <div class="bg-light text-center p-5">
+
+                        <h4>
+                            No Products Found
+                        </h4>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+
+
+            <!-- PAGINATION -->
+            {% if page_obj.has_other_pages %}
+
+            <div class="col-12 mt-4">
+
+                <nav>
+
+                    <ul class="pagination justify-content-center">
+
+                        <!-- PREVIOUS -->
+                        {% if page_obj.has_previous %}
+
+                        <li class="page-item">
+
+                            <a class="page-link"
+                               href="?page={{ page_obj.previous_page_number }}">
+
+                                Previous
+
+                            </a>
+
+                        </li>
+
+                        {% endif %}
+
+
+
+                        <!-- PAGE -->
+                        {% for num in page_obj.paginator.page_range %}
+
+                        <li class="page-item
+
+                            {% if page_obj.number == num %}
+                            active
+                            {% endif %}
+                        ">
+
+                            <a class="page-link"
+                               href="?page={{ num }}">
+
+                                {{ num }}
+
+                            </a>
+
+                        </li>
+
+                        {% endfor %}
+
+
+
+                        <!-- NEXT -->
+                        {% if page_obj.has_next %}
+
+                        <li class="page-item">
+
+                            <a class="page-link"
+                               href="?page={{ page_obj.next_page_number }}">
+
+                                Next
+
+                            </a>
+
+                        </li>
+
+                        {% endif %}
+
+                    </ul>
+
                 </nav>
+
             </div>
+
+            {% endif %}
+
         </div>
+        <!-- END PRODUCTS -->
+
     </div>
-    <!-- Breadcrumb End -->
+
+</div>
 
 
-    <!-- Shop Start -->
-    <div class="container-fluid">
-        <div class="row px-xl-5">
-            <!-- Shop Sidebar Start -->
-            <div class="col-lg-3 col-md-4">
-                <!-- Price Start -->
-                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Filter by price</span></h5>
-                <div class="bg-light p-4 mb-30">
-                    <form>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" checked id="price-all">
-                            <label class="custom-control-label" for="price-all">All Price</label>
-                            <span class="badge border font-weight-normal">1000</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="price-1">
-                            <label class="custom-control-label" for="price-1">$0 - $100</label>
-                            <span class="badge border font-weight-normal">150</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="price-2">
-                            <label class="custom-control-label" for="price-2">$100 - $200</label>
-                            <span class="badge border font-weight-normal">295</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="price-3">
-                            <label class="custom-control-label" for="price-3">$200 - $300</label>
-                            <span class="badge border font-weight-normal">246</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="price-4">
-                            <label class="custom-control-label" for="price-4">$300 - $400</label>
-                            <span class="badge border font-weight-normal">145</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between">
-                            <input type="checkbox" class="custom-control-input" id="price-5">
-                            <label class="custom-control-label" for="price-5">$400 - $500</label>
-                            <span class="badge border font-weight-normal">168</span>
-                        </div>
-                    </form>
-                </div>
-                <!-- Price End -->
 
-                <!-- Color Start -->
-                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Filter by color</span></h5>
-                <div class="bg-light p-4 mb-30">
-                    <form>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" checked id="color-all">
-                            <label class="custom-control-label" for="price-all">All Color</label>
-                            <span class="badge border font-weight-normal">1000</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="color-1">
-                            <label class="custom-control-label" for="color-1">Black</label>
-                            <span class="badge border font-weight-normal">150</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="color-2">
-                            <label class="custom-control-label" for="color-2">White</label>
-                            <span class="badge border font-weight-normal">295</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="color-3">
-                            <label class="custom-control-label" for="color-3">Red</label>
-                            <span class="badge border font-weight-normal">246</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="color-4">
-                            <label class="custom-control-label" for="color-4">Blue</label>
-                            <span class="badge border font-weight-normal">145</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between">
-                            <input type="checkbox" class="custom-control-input" id="color-5">
-                            <label class="custom-control-label" for="color-5">Green</label>
-                            <span class="badge border font-weight-normal">168</span>
-                        </div>
-                    </form>
-                </div>
-                <!-- Color End -->
+<script>
 
-                <!-- Size Start -->
-                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Filter by size</span></h5>
-                <div class="bg-light p-4 mb-30">
-                    <form>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" checked id="size-all">
-                            <label class="custom-control-label" for="size-all">All Size</label>
-                            <span class="badge border font-weight-normal">1000</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="size-1">
-                            <label class="custom-control-label" for="size-1">XS</label>
-                            <span class="badge border font-weight-normal">150</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="size-2">
-                            <label class="custom-control-label" for="size-2">S</label>
-                            <span class="badge border font-weight-normal">295</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="size-3">
-                            <label class="custom-control-label" for="size-3">M</label>
-                            <span class="badge border font-weight-normal">246</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="size-4">
-                            <label class="custom-control-label" for="size-4">L</label>
-                            <span class="badge border font-weight-normal">145</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between">
-                            <input type="checkbox" class="custom-control-input" id="size-5">
-                            <label class="custom-control-label" for="size-5">XL</label>
-                            <span class="badge border font-weight-normal">168</span>
-                        </div>
-                    </form>
-                </div>
-                <!-- Size End -->
-            </div>
-            <!-- Shop Sidebar End -->
+function getCSRFToken() {
+
+    return document.querySelector(
+        '[name=csrfmiddlewaretoken]'
+    ).value;
+
+}
 
 
-            <!-- Shop Product Start -->
-            <div class="col-lg-9 col-md-8">
-                <div class="row pb-3">
-                    <div class="col-12 pb-1">
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                            <div>
-                                <button class="btn btn-sm btn-light"><i class="fa fa-th-large"></i></button>
-                                <button class="btn btn-sm btn-light ml-2"><i class="fa fa-bars"></i></button>
-                            </div>
-                            <div class="ml-2">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">Sorting</button>
-                                    <div class="dropdown-menu dropdown-menu-right">
-                                        <a class="dropdown-item" href="#">Latest</a>
-                                        <a class="dropdown-item" href="#">Popularity</a>
-                                        <a class="dropdown-item" href="#">Best Rating</a>
-                                    </div>
-                                </div>
-                                <div class="btn-group ml-2">
-                                    <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">Showing</button>
-                                    <div class="dropdown-menu dropdown-menu-right">
-                                        <a class="dropdown-item" href="#">10</a>
-                                        <a class="dropdown-item" href="#">20</a>
-                                        <a class="dropdown-item" href="#">30</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
-                        <div class="product-item bg-light mb-4">
-                            <div class="product-img position-relative overflow-hidden">
-                                <img class="img-fluid w-100" src="{% static 'img/product-1.jpg' %}" alt="">
-                                <div class="product-action">
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                                </div>
-                            </div>
-                            <div class="text-center py-4">
-                                <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                                <div class="d-flex align-items-center justify-content-center mt-2">
-                                    <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center mb-1">
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small>(99)</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
-                        <div class="product-item bg-light mb-4">
-                            <div class="product-img position-relative overflow-hidden">
-                                <img class="img-fluid w-100" src="{% static 'img/product-2.jpg' %}" alt="">
-                                <div class="product-action">
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                                </div>
-                            </div>
-                            <div class="text-center py-4">
-                                <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                                <div class="d-flex align-items-center justify-content-center mt-2">
-                                    <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center mb-1">
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star-half-alt text-primary mr-1"></small>
-                                    <small>(99)</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
-                        <div class="product-item bg-light mb-4">
-                            <div class="product-img position-relative overflow-hidden">
-                                <img class="img-fluid w-100" src="{% static 'img/product-3.jpg' %}" alt="">
-                                <div class="product-action">
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                                </div>
-                            </div>
-                            <div class="text-center py-4">
-                                <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                                <div class="d-flex align-items-center justify-content-center mt-2">
-                                    <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center mb-1">
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star-half-alt text-primary mr-1"></small>
-                                    <small class="far fa-star text-primary mr-1"></small>
-                                    <small>(99)</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
-                        <div class="product-item bg-light mb-4">
-                            <div class="product-img position-relative overflow-hidden">
-                                <img class="img-fluid w-100" src="{% static 'img/product-4.jpg' %}" alt="">
-                                <div class="product-action">
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                                </div>
-                            </div>
-                            <div class="text-center py-4">
-                                <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                                <div class="d-flex align-items-center justify-content-center mt-2">
-                                    <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center mb-1">
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="far fa-star text-primary mr-1"></small>
-                                    <small class="far fa-star text-primary mr-1"></small>
-                                    <small>(99)</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
-                        <div class="product-item bg-light mb-4">
-                            <div class="product-img position-relative overflow-hidden">
-                                <img class="img-fluid w-100" src="{% static 'img/product-5.jpg' %}" alt="">
-                                <div class="product-action">
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                                </div>
-                            </div>
-                            <div class="text-center py-4">
-                                <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                                <div class="d-flex align-items-center justify-content-center mt-2">
-                                    <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center mb-1">
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small>(99)</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
-                        <div class="product-item bg-light mb-4">
-                            <div class="product-img position-relative overflow-hidden">
-                                <img class="img-fluid w-100" src="{% static 'img/product-6.jpg' %}" alt="">
-                                <div class="product-action">
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                                </div>
-                            </div>
-                            <div class="text-center py-4">
-                                <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                                <div class="d-flex align-items-center justify-content-center mt-2">
-                                    <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center mb-1">
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star-half-alt text-primary mr-1"></small>
-                                    <small>(99)</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
-                        <div class="product-item bg-light mb-4">
-                            <div class="product-img position-relative overflow-hidden">
-                                <img class="img-fluid w-100" src="{% static 'img/product-7.jpg' %}" alt="">
-                                <div class="product-action">
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                                </div>
-                            </div>
-                            <div class="text-center py-4">
-                                <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                                <div class="d-flex align-items-center justify-content-center mt-2">
-                                    <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center mb-1">
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star-half-alt text-primary mr-1"></small>
-                                    <small class="far fa-star text-primary mr-1"></small>
-                                    <small>(99)</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
-                        <div class="product-item bg-light mb-4">
-                            <div class="product-img position-relative overflow-hidden">
-                                <img class="img-fluid w-100" src="{% static 'img/product-8.jpg' %}" alt="">
-                                <div class="product-action">
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                                </div>
-                            </div>
-                            <div class="text-center py-4">
-                                <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                                <div class="d-flex align-items-center justify-content-center mt-2">
-                                    <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center mb-1">
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="far fa-star text-primary mr-1"></small>
-                                    <small class="far fa-star text-primary mr-1"></small>
-                                    <small>(99)</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
-                        <div class="product-item bg-light mb-4">
-                            <div class="product-img position-relative overflow-hidden">
-                                <img class="img-fluid w-100" src="{% static 'img/product-9.jpg' %}" alt="">
-                                <div class="product-action">
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                                </div>
-                            </div>
-                            <div class="text-center py-4">
-                                <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                                <div class="d-flex align-items-center justify-content-center mt-2">
-                                    <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center mb-1">
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="fa fa-star text-primary mr-1"></small>
-                                    <small class="far fa-star text-primary mr-1"></small>
-                                    <small class="far fa-star text-primary mr-1"></small>
-                                    <small>(99)</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <nav>
-                          <ul class="pagination justify-content-center">
-                            <li class="page-item disabled"><a class="page-link" href="#">Previous</span></a></li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                          </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-            <!-- Shop Product End -->
-        </div>
-    </div>
-    <!-- Shop End -->
+
+// =====================================
+// PRICE ELEMENTS
+// =====================================
+
+const minPrice =
+document.getElementById("minPrice");
+
+const maxPrice =
+document.getElementById("maxPrice");
+
+const minPriceText =
+document.getElementById("minPriceText");
+
+const maxPriceText =
+document.getElementById("maxPriceText");
+
+
+
+function updatePriceText() {
+
+    minPriceText.innerText =
+    minPrice.value;
+
+    maxPriceText.innerText =
+    maxPrice.value;
+
+}
+
+updatePriceText();
+
+
+
+// =====================================
+// AJAX FILTER
+// =====================================
+
+const filterForm =
+document.getElementById("filterForm");
+
+const productsContainer =
+document.querySelector(".col-lg-9.col-md-8");
+
+let filterTimeout;
+
+
+
+function loadProducts() {
+
+    productsContainer.classList.add(
+        "products-loading"
+    );
+
+    const formData =
+    new FormData(filterForm);
+
+    const params =
+    new URLSearchParams(formData);
+
+    fetch(
+        window.location.pathname + "?" + params.toString(),
+        {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        }
+    )
+
+    .then(response => response.text())
+
+    .then(data => {
+
+        const parser =
+        new DOMParser();
+
+        const html =
+        parser.parseFromString(
+            data,
+            "text/html"
+        );
+
+        const newProducts =
+        html.querySelector(
+            ".col-lg-9.col-md-8"
+        );
+
+        productsContainer.innerHTML =
+        newProducts.innerHTML;
+
+        productsContainer.classList.remove(
+            "products-loading"
+        );
+
+        productsContainer.classList.add(
+            "products-show"
+        );
+
+        setTimeout(() => {
+
+            productsContainer.classList.remove(
+                "products-show"
+            );
+
+        }, 400);
+
+
+        bindWishlistButtons();
+
+
+
+        // URL UPDATE
+        window.history.pushState(
+            {},
+            "",
+            "?" + params.toString()
+        );
+
+    });
+
+}
+
+
+
+// =====================================
+// FILTER CHANGE
+// =====================================
+
+document.querySelectorAll(
+    ".filter-input"
+).forEach(input => {
+
+    input.addEventListener(
+        "change",
+        function () {
+
+            loadProducts();
+
+        }
+    );
+
+});
+
+
+
+// =====================================
+// PRICE FILTER
+// =====================================
+
+minPrice.addEventListener(
+    "input",
+    function(){
+
+        if(
+            parseInt(minPrice.value)
+            >
+            parseInt(maxPrice.value)
+        ){
+
+            minPrice.value =
+            maxPrice.value;
+
+        }
+
+        updatePriceText();
+
+        clearTimeout(filterTimeout);
+
+        filterTimeout = setTimeout(() => {
+
+            loadProducts();
+
+        }, 500);
+
+    }
+);
+
+
+
+maxPrice.addEventListener(
+    "input",
+    function(){
+
+        if(
+            parseInt(maxPrice.value)
+            <
+            parseInt(minPrice.value)
+        ){
+
+            maxPrice.value =
+            minPrice.value;
+
+        }
+
+        updatePriceText();
+
+        clearTimeout(filterTimeout);
+
+        filterTimeout = setTimeout(() => {
+
+            loadProducts();
+
+        }, 500);
+
+    }
+);
+
+// =====================================
+// WISHLIST BUTTON
+// =====================================
+
+function bindWishlistButtons() {
+
+    document.querySelectorAll(
+        ".wishlist-btn"
+    ).forEach(button => {
+
+        button.onclick = function () {
+
+            const btn = this;
+
+            const productId =
+            btn.dataset.productId;
+
+            fetch(`/wishlist-toggle/${productId}/`, {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                    "application/json",
+
+                    "X-CSRFToken":
+                    getCSRFToken()
+
+                }
+
+            })
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                const icon =
+                btn.querySelector("i");
+
+                if(data.status === "added"){
+
+                    btn.classList.remove(
+                        "btn-outline-dark"
+                    );
+
+                    btn.classList.add(
+                        "btn-danger"
+                    );
+
+                    icon.classList.remove(
+                        "far"
+                    );
+
+                    icon.classList.add(
+                        "fas"
+                    );
+
+                }
+
+                else{
+
+                    btn.classList.remove(
+                        "btn-danger"
+                    );
+
+                    btn.classList.add(
+                        "btn-outline-dark"
+                    );
+
+                    icon.classList.remove(
+                        "fas"
+                    );
+
+                    icon.classList.add(
+                        "far"
+                    );
+
+                }
+
+            });
+
+        };
+
+    });
+
+}
+
+
+
+// =====================================
+// INITIAL LOAD
+// =====================================
+
+
+bindWishlistButtons();
+
+</script>
+<style>
+
+.products-loading{
+    opacity:0.4;
+    pointer-events:none;
+    transition:0.3s;
+    transform:scale(0.98);
+}
+
+.products-show{
+    animation:fadeProducts 0.4s ease;
+}
+
+@keyframes fadeProducts{
+
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0px);
+    }
+
+}
+
+</style>
 {% endblock content %}

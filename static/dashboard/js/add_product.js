@@ -257,6 +257,8 @@ fetch('/api/categories/')
         let category = document.getElementById('category').value;
         let type = document.getElementById('type').value;
         let price = document.getElementById('price').value;
+        let color = document.getElementById('color').value;
+        let size = document.getElementById('size').value;
         let stock = document.getElementById('stock').value;
         let description = document.getElementById('description').value;
         let imageInput = document.getElementById('imageInput').value;
@@ -279,6 +281,15 @@ fetch('/api/categories/')
 
         if (!type) {
             showError("type", "Please select type");
+            isValid = false;
+        }
+        if (!color) {
+            showError("color", "Please select color");
+            isValid = false;
+        }
+
+        if (!size) {
+            showError("size", "Please select size");
             isValid = false;
         }
 
@@ -330,6 +341,8 @@ fetch('/api/categories/')
         formData.append('name', name);
         formData.append('category', category);
         formData.append('type', type);
+        formData.append('color', color);
+        formData.append('size', size);
         formData.append('price', price);
         formData.append('stock', stock);
         formData.append('description', description);

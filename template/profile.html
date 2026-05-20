@@ -1,141 +1,729 @@
 {% extends "base.html" %}
-{% block content %}
 {% load static %}
-<div class="container" style="margin-top:100px;max-width:700px;">
+{% block content %}
+<div class="container-fluid profile-page">
 
-    <div class="card p-4 profile-card">
+    <div class="container">
 
-        <!-- HEADER -->
-        <div class="profile-header mb-3">
-
-            <div class="avatar-wrapper">
-
-                <div class="profile-avatar" onclick="openImageModal()">
-                    <img id="profileImage" style="display:none;">
-                    <span id="avatarText">U</span>
-                </div>
-
-                <span class="edit-btn" onclick="openImageModal()">
-                    <i class="bi bi-camera-fill"></i>
-                </span>
-
-            </div>
-
-            <div>
-                <h4 id="displayName">Your Name</h4>
-                <small style="font-weight:600; color:#000;">Double click to edit</small>
-            </div>
-
-        </div>
-
-        <!-- PROGRESS -->
-        <div class="profile-progress">
-            <div class="progress-track">
-                <div id="progressBar" class="progress-fill"></div>
-            </div>
-            <div id="progressText" class="progress-text">0%</div>
-        </div>
-
-        <!-- FORM -->
         <div class="row">
 
-        <!-- USERNAME -->
-        <div class="col-md-6 mb-3">
-        <label>Username</label>
-        <div class="display-field" ondblclick="enableEdit('username')">
-        <span id="usernameText">--</span>
-        </div>
-        <input id="username" class="form-control d-none">
-        <small id="usernameError" class="text-danger"></small>
-        </div>
+            <!-- SIDEBAR -->
 
-        <!-- EMAIL -->
-        <div class="col-md-6 mb-3">
-        <label>Email</label>
-        <div class="display-field" ondblclick="enableEdit('email')">
-        <span id="emailText">--</span>
-        </div>
-        <input id="email" class="form-control d-none">
-        <small id="emailError" class="text-danger"></small>
-        </div>
+            <div class="col-lg-3">
 
-        <!-- FIRST NAME -->
-        <div class="col-md-6 mb-3">
-        <label>First Name</label>
-        <div class="display-field" ondblclick="enableEdit('first_name')">
-        <span id="first_nameText">--</span>
-        </div>
-        <input id="first_name" class="form-control d-none">
-        <small id="first_nameError" class="text-danger"></small>
-        </div>
+                <div class="profile-sidebar">
 
-        <!-- LAST NAME -->
-        <div class="col-md-6 mb-3">
-        <label>Last Name</label>
-        <div class="display-field" ondblclick="enableEdit('last_name')">
-        <span id="last_nameText">--</span>
-        </div>
-        <input id="last_name" class="form-control d-none">
-        <small id="last_nameError" class="text-danger"></small>
-        </div>
+                    <div class="profile-user">
 
-        <!-- PHONE -->
-        <div class="col-md-6 mb-3">
-        <label>Phone</label>
-        <div class="display-field" ondblclick="enableEdit('phone')">
-        <span id="phoneText">--</span>
-        </div>
-        <input id="phone" class="form-control d-none">
-        <small id="phoneError" class="text-danger"></small>
-        </div>
+                        <!-- AVATAR -->
+                        <div class="avatar-wrapper">
 
-        <!-- CITY -->
-        <div class="col-md-6 mb-3">
-        <label>City</label>
-        <div class="display-field" ondblclick="enableEdit('city')">
-        <span id="cityText">--</span>
-        </div>
-        <input id="city" class="form-control d-none">
-        <small id="cityError" class="text-danger"></small>
-        </div>
+                            <div
+                                class="profile-avatar"
+                                onclick="openImageModal()"
+                            >
 
-        <!-- BIO -->
-        <div class="col-12 mb-3">
-        <label>Bio</label>
-        <div class="display-field" ondblclick="enableEdit('bio')">
-        <span id="bioText">--</span>
-        </div>
-        <input id="bio" class="form-control d-none">
-        <small id="bioError" class="text-danger"></small>
-        </div>
+                                {% if profile.image %}
+                                    <img
+                                        id="profilePreview"
+                                        src="{{ profile.image.url }}"
+                                    >
+                                {% else %}
+                                    <img
+                                        id="profilePreview"
+                                        src="{% static 'img/default-user.png' %}"
+                                    >
+                                {% endif %}
+
+                            </div>
+
+                            <button
+                                class="edit-avatar-btn"
+                                onclick="openImageModal()"
+                                type="button"
+                            >
+
+                                <i class="fa fa-camera"></i>
+
+                            </button>
+
+                            <input
+                                type="file"
+                                id="profileImageInput"
+                                hidden
+                            >
+
+                        </div>
+                        
+                        <h4>
+                            {{ request.user.username }}
+                        </h4>
+
+                        <p>
+                            {{ request.user.email }}
+                        </p>
+                        <!-- PROFILE PROGRESS -->
+
+                        <div class="profile-progress">
+
+                            <div class="progress-track">
+
+                                <div class="progress-fill" id="profileProgressBar"></div>
+
+                            </div>
+
+                            <div class="progress-text">
+
+                                0% Profile Completed
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="sidebar-menu">
+
+                        <button class="sidebar-link active" onclick="showTab('profile',this)">
+
+                            <div class="sidebar-icon">
+                                <i class="fa fa-user"></i>
+                            </div>
+
+                            Profile
+
+                        </button>
+
+                        <button class="sidebar-link" onclick="showTab('wishlist',this)">
+
+                            <div class="sidebar-icon">
+                                <i class="fa fa-heart"></i>
+                            </div>
+
+                            Wishlist
+
+                        </button>
+
+                        <button class="sidebar-link" onclick="showTab('cart',this)">
+
+                            <div class="sidebar-icon">
+                                <i class="fa fa-shopping-cart"></i>
+                            </div>
+
+                            Cart
+
+                        </button>
+                        <button class="sidebar-link" onclick="showTab('address',this)">
+
+                            <div class="sidebar-icon">
+                                <i class="fa fa-map-marker-alt"></i>
+                            </div>
+
+                            Address
+
+                        </button>
+
+                        <button class="sidebar-link" onclick="showTab('orders',this)">
+
+                            <div class="sidebar-icon">
+                                <i class="fa fa-box"></i>
+                            </div>
+
+                            Orders
+
+                        </button>
+
+                        <form action="{% url 'logout' %}" method="POST">
+
+                            {% csrf_token %}
+
+                            <button type="submit" class="sidebar-link logout-btn border-0">
+
+                                <div class="sidebar-icon">
+                                    <i class="fa fa-sign-out-alt"></i>
+                                </div>
+
+                                Logout
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- CONTENT -->
+
+            <div class="col-lg-9">
+
+                <!-- PROFILE TAB -->
+
+                <div id="profileTab" class="tab-content-box">
+
+                    <div class="profile-card">
+
+                        <div class="profile-top">
+
+                            <h3>
+                                My Profile
+                            </h3>
+
+                            <div class="edit-profile-info">
+
+                                <i class="fa fa-info-circle"></i>
+
+                                Double click on any field to edit profile
+
+                            </div>
+
+                        </div>
+
+                        <div class="profile-info-grid">
+
+                            <div class="info-box">
+
+                                <label>Username</label>
+
+                                <div class="display-field" ondblclick="enableEdit('username')">
+
+                                    <span id="usernameText">
+
+                                        {{ request.user.username }}
+
+                                    </span>
+
+                                </div>
+
+                                <input type="text" id="username" class="form-control d-none">
+
+                                <div class="text-danger mt-1" id="usernameError"></div>
+
+                            </div>
+
+                            <div class="info-box">
+
+                                <label>Email</label>
+
+                                <div class="display-field" ondblclick="enableEdit('email')">
+
+                                    <span id="emailText">
+
+                                        {{ request.user.email }}
+
+                                    </span>
+
+                                </div>
+
+                                <input type="email" id="email" class="form-control d-none">
+
+                                <div class="text-danger mt-1" id="emailError"></div>
+
+                            </div>
+
+                            <div class="info-box">
+
+                                <label>Phone</label>
+
+                                <div class="display-field" ondblclick="enableEdit('phone')">
+
+                                    <span id="phoneText">
+
+                                        {{ profile.phone|default:"--" }}
+
+                                    </span>
+
+                                </div>
+
+                                <input type="text" id="phone" class="form-control d-none">
+
+                                <div class="text-danger mt-1" id="phoneError"></div>
+
+                            </div>
+
+                            <div class="info-box">
+
+                                <label>City</label>
+
+                                <div class="display-field" ondblclick="enableEdit('city')">
+
+                                    <span id="cityText">
+
+                                        {{ profile.city|default:"--" }}
+
+                                    </span>
+
+                                </div>
+
+                                <input type="text" id="city" class="form-control d-none">
+
+                                <div class="text-danger mt-1" id="cityError"></div>
+
+                            </div>
+
+                            <div class="info-box">
+
+                                <label>Bio</label>
+
+                                <div class="display-field" ondblclick="enableEdit('bio')">
+
+                                    <span id="bioText">
+
+                                        {{ profile.bio|default:"--" }}
+
+                                    </span>
+
+                                </div>
+
+                                <textarea id="bio" class="form-control d-none"></textarea>
+
+                                <div class="text-danger mt-1" id="bioError"></div>
+
+                            </div>
+
+                            <div class="info-box">
+
+                                <label>Joined Date</label>
+
+                                <div class="display-field">
+                                    {{ request.user.date_joined|date:"d M Y" }}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- WISHLIST -->
+
+                <div id="wishlistTab" class="tab-content-box d-none">
+
+                    <div class="profile-card">
+
+                        <h3 class="mb-4">
+                            My Wishlist
+                        </h3>
+
+                        {% if wishlist_items %}
+
+                        {% for item in wishlist_items %}
+
+                        <div class="product-item">
+
+                            <div class="product-image">
+
+                                {% if item.product.images.first %}
+                                <img src="{{ item.product.images.first.image.url }}">
+                                {% else %}
+                                <img src="{% static 'img/no-image.png' %}">
+                                {% endif %}
+
+                            </div>
+
+                            <div class="product-content">
+
+                                <h5>
+                                    {{ item.product.name }}
+                                </h5>
+
+                                <p>
+                                    {{ item.product.category.name }}
+                                </p>
+
+                                <div class="product-price">
+                                    ₹{{ item.product.final_price }}
+                                </div>
+
+                            </div>
+
+                            <div class="product-actions">
+
+                                    <button class="theme-btn cart-btn add-to-cart"
+    data-id="{{ item.product.id }}">
+
+    <i class="fa fa-shopping-cart"></i>
+
+</button>
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                        {% else %}
+
+                        <div class="empty-box">
+
+                            <img src="{% static 'img/empty-wishlist.png' %}">
+
+                            <h4>
+                                Wishlist Empty
+                            </h4>
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <!-- CART -->
+
+                <div id="cartTab" class="tab-content-box d-none">
+
+                    <div class="profile-card">
+
+                        <h3 class="mb-4">
+                            My Cart
+                        </h3>
+
+                        {% if cart_items %}
+
+                        {% for item in cart_items %}
+
+                        <div class="product-item">
+
+                            <div class="product-image">
+
+                                {% if item.product.images.first %}
+                                <img src="{{ item.product.images.first.image.url }}">
+                                {% else %}
+                                <img src="{% static 'img/no-image.png' %}">
+                                {% endif %}
+
+                            </div>
+
+                            <div class="product-content">
+
+                                <h5>
+                                    {{ item.product.name }}
+                                </h5>
+
+                                <p>
+                                    Quantity : {{ item.quantity }}
+                                </p>
+
+                                <div class="product-price">
+                                    ₹{{ item.total_price }}
+                                </div>
+
+                            </div>
+
+                            <div class="product-actions">
+
+                                <button class="theme-btn remove-btn remove-cart-btn" data-cart-id="{{ item.id }}">
+
+                                    Remove
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                        {% else %}
+
+                        <div class="empty-box">
+
+                            <img src="{% static 'img/empty-cart.png' %}">
+
+                            <h4>
+                                Cart Empty
+                            </h4>
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+                <!-- ADDRESS TAB -->
+
+                <div id="addressTab" class="tab-content-box d-none">
+
+                    <div class="profile-card">
+
+                        <div class="d-flex
+                    justify-content-between
+                    align-items-center
+                    mb-4">
+
+                            <h3 class="mb-0">
+                                My Address
+                            </h3>
+
+                            <button class="theme-btn cart-btn" data-toggle="modal" data-target="#addressModal">
+
+                                Add Address
+
+                            </button>
+
+                        </div>
+
+                        {% if addresses %}
+
+                        {% for address in addresses %}
+
+                        <div class="order-box">
+
+                            <div>
+
+                                <h5>
+                                    {{ address.full_name }}
+                                </h5>
+
+                                <p class="mb-1">
+                                    {{ address.phone }}
+                                </p>
+
+                                <p class="mb-1">
+                                    {{ address.address }}
+                                </p>
+
+                                <p class="mb-0">
+
+                                    {{ address.city }},
+                                    {{ address.state }}
+                                    -
+                                    {{ address.pincode }}
+
+                                </p>
+
+                            </div>
+
+                            <button onclick="deleteAddress('{{ address.id }}')" class="btn btn-dark">
+
+                                Delete
+
+                            </button>
+
+                        </div>
+
+                        {% endfor %}
+
+                        {% else %}
+
+                        <div class="empty-box">
+
+                            <h4>
+                                No Address Added
+                            </h4>
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+                <!-- ORDERS -->
+
+                <div id="ordersTab" class="tab-content-box d-none">
+
+                    <div class="profile-card">
+
+                        <h3 class="mb-4">
+                            My Orders
+                        </h3>
+
+                        {% if orders %}
+
+                        {% for order in orders %}
+
+                        <div class="order-box">
+
+                            <div class="order-left">
+
+                                <h5>
+                                    Order #{{ order.id }}
+                                </h5>
+
+                                <p class="mb-2 text-muted">
+                                    {{ order.created_at|date:"d M Y" }}
+                                </p>
+
+                                <strong>
+                                    ₹{{ order.total_price }}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                {% if order.status == "Delivered" %}
+
+                                <span class="order-status status-delivered">
+                                    Delivered
+                                </span>
+
+                                {% elif order.status == "Cancelled" %}
+
+                                <span class="order-status status-cancelled">
+                                    Cancelled
+                                </span>
+
+                                {% else %}
+
+                                <span class="order-status status-pending">
+                                    Pending
+                                </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                        {% else %}
+
+                        <div class="empty-box">
+
+                            <img src="{% static 'img/no-order.png' %}">
+
+                            <h4>
+                                No Orders Yet
+                            </h4>
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
     </div>
-</div>
 
+</div>
+<div class="modal fade" id="addressModal">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5>
+                    Add Address
+                </h5>
+
+                <button type="button" class="close" data-dismiss="modal">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <form id="addressForm">
+
+                    {% csrf_token %}
+
+                    <input type="text" name="full_name" class="form-control mb-3" placeholder="Full Name"
+                        value="{{ request.user.username }}" required>
+
+                    <input type="text" name="phone" class="form-control mb-3" placeholder="Phone"
+                        value="{{ profile.phone }}" required>
+
+                    <textarea name="address" class="form-control mb-3" placeholder="Address" required></textarea>
+
+                    <input type="text" name="city" class="form-control mb-3" placeholder="City"
+                        value="{{ profile.city }}" required>
+
+                    <input type="text" name="state" class="form-control mb-3" placeholder="State" required>
+
+                    <input type="text" name="pincode" class="form-control mb-3" placeholder="Pincode" required>
+
+                    <button type="submit" class="theme-btn cart-btn w-100">
+
+                        Save Address
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 <!-- IMAGE MODAL -->
-<div id="imageModal" class="image-modal">
+<div class="image-modal" id="imageModal">
+
     <div class="image-modal-content">
 
+        <!-- HEADER -->
         <div class="modal-header-custom">
-            <h5>Update Profile Photo</h5>
-            <span onclick="closeImageModal()">✖</span>
+
+            <h5 class="mb-0">
+                Profile Image
+            </h5>
+
+            <span
+                class="close-image-modal"
+                onclick="closeImageModal()"
+            >
+                <i class="fa fa-times"></i>
+            </span>
+
         </div>
 
-        <div class="image-preview-box">
-            <img id="popupImage" src="{% static 'img/download.jpg' %}">
+        <!-- IMAGE PREVIEW -->
+        <div class="image-preview-box mt-4">
+
+            {% if profile.image %}
+                <img
+                    id="modalPreviewImage"
+                    src="{{ profile.image.url }}"
+                >
+            {% else %}
+                <img
+                    id="modalPreviewImage"
+                    src="{% static 'img/default-user.png' %}"
+                >
+            {% endif %}
+
         </div>
 
-        <label class="upload-box">
-            <input type="file" id="imageInput" hidden>
-            <span>Select Image</span>
-        </label>
+        <!-- BUTTONS -->
+        <div class="image-modal-buttons">
 
-        <button class="btn btn-primary w-100 mt-3" onclick="uploadImage()">
-            Upload
-        </button>
+            <button
+                class="theme-btn remove-btn"
+                onclick="closeImageModal()"
+            >
+                Back
+            </button>
+
+            <button
+                class="theme-btn cart-btn"
+                onclick="document.getElementById('profileImageInput').click()"
+            >
+                Select Image
+            </button>
+
+        </div>
 
     </div>
+
 </div>
 {% endblock %}

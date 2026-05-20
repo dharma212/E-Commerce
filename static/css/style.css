@@ -3354,6 +3354,7 @@ input[type="button"].btn-block {
   width: 1%;
   min-width: 0;
   margin-bottom: 0;
+  border-radius: 0;
 }
 
 .input-group > .form-control + .form-control,

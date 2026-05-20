@@ -1,145 +1,150 @@
-{% extends "base.html" %}
-{% load static %}
-{% block content %}
+    {% extends "base.html" %}
+    {% load static %}
+    {% block content %}
 
-<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-<!-- PAGE TITLE -->
-<div class="container-fluid pt-5 pb-3">
-    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
-        <span class="bg-secondary pr-3">
-            My Wishlist ({{ wishlist_count }})
-        </span>
-    </h2>
-</div>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <!-- PAGE TITLE -->
+    <div class="container-fluid pt-5 pb-3">
+        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
+            <span class="bg-secondary pr-3">
+                My Wishlist ({{ wishlist_count }})
+            </span>
+        </h2>
+    </div>
 
-<!-- WISHLIST PRODUCTS -->
-<div class="container-fluid pb-5">
-    <div class="row px-xl-5">
-        {% if wishlist_items %}
-            {% for item in wishlist_items %}
-            <div class="col-lg-3 col-md-4 col-sm-6 pb-1 wishlist-card-{{ item.id }}">
-                <div class="product-item bg-light mb-4">
-                    <!-- IMAGE -->
-                    <div class="product-img position-relative overflow-hidden">
-                        <!-- PRODUCT IMAGE -->
-                        <a href="{% url 'product_detail' item.id %}">
-                            {% if item.image %}
-                                <img class="img-fluid w-100" src="{{ item.image }}" alt="{{ item.name }}">
-                            {% else %}
-                                <img class="img-fluid w-100" src="{% static 'img/default.jpg' %}" alt="">
-                            {% endif %}
-                        </a>
-
-                        <!-- DISCOUNT BADGE -->
-                        {% if item.discount > 0 %}
-                        <div class="discount-badge">
-                            {{ item.discount_percent }}% OFF
-                        </div>
-                        {% endif %}
-
-                        <!-- ACTION BUTTONS -->
-                        <div class="product-action">
-                            <a href="javascript:void(0)"
-                            class="btn btn-outline-dark btn-square cart-btn {% if item.in_cart %}active-cart{% endif %}"
-                            data-product-id="{{ item.id }}">
-
-                                <i class="fa fa-shopping-cart"></i>
-
-                            </a>
-                            <!-- REMOVE -->
-                            <a class="btn btn-outline-dark btn-square remove-wishlist-btn" data-product-id="{{ item.id }}">
-                                <i class="fas fa-heart"></i>
+    <!-- WISHLIST PRODUCTS -->
+    <div class="container-fluid pb-5">
+        <div class="row px-xl-5">
+            {% if wishlist_items %}
+                {% for item in wishlist_items %}
+                <div class="col-lg-3 col-md-4 col-sm-6 pb-1 wishlist-card-{{ item.id }}">
+                    <div class="product-item bg-light mb-4">
+                        <!-- IMAGE -->
+                        <div class="product-img position-relative overflow-hidden">
+                            <!-- PRODUCT IMAGE -->
+                            <a href="{% url 'product_detail' item.id %}">
+                                {% if item.image %}
+                                    <img class="img-fluid w-100" src="{{ item.image }}" alt="{{ item.name }}">
+                                {% else %}
+                                    <img class="img-fluid w-100" src="{% static 'img/default.jpg' %}" alt="">
+                                {% endif %}
                             </a>
 
-                            <!-- DETAIL -->
-                            <a class="btn btn-outline-dark btn-square"
-                               href="{% url 'product_detail' item.id %}">
-                                <i class="fa fa-search"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- CONTENT -->
-                    <div class="text-center py-4">
-                        <!-- PRODUCT NAME -->
-                        <a class="h6 text-decoration-none product-name" href="{% url 'product_detail' item.id %}">
-                            {{ item.name }}
-                        </a>
-
-                        <!-- PRICE -->
-                        <div class="d-flex align-items-center justify-content-center mt-2">
-                            <!-- FINAL PRICE -->
-                            <h5>
-                                ₹{{ item.final_price }}
-                            </h5>
-                            <!-- OLD PRICE -->
+                            <!-- DISCOUNT BADGE -->
                             {% if item.discount > 0 %}
-                            <h6 class="text-muted ml-2">
-                                <del>₹{{ item.price }}</del>
-                            </h6>
+                            <div class="discount-badge">
+                                {{ item.discount_percent }}% OFF
+                            </div>
                             {% endif %}
+
+                            <!-- ACTION BUTTONS -->
+                            <div class="product-action">
+                                <a href="javascript:void(0)"
+   class="btn btn-square add-to-cart cart-btn
+   {% if item.in_cart %}btn-warning active-cart{% else %}btn-outline-dark{% endif %}"
+   data-id="{{ item.id }}">
+
+    {% if item.in_cart %}
+        <i class="fa fa-check"></i>
+    {% else %}
+        <i class="fa fa-shopping-cart"></i>
+    {% endif %}
+
+</a>
+                                <!-- REMOVE -->
+                                <a class="btn btn-outline-dark btn-square remove-wishlist-btn" data-product-id="{{ item.id }}">
+                                    <i class="fas fa-heart"></i>
+                                </a>
+
+                                <!-- DETAIL -->
+                                <a class="btn btn-outline-dark btn-square"
+                                href="{% url 'product_detail' item.id %}">
+                                    <i class="fa fa-search"></i>
+                                </a>
+                            </div>
                         </div>
 
-                        <!-- OFF TEXT -->
-                        {% if item.discount > 0 %}
-                        <div class="text-success font-weight-bold small">
-                            {{ item.discount_percent }}% OFF
-                        </div>
-                        {% endif %}
-                        <!-- STATIC RATING -->
-                        <div class="d-flex align-items-center justify-content-center mb-1 mt-2">
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small>(99)</small>
+                        <!-- CONTENT -->
+                        <div class="text-center py-4">
+                            <!-- PRODUCT NAME -->
+                            <a class="h6 text-decoration-none product-name" href="{% url 'product_detail' item.id %}">
+                                {{ item.name }}
+                            </a>
+
+                            <!-- PRICE -->
+                            <div class="d-flex align-items-center justify-content-center mt-2">
+                                <!-- FINAL PRICE -->
+                                <h5>
+                                    ₹{{ item.final_price }}
+                                </h5>
+                                <!-- OLD PRICE -->
+                                {% if item.discount > 0 %}
+                                <h6 class="text-muted ml-2">
+                                    <del>₹{{ item.price }}</del>
+                                </h6>
+                                {% endif %}
+                            </div>
+
+                            <!-- OFF TEXT -->
+                            {% if item.discount > 0 %}
+                            <div class="text-success font-weight-bold small">
+                                {{ item.discount_percent }}% OFF
+                            </div>
+                            {% endif %}
+                            <!-- STATIC RATING -->
+                            <div class="d-flex align-items-center justify-content-center mb-1 mt-2">
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small class="fa fa-star text-primary mr-1"></small>
+                                <small>(99)</small>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            {% endfor %}
-        {% else %}
+                {% endfor %}
+            {% else %}
 
-        <!-- EMPTY -->
-        <div class="col-12">
-            <div class="bg-light text-center p-5 rounded">
-                <img src="{% static 'img/empty-wishlist.png' %}"style="width:220px;">
-                <h3 class="mt-4">Your Wishlist is Empty</h3>
-                <p class="text-muted">Add products you love to wishlist</p>
-                <a href="{% url 'index' %}" class="btn btn-primary px-4 py-2 mt-2"> Continue Shopping </a>
+            <!-- EMPTY -->
+            <div class="col-12">
+                <div class="bg-light text-center p-5 rounded">
+                    <img src="{% static 'img/empty-wishlist.png' %}"style="width:220px;">
+                    <h3 class="mt-4">Your Wishlist is Empty</h3>
+                    <p class="text-muted">Add products you love to wishlist</p>
+                    <a href="{% url 'index' %}" class="btn btn-primary px-4 py-2 mt-2"> Continue Shopping </a>
+                </div>
             </div>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
-</div>
-<style>
+    <style>
 
-/* =========================
-ACTIVE CART BUTTON
-========================= */
-.cart-btn.active-cart{
-    background-color: #ffd333 !important;
-    border-color: #ffd333 !important;
-}
-.cart-btn.active-cart i{
-    color: #000 !important;
-}
-/* =========================
-NORMAL BUTTON
-========================= */
-.cart-btn{
-    transition: 0.3s;
-}
-/* =========================
-HOVER SAME COLOR
-========================= */
-.cart-btn.active-cart:hover{
-    background-color: #3D464D !important;
-    border-color: #3D464D !important;
-}
-.cart-btn.active-cart:hover i{
-    color: white !important;
-}
-</style>
-{% endblock %}
+    /* =========================
+    ACTIVE CART BUTTON
+    ========================= */
+    .cart-btn.active-cart{
+        background-color: #ffd333 !important;
+        border-color: #ffd333 !important;
+    }
+    .cart-btn.active-cart i{
+        color: #000 !important;
+    }
+    /* =========================
+    NORMAL BUTTON
+    ========================= */
+    .cart-btn{
+        transition: 0.3s;
+    }
+    /* =========================
+    HOVER SAME COLOR
+    ========================= */
+    .cart-btn.active-cart:hover{
+        background-color: #3D464D !important;
+        border-color: #3D464D !important;
+    }
+    .cart-btn.active-cart:hover i{
+        color: white !important;
+    }
+    </style>
+    {% endblock %}
