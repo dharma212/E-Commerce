@@ -116,38 +116,42 @@
                         <!-- QUANTITY -->
                         <td class="align-middle">
 
-                            <div class="input-group quantity mx-auto" style="width: 120px;">
+                            <div class="cart-qty-wrapper">
 
                                 <!-- MINUS -->
-                                <div class="input-group-btn">
 
-                                    <button class="btn btn-sm btn-primary update-cart" data-id="{{ item.id }}"
-                                        data-action="decrease" {% if item.quantity|add:0 <= 1 %} disabled {% endif %}>
+                                <button class="qty-btn update-cart"
+                                        data-id="{{ item.id }}"
+                                        data-action="decrease"
 
-                                        <i class="fa fa-minus"></i>
+                                        {% if item.quantity|add:0 <= 1 %}
+                                        disabled
+                                        {% endif %}>
 
-                                    </button>
+                                    <i class="fa fa-minus"></i>
 
-                                </div>
+                                </button>
 
-                                <!-- QUANTITY -->
+                                <!-- INPUT -->
+
                                 <input type="text"
-                                    class="form-control form-control-sm bg-secondary border-0 text-center"
-                                    value="{{ item.quantity }}" readonly>
+                                    class="quantity-input"
+                                    value="{{ item.quantity }}"
+                                    readonly>
 
                                 <!-- PLUS -->
-                                <div class="input-group-btn">
 
-                                    <button class="btn btn-sm btn-primary update-cart" data-id="{{ item.id }}"
-                                        data-action="increase" {% if item.quantity >= item.product.stock %}
+                                <button class="qty-btn update-cart"
+                                        data-id="{{ item.id }}"
+                                        data-action="increase"
+
+                                        {% if item.quantity >= item.product.stock %}
                                         disabled
-                                        {% endif %} >
+                                        {% endif %}>
 
-                                        <i class="fa fa-plus"></i>
+                                    <i class="fa fa-plus"></i>
 
-                                    </button>
-
-                                </div>
+                                </button>
 
                             </div>
 

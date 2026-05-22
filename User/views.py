@@ -477,160 +477,150 @@ class contactview(TemplateView):
 # ====================================
 
 class checkoutview(LoginRequiredMixin, TemplateView):
-
     template_name = "checkout.html"
 
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
 
-        cart, created = Cart.objects.get_or_create(
-            user=self.request.user
-        )
+        # Ensure cart exists
+        cart, created = Cart.objects.get_or_create(user=self.request.user)
+        cart_items = CartItem.objects.filter(cart=cart).select_related("product")
 
-        cart_items = CartItem.objects.filter(
-            cart=cart
-        ).select_related("product")
-
-        if not cart_items.exists():
-            return redirect("cart")
-
-        subtotal = sum(
-            item.total_price for item in cart_items
-        )
-
+        # Financials
+        subtotal = sum(item.total_price for item in cart_items)
         shipping = 100 if subtotal > 0 else 0
-
         grand_total = subtotal + shipping
 
-        profile, created = Profile.objects.get_or_create(
-            user=self.request.user
-        )
+        # Profile & User Data (Fixes the missing user details)
+        profile, created = Profile.objects.get_or_create(user=self.request.user)
 
+        # Address Logic
+        all_addresses = Address.objects.filter(user=self.request.user)
+        default_address = all_addresses.filter(is_default=True).first() or all_addresses.first()
+
+        # Context Mapping
         context["cart_items"] = cart_items
         context["subtotal"] = subtotal
         context["shipping"] = shipping
         context["grand_total"] = grand_total
         context["profile"] = profile
+        context["default_address"] = default_address
+        context["all_addresses"] = all_addresses  # So user can pick between addresses
+        context["cart_empty"] = not cart_items.exists()
 
         return context
 
-
     def post(self, request, *args, **kwargs):
+        # =========================================
+        # FORM DATA
+        # =========================================
+        full_name = request.POST.get("full_name", "").strip()
+        phone = request.POST.get("phone", "").strip()
+        email = request.POST.get("email", "").strip()
+        city = request.POST.get("city", "").strip()
+        payment_method = request.POST.get("payment")
 
-        # =========================
+        # =========================================
         # UPDATE USER
-        # =========================
+        # =========================================
+        request.user.email = email
 
-        request.user.first_name = request.POST.get(
-            "first_name"
-        ) or ""
-
-        request.user.last_name = request.POST.get(
-            "last_name"
-        ) or ""
-
-        request.user.email = request.POST.get(
-            "email"
-        ) or ""
-
+        if full_name:
+            split_name = full_name.split()
+            request.user.first_name = split_name[0]
+            if len(split_name) > 1:
+                request.user.last_name = " ".join(split_name[1:])
         request.user.save()
 
-        # =========================
-        # UPDATE PROFILE
-        # =========================
-
-        profile, created = Profile.objects.get_or_create(
-            user=request.user
-        )
-
-        profile.phone = request.POST.get(
-            "phone"
-        ) or ""
-
-        profile.city = request.POST.get(
-            "city",
-            ""
-        ).strip()
-
+        # =========================================
+        # PROFILE UPDATE
+        # =========================================
+        profile, created = Profile.objects.get_or_create(user=request.user)
+        profile.phone = phone
+        profile.city = city
         profile.save()
 
-        # =========================
-        # PAYMENT
-        # =========================
+        # =========================================
+        # SELECTED ADDRESS
+        # =========================================
+        selected_address_id = request.POST.get("selected_address")
+        selected_address = None
 
-        payment_method = request.POST.get(
-            "payment"
-        )
+        if selected_address_id:
+            selected_address = Address.objects.filter(
+                id=selected_address_id,
+                user=request.user
+            ).first()
 
-        # =========================
+        if not selected_address:
+            selected_address = Address.objects.filter(user=request.user, is_default=True).first() or \
+                               Address.objects.filter(user=request.user).first()
+
+        # =========================================
+        # UPDATE ADDRESS
+        # =========================================
+        if selected_address:
+            selected_address.full_name = full_name
+            selected_address.phone = phone
+            selected_address.city = city
+            selected_address.save()
+
+        # =========================================
         # GET CART
-        # =========================
+        # =========================================
+        try:
+            cart = Cart.objects.get(user=request.user)
+            cart_items = CartItem.objects.filter(cart=cart)
+        except Cart.DoesNotExist:
+            messages.error(request, "Your cart does not exist.")
+            return redirect("cart")
 
-        cart = Cart.objects.get(
-            user=request.user
-        )
+        # =========================================
+        # EMPTY CART CHECK
+        # =========================================
+        if not cart_items.exists():
+            messages.error(request, "Your cart is empty")
+            return redirect("cart")
 
-        cart_items = CartItem.objects.filter(
-            cart=cart
-        )
-
-        # =========================
+        # =========================================
         # TOTAL
-        # =========================
-
-        subtotal = sum(
-            item.total_price for item in cart_items
-        )
-
+        # =========================================
+        subtotal = sum(item.total_price for item in cart_items)
         shipping = 100 if subtotal > 0 else 0
-
         grand_total = subtotal + shipping
 
-        # =========================
-        # CREATE ORDER
-        # =========================
-
+        # =========================================
+        # CREATE ORDER (FIXED & FULLY MAPPED)
+        # =========================================
         order = Order.objects.create(
-
             user=request.user,
-
+            address=selected_address,   # <-- CRITICAL FIX: Links the shipping address!
             total_price=grand_total,
-
             status="Pending"
-
         )
 
-        # =========================
-        # CREATE ORDER ITEMS
-        # =========================
-
+        # =========================================
+        # ORDER ITEMS
+        # =========================================
         for item in cart_items:
-
             OrderItem.objects.create(
-
                 order=order,
-
                 product=item.product,
-
                 quantity=item.quantity,
-
-                price=item.product.price
-
+                price=item.product.final_price()  # GOOD PRACTICE: Uses final discounted price if available
             )
 
-        # =========================
+        # =========================================
         # CLEAR CART
-        # =========================
-
+        # =========================================
         cart_items.delete()
 
+        # =========================================
+        # SUCCESS MESSAGE
+        # =========================================
         messages.success(
-
             request,
-
             f"Order placed successfully using {payment_method}"
-
         )
 
         return redirect("my_orders")
@@ -1701,20 +1691,71 @@ class AddCategoryView(View):
 
 
 # ================= ADD TYPE =================
+import json
+
+from django.views import View
+from django.http import JsonResponse
+
+from .models import ProductType, Category
+
+
 class AddTypeView(View):
 
     def post(self, request):
 
-        data = json.loads(request.body)
+        try:
 
-        type_obj = Type.objects.create(
-            name=data.get("name")
-        )
+            data = json.loads(request.body)
 
-        return JsonResponse({
-            "id": type_obj.id,
-            "name": type_obj.name
-        })
+            name = data.get("name")
+
+            category_id = data.get("category_id")
+
+            # VALIDATION
+            if not name:
+
+                return JsonResponse({
+                    "success": False,
+                    "message": "Type name required"
+                })
+
+            if not category_id:
+
+                return JsonResponse({
+                    "success": False,
+                    "message": "Category required"
+                })
+
+            # CATEGORY
+            category = Category.objects.get(
+                id=category_id
+            )
+
+            # CREATE TYPE
+            type_obj = ProductType.objects.create(
+                name=name,
+                category=category
+            )
+
+            return JsonResponse({
+
+                "success": True,
+
+                "id": type_obj.id,
+
+                "name": type_obj.name
+
+            })
+
+        except Exception as e:
+
+            return JsonResponse({
+
+                "success": False,
+
+                "message": str(e)
+
+            }, status=500)
         
 
 class OrderListView(LoginRequiredMixin, TemplateView):
@@ -1723,8 +1764,46 @@ class OrderListView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['orders'] = Order.objects.filter(
-            user=self.request.user
-        ).prefetch_related('items__product').order_by('-id')
+        # OPTIMIZATION: Added select_related('address') to pull address 
+        # objects efficiently without hitting the database repeatedly inside the loop.
+        context['orders'] = Order.objects.filter(user=self.request.user)\
+                                         .select_related('address')\
+                                         .prefetch_related('items__product')\
+                                         .order_by('-id')
 
         return context
+
+# ====================================
+# SET DEFAULT ADDRESS
+# ====================================
+
+class SetDefaultAddressView(LoginRequiredMixin, View):
+
+    def post(self, request, id):
+
+        try:
+
+            address = Address.objects.get(
+                id=id,
+                user=request.user
+            )
+
+            # remove old default address
+            Address.objects.filter(
+                user=request.user
+            ).update(is_default=False)
+
+            # set new default
+            address.is_default = True
+            address.save()
+
+            return JsonResponse({
+                "status": "success"
+            })
+
+        except Address.DoesNotExist:
+
+            return JsonResponse({
+                "status": "error",
+                "message": "Address not found"
+            })

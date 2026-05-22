@@ -370,7 +370,7 @@ function setupSearch(inputId, resultId, hiddenId){
 
         items.forEach(item => {
 
-            const name = item.dataset.name;
+            const name = (item.dataset.name || "").toLowerCase();
 
             if(name.includes(value)){
 
@@ -445,9 +445,11 @@ function setupSearch(inputId, resultId, hiddenId){
 
                 body: JSON.stringify({
 
-                    name: value
+    name: value,
 
-                })
+    category_id: document.getElementById("category").value
+
+})
 
             })
 
@@ -478,9 +480,9 @@ function setupSearch(inputId, resultId, hiddenId){
                 );
 
                 div.setAttribute(
-                    "data-name",
-                    data.name.toLowerCase()
-                );
+    "data-name",
+    (data.name || "").toLowerCase()
+);
 
                 div.innerText = data.name;
 
@@ -567,7 +569,7 @@ fetch('/api/categories/')
 
             <div class="search-item"
                  data-id="${item.id}"
-                 data-name="${item.name.toLowerCase()}">
+                 data-name="${(item.name || '').toLowerCase()}">
 
                 ${item.name}
 
@@ -609,7 +611,7 @@ document
 
                 <div class="search-item"
                      data-id="${type.id}"
-                     data-name="${type.name.toLowerCase()}">
+                     data-name="${(type.name || '').toLowerCase()}">
 
                     ${type.name}
 

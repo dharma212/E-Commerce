@@ -1,5 +1,4 @@
-from .models import Wishlist, CartItem
-
+from .models import Wishlist, CartItem, Category
 
 def global_counts(request):
 
@@ -8,19 +7,23 @@ def global_counts(request):
 
     if request.user.is_authenticated:
 
-        # Wishlist Count
         wishlist_count = Wishlist.objects.filter(
             user=request.user
         ).count()
 
-        # Cart Count
         cart_count = CartItem.objects.filter(
             cart__user=request.user
         ).count()
 
+    categories = Category.objects.prefetch_related(
+        'types'
+    ).all()
+
     return {
 
         'wishlist_count': wishlist_count,
+
         'cart_count': cart_count,
 
+        'categories': categories,
     }

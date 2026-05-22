@@ -1,7 +1,23 @@
 <!-- =========================
 HEADER START
 ========================= -->
+<style>
+    @media (min-width: 992px) {
+    /* Show the product menu when hovering over the category item */
+    .nav-item.dropdown.dropright:hover > .dropdown-menu {
+        display: block;
+        top: 0;
+        left: 100%; /* Positions it to the right of the category list */
+        margin-top: 0;
+    }
+}
 
+/* Style for the product images inside the category hover menu */
+.dropdown-item img {
+    border-radius: 3px;
+    border: 1px solid #ddd;
+}
+</style>
 <div id="main-header">
 
     <!-- TOPBAR -->
@@ -170,82 +186,119 @@ HEADER START
 
                 </a>
 
-                <!-- CATEGORY MENU -->
-                <nav class="collapse position-absolute navbar navbar-vertical navbar-light align-items-start p-0 bg-light"
-                     id="navbar-vertical"
-                     style="width: calc(100% - 30px); z-index:999;">
+                <!-- =========================
+CATEGORY MENU
+========================= -->
+<nav class="collapse position-absolute navbar navbar-vertical navbar-light align-items-start p-0 bg-light"
+     id="navbar-vertical"
+     style="width: calc(100% - 30px); z-index:999;">
 
-                    <div class="navbar-nav w-100">
+    <div class="navbar-nav w-100">
 
-                        <div class="nav-item dropdown dropright">
+        {% for category in categories %}
 
-                            <a href="#"
-                               class="nav-link dropdown-toggle"
-                               data-toggle="dropdown">
+        <!-- CATEGORY -->
+        <div class="nav-item mega-category-wrapper">
 
-                                Dresses
+            <!-- CATEGORY LINK -->
+            <a href="{% url 'shop' %}?category={{ category.id }}"
+               class="nav-link mega-category-link">
 
-                                <i class="fa fa-angle-right float-right mt-1"></i>
+                {{ category.name }}
 
-                            </a>
+                <i class="fa fa-angle-right float-right mt-1"></i>
 
-                            <div class="dropdown-menu position-absolute rounded-0 border-0 m-0">
+            </a>
 
-                                <a href="" class="dropdown-item">
-                                    Men's Dresses
-                                </a>
+            <!-- TYPE DROPDOWN -->
+            <div class="mega-type-dropdown">
 
-                                <a href="" class="dropdown-item">
-                                    Women's Dresses
-                                </a>
+                {% for type in category.types.all %}
 
-                                <a href="" class="dropdown-item">
-                                    Baby's Dresses
-                                </a>
+                <!-- TYPE -->
+                <div class="mega-type-wrapper">
 
-                            </div>
+                    <a href="{% url 'shop' %}?type={{ type.id }}"
+                       class="mega-type-link">
+
+                        {{ type.name }}
+
+                        <i class="fa fa-angle-right float-right mt-1"></i>
+
+                    </a>
+
+                    <!-- PRODUCT DROPDOWN -->
+                    <div class="mega-product-dropdown">
+
+                        <div class="mega-product-header">
+
+                            {{ type.name }} Products
 
                         </div>
 
-                        <a href="" class="nav-item nav-link">
-                            Shirts
+                        {% for product in type.product_set.all|slice:":6" %}
+
+                        <a href="{% url 'product_detail' product.id %}"
+                           class="mega-product-item">
+
+                            {% if product.images.first %}
+
+                            <img src="{{ product.images.first.image.url }}"
+                                 alt="{{ product.name }}">
+
+                            {% endif %}
+
+                            <div class="mega-product-info">
+
+                                <div class="mega-product-name">
+
+                                    {{ product.name }}
+
+                                </div>
+
+                                <div class="mega-product-price">
+
+                                    ₹{{ product.price }}
+
+                                </div>
+
+                            </div>
+
                         </a>
 
-                        <a href="" class="nav-item nav-link">
-                            Jeans
-                        </a>
+                        {% empty %}
 
-                        <a href="" class="nav-item nav-link">
-                            Swimwear
-                        </a>
+                        <div class="p-3 text-muted">
 
-                        <a href="" class="nav-item nav-link">
-                            Sleepwear
-                        </a>
+                            No Products Found
 
-                        <a href="" class="nav-item nav-link">
-                            Sportswear
-                        </a>
+                        </div>
 
-                        <a href="" class="nav-item nav-link">
-                            Jumpsuits
-                        </a>
+                        {% endfor %}
 
-                        <a href="" class="nav-item nav-link">
-                            Blazers
-                        </a>
+                        <!-- VIEW ALL -->
+                        <a href="{% url 'shop' %}?type={{ type.id }}"
+                           class="mega-view-all">
 
-                        <a href="" class="nav-item nav-link">
-                            Jackets
-                        </a>
+                            View All Products
 
-                        <a href="" class="nav-item nav-link">
-                            Shoes
                         </a>
 
                     </div>
 
-                </nav>
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</nav>
 
             </div>
 
@@ -729,3 +782,243 @@ document.addEventListener("click", function(e){
 });
 
 </script>
+ <style>
+/* =========================
+MEGA MENU MAIN
+========================= */
+
+#navbar-vertical{
+    border-top: none;
+    overflow: visible ;
+}
+
+/* =========================
+CATEGORY
+========================= */
+
+.mega-category-wrapper{
+    position: relative;
+    width: 100%;
+}
+
+.mega-category-link{
+    background: #fff;
+    padding: 14px 20px ;
+    border-bottom: 1px solid #f5f5f5;
+    color: #333 ;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.mega-category-link:hover{
+    background: #f8f8f8;
+    color: #d19c97 ;
+}
+
+/* =========================
+TYPE DROPDOWN
+========================= */
+
+.mega-type-dropdown{
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 260px;
+    background: #fff;
+    border: 1px solid #eee;
+    display: none;
+    min-height: 100%;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    z-index: 999;
+}
+
+.mega-category-wrapper:hover .mega-type-dropdown{
+    display: block;
+    animation: fadeIn 0.25s ease;
+}
+
+/* =========================
+TYPE
+========================= */
+
+.mega-type-wrapper{
+    position: relative;
+}
+
+.mega-type-link{
+    display: block;
+    padding: 14px 20px;
+    color: #333;
+    text-decoration: none;
+    border-bottom: 1px solid #f5f5f5;
+    transition: 0.3s;
+    background: #fff;
+    font-weight: 500;
+}
+
+.mega-type-link:hover{
+    background: #fafafa;
+    color: #d19c97;
+    text-decoration: none;
+}
+
+/* =========================
+PRODUCT DROPDOWN
+========================= */
+
+.mega-product-dropdown{
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 340px;
+    background: #fff;
+    border: 1px solid #eee;
+    display: none;
+    min-height: 100%;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    z-index: 999;
+}
+
+.mega-type-wrapper:hover .mega-product-dropdown{
+    display: block;
+    animation: fadeIn 0.25s ease;
+}
+
+/* =========================
+HEADER
+========================= */
+
+.mega-product-header{
+    padding: 14px 18px;
+    font-size: 16px;
+    font-weight: 700;
+    border-bottom: 1px solid #f1f1f1;
+    background: #fafafa;
+    color: #222;
+}
+
+/* =========================
+PRODUCT ITEM
+========================= */
+
+.mega-product-item{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    text-decoration: none;
+    color: #333;
+    border-bottom: 1px solid #f5f5f5;
+    transition: 0.3s;
+    background: #fff;
+}
+
+.mega-product-item:hover{
+    background: #fafafa;
+    text-decoration: none;
+    transform: translateX(4px);
+}
+
+/* =========================
+PRODUCT IMAGE
+========================= */
+
+.mega-product-item img{
+    width: 60px ;
+    height: 60px ;
+    min-width: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    background: #fff;
+    padding: 2px;
+}
+
+/* =========================
+PRODUCT INFO
+========================= */
+
+.mega-product-info{
+    flex: 1;
+    overflow: hidden;
+}
+
+.mega-product-name{
+    font-size: 14px;
+    font-weight: 600;
+    color: #222;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mega-product-price{
+    font-size: 14px;
+    font-weight: 700;
+    color: #d19c97;
+    margin-top: 4px;
+}
+
+/* =========================
+VIEW ALL BUTTON
+========================= */
+
+.mega-view-all{
+    display: block;
+    text-align: center;
+    padding: 12px;
+    background: #ffd333;
+    color: #222;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.mega-view-all:hover{
+    background: #222;
+    color: #ffd333;
+    text-decoration: none;
+}
+
+/* =========================
+ANIMATION
+========================= */
+
+@keyframes fadeIn{
+
+    from{
+        opacity: 0;
+        transform: translateX(10px);
+    }
+
+    to{
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+}
+
+/* =========================
+IMPORTANT FIX
+========================= */
+
+/* ONLY TARGET HEADER MENU IMAGES */
+.mega-product-item img{
+    border-radius: 6px ;
+}
+
+/* REMOVE GLOBAL EFFECT */
+.dropdown-item img{
+    width: auto ;
+    height: auto ;
+}
+
+/* PREVENT PRODUCT CARD DAMAGE */
+.product-item img,
+.product-img img,
+.card img{
+    width: 100%;
+    height: auto;
+}
+</style> 

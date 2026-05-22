@@ -107,7 +107,11 @@ urlpatterns = [
     path('api/categories/', CategoryListAPI.as_view(), name='categories'),
     path('api/types/<int:category_id>/', TypeListAPI.as_view(), name='types'),
     path('api/products/', ProductListAPI.as_view(), name='api_products'),
-
+    path(
+        'set-default-address/<int:id>/',
+        SetDefaultAddressView.as_view(),
+        name='set_default_address'
+    ),
 ]
 
 # =========================

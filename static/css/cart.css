@@ -151,3 +151,52 @@ MOBILE DESIGN
     }
 
 }
+.quantity-input{
+    height:42px;
+    background:#fff !important;
+    border:2px solid #e5e5e5 !important;
+    font-weight:700;
+    color:#111;
+    box-shadow:none !important;
+    border-radius:0;
+}
+
+.quantity-input:focus{
+    box-shadow:none !important;
+}
+.cart-qty-wrapper{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.qty-btn{
+    width:40px;
+    height:42px;
+    border:none;
+    background:#FFD333;
+    color:#000;
+    font-size:16px;
+    font-weight:700;
+    transition:.3s;
+}
+
+.qty-btn:hover{
+    background:#e6bd00;
+}
+
+.qty-btn:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+.quantity-input{
+    width:55px;
+    height:42px;
+    border:2px solid #ececec;
+    text-align:center;
+    font-weight:700;
+    background:#fff;
+    color:#111;
+    outline:none;
+}

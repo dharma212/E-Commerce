@@ -471,56 +471,89 @@
 
                         {% if addresses %}
 
-                        {% for address in addresses %}
+                            {% for address in addresses %}
 
-                        <div class="order-box">
+                            <div class="order-box address-card mb-3">
 
-                            <div>
+                                <div class="address-left">
 
-                                <h5>
-                                    {{ address.full_name }}
-                                </h5>
+                                    <div class="d-flex align-items-center mb-2">
 
-                                <p class="mb-1">
-                                    {{ address.phone }}
-                                </p>
+                                        <h5 class="mb-0 mr-2">
+                                            {{ address.full_name }}
+                                        </h5>
 
-                                <p class="mb-1">
-                                    {{ address.address }}
-                                </p>
+                                        {% if address.is_default %}
 
-                                <p class="mb-0">
+                                        <span class="badge badge-warning px-3 py-2">
+                                            Default Address
+                                        </span>
 
-                                    {{ address.city }},
-                                    {{ address.state }}
-                                    -
-                                    {{ address.pincode }}
+                                        {% endif %}
 
-                                </p>
+                                    </div>
+
+                                    <p class="mb-1">
+                                        <strong>Phone:</strong>
+                                        {{ address.phone }}
+                                    </p>
+
+                                    <p class="mb-1">
+                                        {{ address.address }}
+                                    </p>
+
+                                    <p class="mb-0">
+
+                                        {{ address.city }},
+                                        {{ address.state }}
+                                        -
+                                        {{ address.pincode }}
+
+                                    </p>
+
+                                </div>
+
+                                <div class="address-actions">
+
+                                    {% if not address.is_default %}
+
+                                    <button
+                                        class="btn btn-warning mb-2 w-100"
+                                        onclick="setDefaultAddress('{{ address.id }}')"
+                                    >
+
+                                        Make Default
+
+                                    </button>
+
+                                    {% endif %}
+
+                                    <button
+                                        onclick="deleteAddress('{{ address.id }}')"
+                                        class="btn btn-dark w-100"
+                                    >
+
+                                        Delete
+
+                                    </button>
+
+                                </div>
 
                             </div>
 
-                            <button onclick="deleteAddress('{{ address.id }}')" class="btn btn-dark">
+                            {% endfor %}
 
-                                Delete
+                            {% else %}
 
-                            </button>
+                            <div class="empty-box">
 
-                        </div>
+                                <h4>
+                                    No Address Added
+                                </h4>
 
-                        {% endfor %}
+                            </div>
 
-                        {% else %}
-
-                        <div class="empty-box">
-
-                            <h4>
-                                No Address Added
-                            </h4>
-
-                        </div>
-
-                        {% endif %}
+                            {% endif %}
 
                     </div>
 
@@ -726,4 +759,41 @@
     </div>
 
 </div>
+<script>
+
+function setDefaultAddress(addressId){
+
+    fetch(`/set-default-address/${addressId}/`, {
+
+        method: "POST",
+
+        headers: {
+
+            "X-CSRFToken": document.querySelector(
+                '[name=csrfmiddlewaretoken]'
+            ).value
+
+        }
+
+    })
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if(data.status === "success"){
+
+            location.reload();
+
+        } else {
+
+            alert(data.message);
+
+        }
+
+    });
+
+}
+
+</script>
 {% endblock %}

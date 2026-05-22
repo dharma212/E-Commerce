@@ -137,6 +137,50 @@ class CartItem(models.Model):
     def __str__(self):
         return f"{self.product.name} - {self.quantity}"
     
+
+# ====================================
+# ADDRESS
+# ====================================
+
+class Address(models.Model):
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="addresses"
+    )
+
+    full_name = models.CharField(max_length=150)
+
+    phone = models.CharField(max_length=10)
+
+    address = models.TextField()
+
+    city = models.CharField(max_length=100)
+
+    state = models.CharField(max_length=100)
+
+    pincode = models.CharField(max_length=6)
+
+    is_default = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+
+        # only one default address
+        if self.is_default:
+
+            Address.objects.filter(
+                user=self.user
+            ).update(is_default=False)
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+
+        return self.full_name
+
 class Order(models.Model):
 
     STATUS_CHOICES = (
@@ -146,7 +190,7 @@ class Order(models.Model):
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
     total_price = models.DecimalField(
         max_digits=10,
         decimal_places=2
@@ -176,49 +220,3 @@ class OrderItem(models.Model):
         max_digits=10,
         decimal_places=2
     )
-
-# ====================================
-# ADDRESS
-# ====================================
-
-class Address(models.Model):
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="addresses"
-    )
-
-    full_name = models.CharField(
-        max_length=150
-    )
-
-    phone = models.CharField(
-        max_length=10
-    )
-
-    address = models.TextField()
-
-    city = models.CharField(
-        max_length=100
-    )
-
-    state = models.CharField(
-        max_length=100
-    )
-
-    pincode = models.CharField(
-        max_length=6
-    )
-
-    is_default = models.BooleanField(
-        default=False
-    )
-
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
-
-    def __str__(self):
-
-        return self.full_name

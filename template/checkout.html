@@ -1,263 +1,392 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
 
-    <!-- Breadcrumb Start -->
-    <div class="container-fluid">
-        <div class="row px-xl-5">
-            <div class="col-12">
-                <nav class="breadcrumb bg-light mb-30">
-                    <a class="breadcrumb-item text-dark" href="#">Home</a>
-                    <a class="breadcrumb-item text-dark" href="#">Shop</a>
-                    <span class="breadcrumb-item active">Checkout</span>
-                </nav>
+<style>
+/* =========================================
+   TAMARA EXISTING STYLES (NO CHANGE)
+   ========================================= */
+html, body{ margin:0; padding:0; background:#f5f5f5; font-family:'Poppins',sans-serif; overflow-x:hidden; }
+.checkout-page-wrapper{ max-width:1350px; margin:35px auto; padding:0 18px; }
+.checkout-steps{ position:relative; display:flex; justify-content:space-between; margin-bottom:35px; padding:0 15px; }
+.checkout-steps::before{ content:""; position:absolute; top:22px; left:55px; right:55px; height:5px; background:#e3e3e3; border-radius:50px; }
+.checkout-progress-line{ position:absolute; top:22px; left:55px; width:0%; height:5px; background:linear-gradient(90deg, #FFD333, #ffbc00); border-radius:50px; transition:.4s; }
+.step-item{ width:25%; text-align:center; position:relative; z-index:2; }
+.step-circle{ width:50px; height:50px; border-radius:50%; background:#ddd; display:flex; align-items:center; justify-content:center; margin:auto; font-weight:700; transition:.3s; }
+.step-label{ margin-top:10px; font-size:13px; font-weight:600; color:#777; }
+.step-item.active .step-circle{ background:#FFD333; color:#000; transform:scale(1.1); }
+.step-item.completed .step-circle{ background:#212529; color:#fff; }
+.checkout-main-layout{ display:flex; gap:25px; align-items:flex-start; }
+.checkout-left-side{ flex:1; }
+.checkout-right-side{ width:390px; position:sticky; top:20px; }
+.checkout-card, .checkout-right-side{ background:#fff; border-radius:20px; padding:28px; box-shadow:0 6px 25px rgba(0,0,0,.05); }
+.checkout-title{ font-size:24px; font-weight:700; margin-bottom:24px; }
+.step-content{ display:none; }
+.step-content.active-step{ display:block; animation:fade .4s ease; }
+@keyframes fade{ from{ opacity:0; transform:translateY(20px); } to{ opacity:1; transform:translateY(0); } }
+.order-item{ display:flex; justify-content:space-between; align-items:center; padding:18px 0; border-bottom:1px solid #eee; }
+.order-left{ display:flex; align-items:center; gap:15px; }
+.order-img{ width:70px; height:70px; border-radius:14px; object-fit:cover; }
+.order-name{ font-size:15px; font-weight:700; }
+.order-meta{ font-size:13px; color:#777; }
+.order-price{ font-weight:700; }
+
+/* =========================================
+   ADDRESS CARD - PARAGRAPH STYLE (UPDATED)
+   ========================================= */
+.selected-address-main-card {
+    border: 2px solid #FFD333;
+    border-radius: 20px;
+    padding: 25px;
+    background: #fffdf6;
+}
+
+.address-text-paragraph {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #444;
+    margin-bottom: 20px; /* Space for the button below */
+}
+
+.address-text-paragraph strong {
+    color: #000;
+    font-size: 16px;
+}
+
+.change-address-main-btn {
+    border: none;
+    background: #212529;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: .3s;
+    display: inline-block;
+}
+
+.change-address-main-btn:hover {
+    background: #000;
+    color: #FFD333;
+}
+
+/* =========================================
+   OTHER STYLES (NO CHANGE)
+   ========================================= */
+.default-address-badge{ display:inline-block; background:#FFD333; padding:6px 14px; border-radius:30px; font-size:12px; font-weight:700; margin-bottom:15px;}
+.selected-user-details{ margin-top:25px; padding-top:25px; border-top:1px dashed #ddd; display:none; } /* Hidden as requested */
+.payment-option{ display:flex; align-items:center; border:2px solid #eee; padding:18px; border-radius:16px; margin-bottom:16px; cursor:pointer; transition:.3s; }
+.payment-option:hover{ border-color:#FFD333; background:#fffdf6; }
+.payment-icon{ font-size:22px; width:40px; text-align:center; margin-right:12px; }
+.total-box{ background:#fafafa; border-radius:18px; padding:20px; margin-bottom:20px; }
+.total-line{ display:flex; justify-content:space-between; margin-bottom:14px; }
+.total-line.final{ border-top:1px solid #ddd; padding-top:15px; font-size:22px; font-weight:700; }
+.btn-theme{ border:none; background:linear-gradient(135deg, #FFD333, #ffbc00); padding:15px; border-radius:14px; font-weight:700; width:100%; }
+.btn-outline-theme{ border:1px solid #ddd; background:#fff; padding:14px; border-radius:14px; font-weight:600; width:100%; }
+.address-modal-content{ border:none; border-radius:22px; }
+.popup-address-card{ border:2px solid #eee; border-radius:16px; padding:18px; display:flex; justify-content:space-between; margin-bottom:10px; cursor:pointer; }
+.active-popup-address{ border-color: #FFD333; background: #fffdf6; }
+
+@media(max-width:991px){ .checkout-main-layout{ flex-direction:column; } .checkout-right-side{ width:100%; position:static; } }
+/* Payment & Final Step Enhancements */
+.payment-option {
+    position: relative;
+    padding: 20px 20px 20px 50px;
+    border: 2px solid #f0f0f0;
+    overflow: hidden;
+}
+
+.payment-option input[type="radio"] {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    accent-color: #FFD333;
+}
+
+.payment-option.active-payment {
+    border-color: #FFD333;
+    background: #fffdf6;
+}
+
+.success-icon-circle {
+    width: 80px;
+    height: 80px;
+    background: #f8f9fa;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: #28a745;
+    font-size: 35px;
+    border: 2px solid #e9ecef;
+}
+
+.order-confirm-box {
+    border: 1px dashed #ccc;
+    padding: 20px;
+    border-radius: 15px;
+    background: #fafafa;
+}
+
+.confirm-label { color: #777; font-size: 13px; margin-bottom: 2px; }
+.confirm-value { font-weight: 600; color: #222; font-size: 15px; }
+
+/* Modal Radio UI Fix */
+.popup-radio {
+    width: 20px;
+    height: 20px;
+    accent-color: #FFD333;
+}
+</style>
+
+<div class="checkout-page-wrapper">
+    <div class="checkout-steps">
+        <div class="checkout-progress-line" id="progressLine"></div>
+        <div class="step-item active" id="indicator1"><div class="step-circle">1</div><div class="step-label">Summary</div></div>
+        <div class="step-item" id="indicator2"><div class="step-circle">2</div><div class="step-label">Address</div></div>
+        <div class="step-item" id="indicator3"><div class="step-circle">3</div><div class="step-label">Payment</div></div>
+        <div class="step-item" id="indicator4"><div class="step-circle">4</div><div class="step-label">Confirm</div></div>
+    </div>
+
+    <form method="POST" class="checkout-main-layout">
+        {% csrf_token %}
+        <div class="checkout-left-side">
+            <div class="step-content active-step" id="step1">
+                <div class="checkout-card">
+                    <h3 class="checkout-title">Review Order</h3>
+                    {% for item in cart_items %}
+                    <div class="order-item">
+                        <div class="order-left">
+                            {% if item.product.images.first %}<img src="{{ item.product.images.first.image.url }}" class="order-img">{% endif %}
+                            <div>
+                                <div class="order-name">{{ item.product.name }}</div>
+                                <div class="order-meta">Qty : {{ item.quantity }}</div>
+                            </div>
+                        </div>
+                        <div class="order-price">₹{{ item.total_price }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="step-content" id="step2">
+                <div class="checkout-card">
+                    <h3 class="checkout-title">Delivery Address</h3>
+                    
+                    {% if default_address %}
+                    <div class="selected-address-main-card">
+                        {% if default_address.is_default %}
+                            <div class="default-address-badge">Default Address</div>
+                        {% endif %}
+
+                        <div class="address-text-paragraph" id="addressDisplayParagraph">
+                            <strong id="showFullName">{{ default_address.full_name }}</strong><br>
+                            <span id="showAddress">{{ default_address.address }}</span>, <br>
+                            <span id="showCity">{{ default_address.city }}</span>, 
+                            <span id="showState">{{ default_address.state }}</span> - 
+                            <span id="showPincode">{{ default_address.pincode }}</span><br>
+                            <strong>Phone:</strong> <span id="showPhone">{{ default_address.phone }}</span><br>
+                            <strong>Email:</strong> <span>{{ request.user.email }}</span>
+                        </div>
+
+                        <button type="button" class="change-address-main-btn" data-toggle="modal" data-target="#addressModal">
+                            <i class="fa fa-edit mr-1"></i> Change Address
+                        </button>
+
+                        <input type="hidden" id="selectedAddressInput" name="selected_address" value="{{ default_address.id }}">
+                        <input type="hidden" id="inputFullName" name="full_name" value="{{ default_address.full_name }}">
+                        <input type="hidden" id="inputPhone" name="phone" value="{{ default_address.phone }}">
+                        <input type="hidden" id="inputCity" name="city" value="{{ default_address.city }}">
+                        <input type="hidden" id="inputEmail" name="email" value="{{ request.user.email }}">
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <h4>No Address Found</h4>
+                        <a href="{% url 'add_address' %}" class="btn-theme mt-3" style="text-decoration:none; display:inline-block; width:auto;">Add Address</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="step-content" id="step3">
+    <div class="checkout-card">
+        <h3 class="checkout-title">Payment Method</h3>
+        <p class="text-muted mb-4">Choose how you'd like to pay for your order.</p>
+        
+        <label class="payment-option">
+            <input type="radio" checked name="payment" value="Paypal">
+            <div class="d-flex align-items:center justify-content-between w-100">
+                <span>
+                    <i class="fab fa-paypal payment-icon text-primary"></i> 
+                    <strong>Paypal / Cards</strong>
+                </span>
+                <small class="text-muted">Fast & Secure</small>
+            </div>
+        </label>
+
+        <label class="payment-option">
+            <input type="radio" name="payment" value="COD">
+            <div class="d-flex align-items:center justify-content-between w-100">
+                <span>
+                    <i class="fa fa-money-bill-wave payment-icon text-success"></i> 
+                    <strong>Cash On Delivery</strong>
+                </span>
+                <small class="text-muted">Pay when you receive</small>
+            </div>
+        </label>
+    </div>
+</div>
+
+            <div class="step-content" id="step4">
+    <div class="checkout-card text-center">
+        <div class="success-icon-circle">
+            <i class="fa fa-shopping-bag"></i>
+        </div>
+        <h3 class="font-weight-bold">Order Summary</h3>
+        <p class="text-muted">Please review your final details before placing the order.</p>
+        
+        <div class="order-confirm-box text-left mt-4">
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <div class="confirm-label">Deliver to</div>
+                    <div class="confirm-value" id="finalNameDisplay">{{ default_address.full_name }}</div>
+                </div>
+                <div class="col-6 mb-3">
+                    <div class="confirm-label">Payment Mode</div>
+                    <div class="confirm-value" id="finalPaymentDisplay">Paypal</div>
+                </div>
+                <div class="col-12">
+                    <div class="confirm-label">Shipping Address</div>
+                    <div class="confirm-value" id="finalAddressDisplay">
+                        {{ default_address.address }}, {{ default_address.city }}
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <!-- Breadcrumb End -->
-
-
-    <!-- Checkout Start -->
-     <form method="POST">
-
-    {% csrf_token %}
-    <div class="container-fluid">
-        <div class="row px-xl-5">
-            <div class="col-lg-8">
-                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Billing Address</span></h5>
-                <div class="bg-light p-30 mb-5">
-                    <div class="row">
-                        <div class="col-md-6 form-group">
-                            <label>First Name</label>
-                            <input class="form-control" type="text" value="{{ request.user.first_name }}">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Last Name</label>
-                            <input class="form-control"
-                                type="text"
-                                value="{{ request.user.last_name }}">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>E-mail</label>
-                            <input class="form-control"
-                                type="text"
-                                value="{{ request.user.email }}">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Mobile No</label>
-                            <input class="form-control"
-                                type="text"
-                                value="{{ profile.phone }}">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Address Line 1</label>
-                            <input class="form-control"
-                                type="text"
-                                name="address1"
-                                placeholder="123 Street">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Address Line 2</label>
-                            <input class="form-control"
-                                type="text"
-                                name="address2"
-                                placeholder="Apartment, Floor">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Country</label>
-                            <select class="custom-select">
-                                <option selected>United States</option>
-                                <option>Afghanistan</option>
-                                <option>Albania</option>
-                                <option>Algeria</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>City</label>
-                            <input class="form-control"
-                                type="text"
-                                name="city"
-                                value="{{ profile.city }}">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>State</label>
-                            <input class="form-control" type="text" placeholder="New York">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>ZIP Code</label>
-                            <input class="form-control" type="text" placeholder="123">
-                        </div>
-                        <div class="col-md-12 form-group">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="newaccount">
-                                <label class="custom-control-label" for="newaccount">Create an account</label>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="shipto">
-                                <label class="custom-control-label" for="shipto"  data-toggle="collapse" data-target="#shipping-address">Ship to different address</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="collapse mb-5" id="shipping-address">
-                    <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Shipping Address</span></h5>
-                    <div class="bg-light p-30">
-                        <div class="row">
-                            <div class="col-md-6 form-group">
-                                <label>First Name</label>
-                                <input class="form-control" type="text" placeholder="John">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>Last Name</label>
-                                <input class="form-control" type="text" placeholder="Doe">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>E-mail</label>
-                                <input class="form-control" type="text" placeholder="example@email.com">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>Mobile No</label>
-                                <input class="form-control" type="text" placeholder="+123 456 789">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>Address Line 1</label>
-                                <input class="form-control" type="text" placeholder="123 Street">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>Address Line 2</label>
-                                <input class="form-control" type="text" placeholder="123 Street">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>Country</label>
-                                <select class="custom-select">
-                                    <option selected>United States</option>
-                                    <option>Afghanistan</option>
-                                    <option>Albania</option>
-                                    <option>Algeria</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>City</label>
-                                <input class="form-control" type="text" placeholder="New York">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>State</label>
-                                <input class="form-control" type="text" placeholder="New York">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>ZIP Code</label>
-                                <input class="form-control" type="text" placeholder="123">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Order Total</span></h5>
-                <div class="bg-light p-30 mb-5">
-                    <div class="border-bottom">
-                        <h6 class="mb-3">Products</h6>
-
-                        {% for item in cart_items %}
-
-                        <div class="d-flex justify-content-between">
-
-                            <p>
-                                {{ item.product.name }} × {{ item.quantity }}
-                            </p>
-
-                            <p>
-                                ₹{{ item.total_price }}
-                            </p>
-
-                        </div>
-
-                        {% endfor %}
-
-                    </div>
-
-
-                    <div class="border-bottom pt-3 pb-2">
-
-                        <div class="d-flex justify-content-between mb-3">
-
-                            <h6>Subtotal</h6>
-
-                            <h6>
-                                ₹{{ subtotal }}
-                            </h6>
-
-                        </div>
-
-                        <div class="d-flex justify-content-between">
-
-                            <h6 class="font-weight-medium">
-                                Shipping
-                            </h6>
-
-                            <h6 class="font-weight-medium">
-                                ₹{{ shipping }}
-                            </h6>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="pt-2">
-
-                        <div class="d-flex justify-content-between mt-2">
-
-                            <h5>Total</h5>
-
-                            <h5>
-                                ₹{{ grand_total }}
-                            </h5>
-
-                        </div>
-
-                    </div>
-                </div>
-                <div class="mb-5">
-                    <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Payment</span></h5>
-                    <div class="bg-light p-30">
-                        <div class="form-group">
-                            <div class="custom-control custom-radio">
-                            <input type="radio"
-                                class="custom-control-input"
-                                name="payment"
-                                value="paypal"
-                                id="paypal">
-                                <label class="custom-control-label" for="paypal">Paypal</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="custom-control custom-radio">
-                            <input type="radio"
-                                class="custom-control-input"
-                                name="payment"
-                                value="directcheck"
-                                id="directcheck">
-                                <label class="custom-control-label" for="directcheck">Direct Check</label>
-                            </div>
-                        </div>
-                        <div class="form-group mb-4">
-                            <div class="custom-control custom-radio">
-                            <input type="radio"
-                                class="custom-control-input"
-                                name="payment"
-                                value="banktransfer"
-                                id="banktransfer">
-                                <label class="custom-control-label" for="banktransfer">Bank Transfer</label>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-block btn-primary font-weight-bold py-3">Place Order</button>
-                    </div>
-                </div>
-            </div>
+        
+        <div class="mt-4 p-2" style="background: #fff9e6; border-radius: 10px; font-size: 14px;">
+            <i class="fa fa-info-circle mr-1"></i> By clicking "Place Order", you agree to our terms.
         </div>
     </div>
+</div>
+        </div>
+
+        <div class="checkout-right-side">
+            <h4 class="mb-4">Price Details</h4>
+            <div class="total-box">
+                <div class="total-line"><span>Subtotal</span><span>₹{{ subtotal }}</span></div>
+                <div class="total-line"><span>Shipping</span><span>₹{{ shipping }}</span></div>
+                <div class="total-line final"><span>Total</span><span>₹{{ grand_total }}</span></div>
+            </div>
+            <div class="action-controller">
+                <button type="button" class="btn-theme" id="primaryActionBtn">Continue</button>
+                <button type="button" class="btn-outline-theme mt-2" id="secondaryBackBtn" style="display:none;">Back</button>
+            </div>
+        </div>
     </form>
-    <!-- Checkout End -->
+</div>
+
+<div class="modal fade" id="addressModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content address-modal-content">
+            <div class="modal-header">
+                <h5 class="font-weight-bold">Select Address</h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">
+                {% for addr in request.user.addresses.all %}
+                <div class="popup-address-card {% if addr.id == default_address.id %}active-popup-address{% endif %}" 
+                     onclick="changeAddress(this)" 
+                     data-id="{{ addr.id }}" data-name="{{ addr.full_name }}" data-phone="{{ addr.phone }}" 
+                     data-address="{{ addr.address }}" data-city="{{ addr.city }}" data-state="{{ addr.state }}" data-pincode="{{ addr.pincode }}">
+                    <div>
+                        <h6 class="font-weight-bold">{{ addr.full_name }}</h6>
+                        <small>{{ addr.address }}, {{ addr.city }}</small>
+                    </div>
+                    <input type="radio" class="popup-radio" {% if addr.id == default_address.id %}checked{% endif %}>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function changeAddress(element){
+    document.querySelectorAll(".popup-address-card").forEach(card => card.classList.remove("active-popup-address"));
+    element.classList.add("active-popup-address");
+    
+    document.querySelectorAll(".popup-radio").forEach(radio => radio.checked = false);
+    element.querySelector(".popup-radio").checked = true;
+
+    document.getElementById("showFullName").innerText = element.dataset.name;
+    document.getElementById("showPhone").innerText = element.dataset.phone;
+    document.getElementById("showAddress").innerText = element.dataset.address;
+    document.getElementById("showCity").innerText = element.dataset.city;
+    document.getElementById("showState").innerText = element.dataset.state;
+    document.getElementById("showPincode").innerText = element.dataset.pincode;
+
+    document.getElementById("selectedAddressInput").value = element.dataset.id;
+    document.getElementById("inputFullName").value = element.dataset.name;
+    document.getElementById("inputPhone").value = element.dataset.phone;
+    document.getElementById("inputCity").value = element.dataset.city;
+
+    $('#addressModal').modal('hide');
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+    let currentStep = 1;
+    const progressLine = document.getElementById("progressLine");
+    const primaryBtn = document.getElementById("primaryActionBtn");
+    const backBtn = document.getElementById("secondaryBackBtn");
+
+    function updateProgress(step){
+        let width = (step === 2) ? 33 : (step === 3) ? 66 : (step === 4) ? 100 : 0;
+        progressLine.style.width = width + "%";
+    }
+
+    function switchStep(step){
+        document.querySelectorAll(".step-content").forEach(item => item.classList.remove("active-step"));
+        document.getElementById("step" + step).classList.add("active-step");
+
+        for(let i=1; i<=4; i++){
+            const indicator = document.getElementById("indicator" + i);
+            indicator.classList.remove("active", "completed");
+            if(i < step) indicator.classList.add("completed");
+            if(i === step) indicator.classList.add("active");
+        }
+
+        currentStep = step;
+        updateProgress(step);
+        backBtn.style.display = (step === 1) ? "none" : "block";
+        primaryBtn.innerText = (step === 4) ? "Place Order" : "Continue";
+        primaryBtn.type = (step === 4) ? "submit" : "button";
+        // Inside switchStep(step) function:
+if(step === 4) {
+    // Final review data update
+    document.getElementById('finalNameDisplay').innerText = document.getElementById('showFullName').innerText;
+    document.getElementById('finalAddressDisplay').innerText = document.getElementById('showAddress').innerText + ", " + document.getElementById('showCity').innerText;
+    
+    let paymentVal = document.querySelector('input[name="payment"]:checked').value;
+    document.getElementById('finalPaymentDisplay').innerText = paymentVal === "COD" ? "Cash On Delivery" : "Paypal";
+}
+    }
+
+    primaryBtn.addEventListener("click", function(e){
+        if(currentStep < 4){
+            e.preventDefault();
+            switchStep(currentStep + 1);
+        }
+    });
+
+    backBtn.addEventListener("click", function(){
+        switchStep(currentStep - 1);
+    });
+});
+</script>
+
 {% endblock content %}

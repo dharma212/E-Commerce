@@ -737,3 +737,34 @@ IMAGE MODAL
     color:#FFD333;
     font-size:16px;
 }
+.address-card{
+    background:#fff;
+    border:1px solid #eee;
+    border-radius:16px;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+    transition:.3s;
+}
+
+.address-card:hover{
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+    transform:translateY(-2px);
+}
+
+.address-left h5{
+    font-weight:700;
+}
+
+.address-actions{
+    min-width:160px;
+}
+
+.badge-warning{
+    background:#FFD333;
+    color:#000;
+    font-size:12px;
+    border-radius:30px;
+}
