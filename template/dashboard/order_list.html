@@ -1,0 +1,362 @@
+<!-- templates/dashboard/order/order_list.html -->
+
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
+
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css"/>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+
+<style>
+
+.order-page{
+    padding:25px;
+    background:#f4f6f9;
+    min-height:100vh;
+}
+
+.order-card{
+    background:#fff;
+    border-radius:18px;
+    padding:25px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.08);
+}
+
+.page-title{
+    font-size:30px;
+    font-weight:700;
+    margin-bottom:25px;
+    color:#111;
+}
+
+/* TABLE */
+
+#orderTable{
+    width:100% !important;
+}
+
+#orderTable thead th{
+    background:#191c24;
+    color:#fff;
+    padding:15px;
+    border:none;
+    font-size:14px;
+}
+
+#orderTable tbody td{
+    padding:15px;
+    vertical-align:middle;
+    border-bottom:1px solid #f1f1f1;
+    font-size:14px;
+}
+
+/* STATUS */
+
+.status-badge{
+    padding:7px 15px;
+    border-radius:30px;
+    color:#fff;
+    font-size:12px;
+    font-weight:600;
+}
+
+.pending{
+    background:#f59e0b;
+}
+
+.delivered{
+    background:#22c55e;
+}
+
+.cancelled{
+    background:#ef4444;
+}
+
+/* USER */
+
+.user-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.user-avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+/* BUTTONS */
+
+.action-wrapper{
+    display:flex;
+    gap:10px;
+}
+
+.action-btn{
+    width:38px;
+    height:38px;
+    border:none;
+    border-radius:10px;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.view-btn{
+    background:#3b82f6;
+}
+
+.delete-btn{
+    background:#ef4444;
+}
+
+/* DATATABLE */
+
+.dataTables_wrapper .dataTables_filter{
+    margin-bottom:20px;
+}
+
+.dataTables_wrapper .dataTables_filter input{
+    border:1px solid #ddd !important;
+    border-radius:10px !important;
+    padding:8px 12px !important;
+}
+
+.dataTables_wrapper .dataTables_length select{
+    border-radius:10px;
+    padding:6px 10px;
+}
+
+</style>
+
+
+<div class="order-page">
+
+    <div class="order-card">
+
+        <h2 class="page-title">
+
+            Order List
+
+        </h2>
+
+        <table id="orderTable"
+               class="display nowrap">
+
+            <thead>
+
+                <tr>
+
+                    <th>Order ID</th>
+
+                    <th>User</th>
+
+                    <th>Phone</th>
+
+                    <th>Address</th>
+
+                    <th>Total</th>
+
+                    <th>Status</th>
+
+                    <th>Date</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for order in orders %}
+
+                <tr>
+
+                    <!-- ORDER ID -->
+
+                    <td>
+
+                        #ORD{{ order.id }}
+
+                    </td>
+
+                    <!-- USER -->
+
+                    <td>
+
+                        <div class="user-box">
+
+                            {% if order.user.profile.image %}
+
+                                <img src="{{ order.user.profile.image.url }}"
+                                     class="user-avatar">
+
+                            {% else %}
+
+                                <img src="{% static 'dashboard/images/default-user.png' %}"
+                                     class="user-avatar">
+
+                            {% endif %}
+
+                            <span>
+
+                                {{ order.user.username }}
+
+                            </span>
+
+                        </div>
+
+                    </td>
+
+                    <!-- PHONE -->
+
+                    <td>
+
+                        {{ order.address.phone }}
+
+                    </td>
+
+                    <!-- ADDRESS -->
+
+                    <td>
+
+                        {{ order.address.city }},
+                        {{ order.address.state }}
+
+                    </td>
+
+                    <!-- TOTAL -->
+
+                    <td>
+
+                        ₹ {{ order.total_price }}
+
+                    </td>
+
+                    <!-- STATUS -->
+
+                    <td>
+
+                        {% if order.status == "Pending" %}
+
+                            <span class="status-badge pending">
+
+                                Pending
+
+                            </span>
+
+                        {% elif order.status == "Delivered" %}
+
+                            <span class="status-badge delivered">
+
+                                Delivered
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="status-badge cancelled">
+
+                                Cancelled
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <!-- DATE -->
+
+                    <td>
+
+                        {{ order.created_at|date:"d M Y" }}
+
+                    </td>
+
+                    <!-- ACTION -->
+
+                    <td>
+
+                        <div class="action-wrapper">
+
+                            <button class="action-btn view-btn">
+
+                                <i class="fa fa-eye"></i>
+
+                            </button>
+
+                            <button class="action-btn delete-btn">
+
+                                <i class="fa fa-trash"></i>
+
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+
+
+<script>
+
+$(document).ready(function(){
+
+    $('#orderTable').DataTable({
+
+        responsive:true,
+
+        pageLength:10,
+
+        lengthMenu:[5,10,25,50,100],
+
+        autoWidth:false,
+
+        ordering:true,
+
+        searching:true,
+
+        paging:true,
+
+        info:true,
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

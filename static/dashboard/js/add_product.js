@@ -256,7 +256,6 @@ fetch('/api/categories/')
         let name = document.getElementById('name').value.trim();
         let category = document.getElementById('category').value;
         let type = document.getElementById('type').value;
-        let price = document.getElementById('price').value;
         let color = document.getElementById('color').value;
         let size = document.getElementById('size').value;
         let stock = document.getElementById('stock').value;
@@ -290,14 +289,6 @@ fetch('/api/categories/')
 
         if (!size) {
             showError("size", "Please select size");
-            isValid = false;
-        }
-
-        if (!price) {
-            showError("price", "Price is required");
-            isValid = false;
-        } else if (price <= 0) {
-            showError("price", "Price must be greater than 0");
             isValid = false;
         }
 
@@ -343,7 +334,6 @@ fetch('/api/categories/')
         formData.append('type', type);
         formData.append('color', color);
         formData.append('size', size);
-        formData.append('price', price);
         formData.append('stock', stock);
         formData.append('description', description);
 

@@ -620,9 +620,12 @@ body {
 
                             <!-- Buttons Operations Cluster -->
                             <div class="checkout-actions-cluster">
-                                <a href="#" class="action-btn-checkout btn-checkout-secondary" title="View Transaction Summary">
-                                    <i class="fa fa-eye"></i> Details
-                                </a>
+                                <a href="{% url 'order_details' order.id %}" 
+   class="action-btn-checkout btn-checkout-secondary">
+
+    <i class="fa fa-eye"></i> Details
+
+</a>
                                 <a href="#" class="action-btn-checkout btn-checkout-secondary" title="Download System Document">
                                     <i class="fa fa-file-invoice-dollar"></i> Invoice
                                 </a>
@@ -634,7 +637,7 @@ body {
                                 {% endif %}
 
                                 {% if order.status == "Delivered" %}
-                                <a href="{% url 'review_order' order.id %}" class="action-btn-checkout btn-checkout-success">
+                                <a href="#" class="action-btn-checkout btn-checkout-success">
                                     <i class="fa fa-signature"></i> Leave Review
                                 </a>
                                 {% endif %}

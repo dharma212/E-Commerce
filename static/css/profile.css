@@ -768,3 +768,82 @@ IMAGE MODAL
     font-size:12px;
     border-radius:30px;
 }
+/* =========================================
+  ORDER VIEW DETAILS BUTTON 
+========================================= */
+.btn-order-view{
+    position: relative;
+    overflow: hidden;
+    height: 44px;
+    padding: 0 22px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(
+        135deg,
+        #ffc800,
+        #cfad30
+    );
+    color: #ffffff !important;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-decoration: none !important;
+    transition: all .25s ease;
+    box-shadow:
+        0 10px 25px rgba(15,23,42,.12);
+}
+/* ICON */
+.btn-order-view i{
+    font-size: 13px;
+    transition: .25s ease;
+}
+/* HOVER */
+.btn-order-view:hover{
+    transform: translateY(-2px);
+    background: linear-gradient(
+        135deg,
+        #ffc800,
+        #cfad30
+    );
+    box-shadow:
+        0 16px 35px rgba(15,23,42,.18);
+    color: #ffffff !important;
+}
+/* ICON MOVE */
+.btn-order-view:hover i{
+    transform: translateX(3px);
+}
+/* ACTIVE */
+.btn-order-view:active{
+    transform: scale(.97);
+}
+/* SHINE EFFECT */
+.btn-order-view::before{
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255,255,255,.22),
+        transparent
+    );
+    transition: .7s ease;
+}
+.btn-order-view:hover::before{
+    left: 100%;
+}
+/* MOBILE */
+@media(max-width:768px){
+    .btn-order-view{
+        width: 100%;
+        margin-top: 10px;
+    }
+}

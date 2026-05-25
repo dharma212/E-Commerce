@@ -1,116 +1,266 @@
 {% load static %}
+
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
-  
+
   <!-- LOGO -->
   <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
-    <a class="sidebar-brand brand-logo" href="{% url 'dashboard' %}">
-      <img src="{% static 'dashboard/images/logo.svg' %}" alt="logo" />
+
+    <a class="sidebar-brand brand-logo"
+       href="{% url 'dashboard' %}">
+
+      <img src="{% static 'dashboard/images/logo.svg' %}"
+           alt="logo" />
+
     </a>
+
   </div>
 
   <ul class="nav">
 
     <!-- PROFILE -->
     <li class="nav-item profile">
+
       <div class="profile-desc">
+
         <div class="profile-pic">
+
           <div class="count-indicator">
-            <img class="img-xs rounded-circle" src="{% static 'dashboard/images/faces/face15.jpg' %}">
+
+            <img class="img-xs rounded-circle"
+                 src="{% static 'dashboard/images/faces/face15.jpg' %}">
+
             <span class="count bg-success"></span>
+
           </div>
+
           <div class="profile-name">
-            <h5 class="mb-0 font-weight-normal">Admin</h5>
-            <span>Store Manager</span>
+
+            <h5 class="mb-0 font-weight-normal">
+              Admin
+            </h5>
+
+            <span>
+              Store Manager
+            </span>
+
           </div>
+
         </div>
+
       </div>
+
     </li>
 
     <!-- TITLE -->
     <li class="nav-item nav-category">
-      <span class="nav-link">E-Commerce</span>
+
+      <span class="nav-link">
+        E-Commerce
+      </span>
+
     </li>
 
     <!-- DASHBOARD -->
-    <li class="nav-item menu-items">
-      <a class="nav-link" href="{% url 'dashboard' %}">
-        <span class="menu-icon"><i class="mdi mdi-speedometer"></i></span>
-        <span class="menu-title">Dashboard</span>
+    <li class="nav-item menu-items {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+
+      <a class="nav-link"
+         href="{% url 'dashboard' %}">
+
+        <span class="menu-icon">
+          <i class="mdi mdi-speedometer"></i>
+        </span>
+
+        <span class="menu-title">
+          Dashboard
+        </span>
+
       </a>
+
     </li>
 
     <!-- PRODUCTS -->
-    <li class="nav-item menu-items">
-      <a class="nav-link" data-toggle="collapse" href="#products">
-        <span class="menu-icon"><i class="mdi mdi-cart"></i></span>
-        <span class="menu-title">Products</span>
-        <i class="menu-arrow"></i>
-      </a>
-      <div class="collapse" id="products">
-        <ul class="nav flex-column sub-menu">
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'add_product_page' %}">Add Product</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'product_list' %}">Product List</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'add_type' %}">Type</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'add_category' %}">Categories</a>
-          </li>
-        </ul>
-      </div>
-    </li>
+<li class="nav-item menu-items {% if request.resolver_match.url_name == 'add_product_page' or request.resolver_match.url_name == 'product_list' or request.resolver_match.url_name == 'add_type' or request.resolver_match.url_name == 'add_category' %}active{% endif %}">
+
+  <a class="nav-link"
+     data-toggle="collapse"
+     href="#products"
+     aria-expanded="{% if request.resolver_match.url_name == 'add_product_page' or request.resolver_match.url_name == 'product_list' or request.resolver_match.url_name == 'add_type' or request.resolver_match.url_name == 'add_category' %}true{% else %}false{% endif %}">
+
+    <span class="menu-icon">
+      <i class="mdi mdi-cart"></i>
+    </span>
+
+    <span class="menu-title">
+      Products
+    </span>
+
+    <i class="menu-arrow"></i>
+
+  </a>
+
+  <div class="collapse {% if request.resolver_match.url_name == 'add_product_page' or request.resolver_match.url_name == 'product_list' or request.resolver_match.url_name == 'add_type' or request.resolver_match.url_name == 'add_category' %}show{% endif %}"
+       id="products">
+
+    <ul class="nav flex-column sub-menu">
+
+      <li class="nav-item">
+
+        <a class="nav-link {% if request.resolver_match.url_name == 'add_product_page' %}active{% endif %}"
+           href="{% url 'add_product_page' %}">
+
+          Add Product
+
+        </a>
+
+      </li>
+
+      <li class="nav-item">
+
+        <a class="nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}"
+           href="{% url 'product_list' %}">
+
+          Product List
+
+        </a>
+
+      </li>
+
+      <li class="nav-item">
+
+        <a class="nav-link {% if request.resolver_match.url_name == 'add_type' %}active{% endif %}"
+           href="{% url 'add_type' %}">
+
+          Type
+
+        </a>
+
+      </li>
+
+      <li class="nav-item">
+
+        <a class="nav-link {% if request.resolver_match.url_name == 'add_category' %}active{% endif %}"
+           href="{% url 'add_category' %}">
+
+          Categories
+
+        </a>
+
+      </li>
+
+    </ul>
+
+  </div>
+
+</li>
 
     <!-- ORDERS -->
-    <li class="nav-item menu-items">
-      <a class="nav-link" href="#">
-        <span class="menu-icon"><i class="mdi mdi-receipt"></i></span>
-        <span class="menu-title">Orders</span>
+    <li class="nav-item menu-items {% if request.resolver_match.url_name == 'admin_orders' %}active{% endif %}">
+
+      <a class="nav-link"
+         href="{% url 'order_list' %}">
+
+        <span class="menu-icon">
+          <i class="mdi mdi-receipt"></i>
+        </span>
+
+        <span class="menu-title">
+          Orders
+        </span>
+
       </a>
+
     </li>
 
     <!-- CUSTOMERS -->
-    <li class="nav-item menu-items">
-      <a class="nav-link" href="#">
-        <span class="menu-icon"><i class="mdi mdi-account-multiple"></i></span>
-        <span class="menu-title">Customers</span>
+    <li class="nav-item menu-items {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}">
+
+      <a class="nav-link"
+         href="{% url 'user_list' %}">
+
+        <span class="menu-icon">
+          <i class="mdi mdi-account-multiple"></i>
+        </span>
+
+        <span class="menu-title">
+          Customers
+        </span>
+
       </a>
+
     </li>
 
     <!-- CART -->
-    <li class="nav-item menu-items">
-      <a class="nav-link" href="#">
-        <span class="menu-icon"><i class="mdi mdi-cart-outline"></i></span>
-        <span class="menu-title">Cart</span>
+    <li class="nav-item menu-items {% if request.resolver_match.url_name == 'admin_cart' %}active{% endif %}">
+
+      <a class="nav-link"
+         href="{% url 'admin_cart' %}">
+
+        <span class="menu-icon">
+          <i class="mdi mdi-cart"></i>
+        </span>
+
+        <span class="menu-title">
+          Cart
+        </span>
+
       </a>
+
     </li>
 
     <!-- WISHLIST -->
-    <li class="nav-item menu-items">
-      <a class="nav-link" href="#">
-        <span class="menu-icon"><i class="mdi mdi-heart"></i></span>
-        <span class="menu-title">Wishlist</span>
+    <li class="nav-item menu-items {% if request.resolver_match.url_name == 'dashboard_wishlist' %}active{% endif %}">
+
+      <a class="nav-link"
+         href="{% url 'dashboard_wishlist' %}">
+
+        <span class="menu-icon">
+          <i class="mdi mdi-heart"></i>
+        </span>
+
+        <span class="menu-title">
+          Wishlist
+        </span>
+
       </a>
+
     </li>
 
     <!-- PAYMENTS -->
-    <li class="nav-item menu-items">
-      <a class="nav-link" href="#">
-        <span class="menu-icon"><i class="mdi mdi-cash"></i></span>
-        <span class="menu-title">Payments</span>
+    <li class="nav-item menu-items {% if request.resolver_match.url_name == 'payments' %}active{% endif %}">
+
+      <a class="nav-link"
+         href="#">
+
+        <span class="menu-icon">
+          <i class="mdi mdi-cash"></i>
+        </span>
+
+        <span class="menu-title">
+          Payments
+        </span>
+
       </a>
+
     </li>
 
     <!-- SETTINGS -->
-    <li class="nav-item menu-items">
-      <a class="nav-link" href="#">
-        <span class="menu-icon"><i class="mdi mdi-settings"></i></span>
-        <span class="menu-title">Settings</span>
+    <li class="nav-item menu-items {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+
+      <a class="nav-link"
+         href="#">
+
+        <span class="menu-icon">
+          <i class="mdi mdi-settings"></i>
+        </span>
+
+        <span class="menu-title">
+          Settings
+        </span>
+
       </a>
+
     </li>
 
   </ul>
+
 </nav>

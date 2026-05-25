@@ -156,21 +156,61 @@ html, body{ margin:0; padding:0; background:#f5f5f5; font-family:'Poppins',sans-
         {% csrf_token %}
         <div class="checkout-left-side">
             <div class="step-content active-step" id="step1">
+
                 <div class="checkout-card">
+
                     <h3 class="checkout-title">Review Order</h3>
-                    {% for item in cart_items %}
-                    <div class="order-item">
-                        <div class="order-left">
-                            {% if item.product.images.first %}<img src="{{ item.product.images.first.image.url }}" class="order-img">{% endif %}
-                            <div>
-                                <div class="order-name">{{ item.product.name }}</div>
-                                <div class="order-meta">Qty : {{ item.quantity }}</div>
+
+                    {% if cart_items %}
+
+                        {% for item in cart_items %}
+
+                        <div class="order-item">
+
+                            <div class="order-left">
+
+                                {% if item.product.images.first %}
+                                    <img src="{{ item.product.images.first.image.url }}" class="order-img">
+                                {% endif %}
+
+                                <div>
+                                    <div class="order-name">{{ item.product.name }}</div>
+                                    <div class="order-meta">Qty : {{ item.quantity }}</div>
+                                </div>
+
                             </div>
+
+                            <div class="order-price">
+                                ₹{{ item.total_price }}
+                            </div>
+
                         </div>
-                        <div class="order-price">₹{{ item.total_price }}</div>
-                    </div>
-                    {% endfor %}
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <!-- EMPTY STATE -->
+                        <div class="text-center py-5">
+
+                            <img src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png" width="150">
+
+                            <h4 class="mt-3">Your Checkout is Empty</h4>
+
+                            <p class="text-muted">
+                                You have no products in checkout.
+                            </p>
+
+                            <a href="{% url 'index' %}" class="btn btn-primary mt-3">
+                                    Continue Shopping
+                            </a>
+
+                        </div>
+
+                    {% endif %}
+
                 </div>
+
             </div>
 
             <div class="step-content" id="step2">
@@ -213,66 +253,66 @@ html, body{ margin:0; padding:0; background:#f5f5f5; font-family:'Poppins',sans-
             </div>
 
             <div class="step-content" id="step3">
-    <div class="checkout-card">
-        <h3 class="checkout-title">Payment Method</h3>
-        <p class="text-muted mb-4">Choose how you'd like to pay for your order.</p>
-        
-        <label class="payment-option">
-            <input type="radio" checked name="payment" value="Paypal">
-            <div class="d-flex align-items:center justify-content-between w-100">
-                <span>
-                    <i class="fab fa-paypal payment-icon text-primary"></i> 
-                    <strong>Paypal / Cards</strong>
-                </span>
-                <small class="text-muted">Fast & Secure</small>
-            </div>
-        </label>
+                <div class="checkout-card">
+                    <h3 class="checkout-title">Payment Method</h3>
+                    <p class="text-muted mb-4">Choose how you'd like to pay for your order.</p>
+                    
+                    <label class="payment-option">
+                        <input type="radio" checked name="payment" value="Paypal">
+                        <div class="d-flex align-items:center justify-content-between w-100">
+                            <span>
+                                <i class="fab fa-paypal payment-icon text-primary"></i> 
+                                <strong>Paypal / Cards</strong>
+                            </span>
+                            <small class="text-muted">Fast & Secure</small>
+                        </div>
+                    </label>
 
-        <label class="payment-option">
-            <input type="radio" name="payment" value="COD">
-            <div class="d-flex align-items:center justify-content-between w-100">
-                <span>
-                    <i class="fa fa-money-bill-wave payment-icon text-success"></i> 
-                    <strong>Cash On Delivery</strong>
-                </span>
-                <small class="text-muted">Pay when you receive</small>
+                    <label class="payment-option">
+                        <input type="radio" name="payment" value="COD">
+                        <div class="d-flex align-items:center justify-content-between w-100">
+                            <span>
+                                <i class="fa fa-money-bill-wave payment-icon text-success"></i> 
+                                <strong>Cash On Delivery</strong>
+                            </span>
+                            <small class="text-muted">Pay when you receive</small>
+                        </div>
+                    </label>
+                </div>
             </div>
-        </label>
-    </div>
-</div>
 
             <div class="step-content" id="step4">
-    <div class="checkout-card text-center">
-        <div class="success-icon-circle">
-            <i class="fa fa-shopping-bag"></i>
-        </div>
-        <h3 class="font-weight-bold">Order Summary</h3>
-        <p class="text-muted">Please review your final details before placing the order.</p>
-        
-        <div class="order-confirm-box text-left mt-4">
-            <div class="row">
-                <div class="col-6 mb-3">
-                    <div class="confirm-label">Deliver to</div>
-                    <div class="confirm-value" id="finalNameDisplay">{{ default_address.full_name }}</div>
-                </div>
-                <div class="col-6 mb-3">
-                    <div class="confirm-label">Payment Mode</div>
-                    <div class="confirm-value" id="finalPaymentDisplay">Paypal</div>
-                </div>
-                <div class="col-12">
-                    <div class="confirm-label">Shipping Address</div>
-                    <div class="confirm-value" id="finalAddressDisplay">
-                        {{ default_address.address }}, {{ default_address.city }}
+                <div class="checkout-card text-center">
+                    <div class="success-icon-circle">
+                        <i class="fa fa-shopping-bag"></i>
+                    </div>
+                    <h3 class="font-weight-bold">Order Summary</h3>
+                    <p class="text-muted">Please review your final details before placing the order.</p>
+                    
+                    <div class="order-confirm-box text-left mt-4">
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <div class="confirm-label">Deliver to</div>
+                                <div class="confirm-value" id="finalNameDisplay">{{ default_address.full_name }}</div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="confirm-label">Payment Mode</div>
+                                <div class="confirm-value" id="finalPaymentDisplay">Paypal</div>
+                            </div>
+                            <div class="col-12">
+                                <div class="confirm-label">Shipping Address</div>
+                                <div class="confirm-value" id="finalAddressDisplay">
+                                    {{ default_address.address }}, {{ default_address.city }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 p-2" style="background: #fff9e6; border-radius: 10px; font-size: 14px;">
+                        <i class="fa fa-info-circle mr-1"></i> By clicking "Place Order", you agree to our terms.
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="mt-4 p-2" style="background: #fff9e6; border-radius: 10px; font-size: 14px;">
-            <i class="fa fa-info-circle mr-1"></i> By clicking "Place Order", you agree to our terms.
-        </div>
-    </div>
-</div>
         </div>
 
         <div class="checkout-right-side">
@@ -283,7 +323,9 @@ html, body{ margin:0; padding:0; background:#f5f5f5; font-family:'Poppins',sans-
                 <div class="total-line final"><span>Total</span><span>₹{{ grand_total }}</span></div>
             </div>
             <div class="action-controller">
-                <button type="button" class="btn-theme" id="primaryActionBtn">Continue</button>
+                <button type="button"class="btn-theme"id="primaryActionBtn"{% if not cart_items %}disabled style="opacity:0.6; cursor:not-allowed; color:black;"{% endif %}>
+                    {% if cart_items %}Continue{% else %}No Products{% endif %}
+                </button>
                 <button type="button" class="btn-outline-theme mt-2" id="secondaryBackBtn" style="display:none;">Back</button>
             </div>
         </div>
@@ -377,10 +419,16 @@ if(step === 4) {
     }
 
     primaryBtn.addEventListener("click", function(e){
+
+        {% if not cart_items %}
+            return; // stop everything
+        {% endif %}
+
         if(currentStep < 4){
             e.preventDefault();
             switchStep(currentStep + 1);
         }
+
     });
 
     backBtn.addEventListener("click", function(){

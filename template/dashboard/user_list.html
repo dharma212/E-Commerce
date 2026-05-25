@@ -1,0 +1,355 @@
+<!-- templates/user/user_list.html -->
+
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- DATATABLE CSS -->
+
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
+
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css"/>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+
+<style>
+
+.user-page{
+    padding:25px;
+    background:#f4f6f9;
+    min-height:100vh;
+}
+
+.user-card{
+    background:#fff;
+    padding:25px;
+    border-radius:18px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.08);
+}
+
+.page-title{
+    font-size:30px;
+    font-weight:700;
+    margin-bottom:25px;
+    color:#111;
+}
+
+/* TABLE */
+
+#userTable{
+    width:100% !important;
+    border-collapse:collapse !important;
+}
+
+#userTable thead th{
+    background:#191c24;
+    color:#fff;
+    padding:15px;
+    font-size:14px;
+    border:none;
+}
+
+#userTable tbody td{
+    padding:15px;
+    vertical-align:middle;
+    border-bottom:1px solid #f1f1f1;
+    font-size:14px;
+}
+
+/* USER IMAGE */
+
+.user-info{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.user-avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid #ddd;
+}
+
+/* ROLE */
+
+.role-badge{
+    padding:7px 16px;
+    border-radius:30px;
+    color:#fff;
+    font-size:12px;
+    font-weight:600;
+}
+
+.admin-role{
+    background:#ef4444;
+}
+
+.customer-role{
+    background:#22c55e;
+}
+
+.seller-role{
+    background:#3b82f6;
+}
+
+/* ACTION */
+
+.action-wrapper{
+    display:flex;
+    gap:10px;
+}
+
+.action-btn{
+    width:38px;
+    height:38px;
+    border:none;
+    border-radius:10px;
+    color:#fff;
+    font-size:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.edit-btn{
+    background:#fbbc04;
+}
+
+.edit-btn:hover{
+    background:#e0a800;
+}
+
+.delete-btn{
+    background:#ef4444;
+}
+
+.delete-btn:hover{
+    background:#dc2626;
+}
+
+/* DATATABLE */
+
+.dataTables_wrapper .dataTables_filter{
+    margin-bottom:20px;
+}
+
+.dataTables_wrapper .dataTables_filter input{
+    border:1px solid #ddd !important;
+    border-radius:10px !important;
+    padding:8px 12px !important;
+    margin-left:10px !important;
+}
+
+.dataTables_wrapper .dataTables_length select{
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:6px 10px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button{
+    border-radius:8px !important;
+}
+
+</style>
+
+
+<div class="user-page">
+
+    <div class="user-card">
+
+        <h2 class="page-title">
+
+            User List
+
+        </h2>
+
+        <table id="userTable"
+               class="display nowrap">
+
+            <thead>
+
+                <tr>
+
+                    <th>Username</th>
+
+                    <th>Phone</th>
+
+                    <th>Email</th>
+
+                    <th>Address</th>
+
+                    <th>Role</th>
+
+                    <th>Join Date</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for user in users %}
+
+                <tr>
+
+                    <!-- USERNAME -->
+
+                    <td>
+
+                        <div class="user-info">
+
+                            {% if user.profile.image %}
+
+                                <img src="{{ user.profile.image.url }}"
+                                     class="user-avatar">
+
+                            {% else %}
+
+                                <img src="{% static 'dashboard/images/default-user.png' %}"
+                                     class="user-avatar">
+
+                            {% endif %}
+
+                            <span>
+
+                                {{ user.username }}
+
+                            </span>
+
+                        </div>
+
+                    </td>
+
+                    <!-- PHONE -->
+
+                    <td>
+
+                        {{ user.profile.phone }}
+
+                    </td>
+
+                    <!-- EMAIL -->
+
+                    <td>
+
+                        {{ user.email }}
+
+                    </td>
+
+                    <!-- ADDRESS -->
+
+                    <td>
+
+                        {% with address=user.addresses.first %}
+
+                            {% if address %}
+
+                                {{ address.city }},
+                                {{ address.state }}
+
+                            {% else %}
+
+                                N/A
+
+                            {% endif %}
+
+                        {% endwith %}
+
+                    </td>
+
+                    <!-- ROLE -->
+
+                    <td>
+
+                        {% if user.is_superuser %}
+
+                            <span class="role-badge admin-role">
+
+                                Admin
+
+                            </span>
+
+                        {% elif user.profile.role == "Seller" %}
+
+                            <span class="role-badge seller-role">
+
+                                Seller
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="role-badge customer-role">
+
+                                Customer
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <!-- JOIN DATE -->
+
+                    <td>
+
+                        {{ user.date_joined|date:"d M Y" }}
+
+                    </td>
+
+                    <!-- ACTION -->
+
+                    <td>
+
+                        <div class="action-wrapper">
+
+                            <button class="action-btn edit-btn">
+
+                                <i class="fa fa-pen"></i>
+
+                            </button>
+
+                            <button class="action-btn delete-btn">
+
+                                <i class="fa fa-trash"></i>
+
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+
+{% block extra_js %}
+
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="{% static 'dashboard/js/user_datatable.js' %}"></script>
+{% endblock %}

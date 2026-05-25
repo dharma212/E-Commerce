@@ -90,7 +90,7 @@
         <div class="col-lg-7 h-auto mb-30">
 
             <div class="h-100 bg-light p-30">
-
+{% csrf_token %}
                 <h3>{{ product.name }}</h3>
 
                 <div class="d-flex mb-3">
@@ -173,51 +173,78 @@
                 </div>
 
                 <!-- QUANTITY -->
-                <div class="d-flex align-items-center mb-4 pt-2">
+<div class="d-flex align-items-center mb-4 pt-2">
 
-                    <div class="input-group quantity mr-3"
-                         style="width: 130px;">
+    <div class="details-qty-wrapper mr-3">
 
-                        <div class="input-group-btn">
+        <!-- MINUS -->
+        <button class="details-qty-btn btn-minus"
 
-                            <button class="btn btn-primary btn-minus">
-                                <i class="fa fa-minus"></i>
-                            </button>
+            {% if cart_quantity|default:1 <= 1 %}
+            disabled
+            {% endif %}>
 
-                        </div>
+            <i class="fa fa-minus"></i>
 
-                        <input type="text"
-                               class="form-control bg-secondary border-0 text-center"
-                               value="1">
+        </button>
 
-                        <div class="input-group-btn">
+        <!-- INPUT -->
+        <input type="text"
 
-                            <button class="btn btn-primary btn-plus">
-                                <i class="fa fa-plus"></i>
-                            </button>
+            min="1"
 
-                        </div>
+            max="{{ product.stock }}"
 
-                    </div>
-                    <!-- CART BUTTON -->
-                    {% if in_cart %}
+            data-stock="{{ product.stock }}"
 
-                    <a class="btn btn-success px-3" href="{% url 'cart' %}">
-                        Added To Cart
-                    </a>
+            class="details-quantity-input"
 
-                    {% else %}
+            value="{{ cart_quantity|default:1 }}"
 
-                    <button class="btn btn-primary px-3 add-to-cart"
-                            data-id="{{ product.id }}">
+            readonly>
 
-                        Add To Cart
+        <!-- PLUS -->
+        <button class="details-qty-btn btn-plus"
 
-                    </button>
+            {% if cart_quantity >= product.stock %}
+            disabled
+            {% endif %}>
 
-                    {% endif %}
+            <i class="fa fa-plus"></i>
 
-                </div>
+        </button>
+
+    </div>
+
+    <!-- CART BUTTON -->
+    {% if in_cart %}
+
+    <a class="btn btn-success px-4 py-2"
+
+        href="{% url 'cart' %}">
+
+        <i class="fa fa-check mr-2"></i>
+
+        Added To Cart
+
+    </a>
+
+    {% else %}
+
+    <button
+        class="btn btn-primary px-4 py-2 add-to-cart"
+        data-id="{{ product.id }}"
+    >
+
+        <i class="fa fa-shopping-cart mr-2"></i>
+
+        Add To Cart
+
+    </button>
+
+    {% endif %}
+
+</div>
 
             </div>
 

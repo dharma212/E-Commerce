@@ -513,7 +513,7 @@
             <a class="h6 text-decoration-none product-name"
                href="{% url 'product_detail' product.id %}">
 
-                {{ product.name }}
+                {{ product.name|truncatechars:50 }}
 
             </a>
 

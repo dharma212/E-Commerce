@@ -1,0 +1,1147 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+/* =========================
+   ORDER TRACKER TIMELINE
+========================= */
+
+.tracking-wrapper{
+    background:#ffffff;
+    border:1px solid #e2e8f0;
+    border-radius:22px;
+    padding:30px;
+    margin-bottom:30px;
+}
+
+.tracking-title{
+    font-size:22px;
+    font-weight:800;
+    color:#0f172a;
+    margin-bottom:30px;
+}
+
+.tracking-progress{
+    display:flex;
+    justify-content:space-between;
+    position:relative;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.tracking-progress::before{
+    content:'';
+    position:absolute;
+    top:24px;
+    left:0;
+    width:100%;
+    height:4px;
+    background:#e2e8f0;
+    z-index:1;
+}
+
+.track-step{
+    position:relative;
+    z-index:2;
+    flex:1;
+    text-align:center;
+    min-width:120px;
+}
+
+.track-icon{
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    background:#e2e8f0;
+    color:#94a3b8;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    margin-bottom:12px;
+    border:4px solid #fff;
+    transition:0.3s;
+}
+
+.track-step.active .track-icon{
+    background:#0f172a;
+    color:#fff;
+}
+
+.track-step.completed .track-icon{
+    background:#22c55e;
+    color:#fff;
+}
+
+.track-label{
+    font-size:13px;
+    font-weight:700;
+    color:#334155;
+    margin-bottom:4px;
+}
+
+.track-date{
+    font-size:11px;
+    color:#94a3b8;
+}
+
+@media(max-width:768px){
+
+    .tracking-progress{
+        flex-direction:column;
+        gap:25px;
+    }
+
+    .tracking-progress::before{
+        display:none;
+    }
+
+}
+/* =========================
+   ORDER DETAILS PAGE
+========================= */
+
+body{
+    background:#f8fafc;
+    font-family:'Inter','Poppins',sans-serif;
+}
+
+.order-detail-section{
+    padding:50px 0;
+    min-height:100vh;
+}
+
+.order-detail-wrapper{
+    max-width:1400px;
+    margin:auto;
+    padding:0 20px;
+}
+
+.order-top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+    flex-wrap:wrap;
+    gap:15px;
+}
+
+.order-page-title h2{
+    font-size:32px;
+    font-weight:800;
+    color:#0f172a;
+    margin-bottom:5px;
+}
+
+.order-page-title p{
+    color:#64748b;
+    font-size:14px;
+}
+
+.back-btn{
+    height:46px;
+    padding:0 22px;
+    border-radius:12px;
+    background:#fff;
+    border:1px solid #dbe2ea;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    text-decoration:none !important;
+    color:#0f172a;
+    font-weight:600;
+    transition:0.3s;
+}
+
+.back-btn:hover{
+    background:#0f172a;
+    color:#fff;
+}
+
+/* GRID */
+
+.order-main-grid{
+    display:grid;
+    grid-template-columns:1fr 380px;
+    gap:30px;
+}
+
+/* LEFT SIDE */
+
+.order-items-card{
+    background:#fff;
+    border-radius:22px;
+    border:1px solid #e2e8f0;
+    overflow:hidden;
+}
+
+.order-card-header{
+    padding:25px 30px;
+    border-bottom:1px solid #edf2f7;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:15px;
+}
+
+.order-id{
+    font-size:22px;
+    font-weight:800;
+    color:#0f172a;
+}
+
+.order-date{
+    font-size:13px;
+    color:#64748b;
+    margin-top:4px;
+}
+
+.status-badge{
+    padding:8px 16px;
+    border-radius:10px;
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+
+.status-delivered{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.status-pending{
+    background:#fef9c3;
+    color:#a16207;
+}
+
+.status-cancelled{
+    background:#fee2e2;
+    color:#b91c1c;
+}
+
+/* PRODUCT */
+
+.order-product-row{
+    display:grid;
+    grid-template-columns:120px 1fr auto;
+    gap:25px;
+    padding:30px;
+    border-bottom:1px solid #f1f5f9;
+    align-items:center;
+}
+
+.order-product-row:last-child{
+    border-bottom:none;
+}
+
+.product-image{
+    width:120px;
+    height:120px;
+    border-radius:18px;
+    object-fit:cover;
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+}
+
+.product-title{
+    font-size:18px;
+    font-weight:700;
+    color:#0f172a;
+    margin-bottom:10px;
+}
+
+.meta-group{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+}
+
+.meta-pill{
+    background:#f1f5f9;
+    padding:6px 12px;
+    border-radius:8px;
+    font-size:12px;
+    color:#475569;
+    font-weight:600;
+}
+
+.price-column{
+    text-align:right;
+}
+
+.price-column h4{
+    font-size:24px;
+    font-weight:800;
+    margin-bottom:6px;
+    color:#0f172a;
+}
+
+.price-column p{
+    color:#64748b;
+    font-size:13px;
+}
+
+/* RIGHT SIDE */
+
+.summary-card{
+    background:#fff;
+    border-radius:22px;
+    border:1px solid #e2e8f0;
+    padding:30px;
+    position:sticky;
+    top:30px;
+}
+
+.summary-title{
+    font-size:22px;
+    font-weight:800;
+    margin-bottom:25px;
+    color:#0f172a;
+}
+
+.summary-row{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:18px;
+    font-size:14px;
+}
+
+.summary-row span:first-child{
+    color:#64748b;
+}
+
+.summary-row span:last-child{
+    font-weight:700;
+    color:#0f172a;
+}
+
+.summary-divider{
+    height:1px;
+    background:#edf2f7;
+    margin:22px 0;
+}
+
+.summary-total{
+    font-size:20px !important;
+    font-weight:800 !important;
+}
+
+.address-box{
+    background:#f8fafc;
+    padding:18px;
+    border-radius:16px;
+    margin-top:20px;
+    border:1px solid #e2e8f0;
+}
+
+.address-box h4{
+    font-size:15px;
+    font-weight:700;
+    margin-bottom:10px;
+    color:#0f172a;
+}
+
+.address-box p{
+    font-size:13px;
+    line-height:1.7;
+    color:#475569;
+    margin:0;
+}
+
+/* ACTIONS */
+
+.action-group{
+    margin-top:25px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.action-btn{
+    height:48px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    text-decoration:none !important;
+    font-weight:700;
+    font-size:14px;
+    transition:0.3s;
+}
+
+.primary-btn{
+    background:#0f172a;
+    color:#fff;
+}
+
+.primary-btn:hover{
+    background:#000;
+    color:#fff;
+}
+
+.secondary-btn{
+    background:#fff;
+    border:1px solid #cbd5e1;
+    color:#334155;
+}
+
+.secondary-btn:hover{
+    background:#f8fafc;
+}
+
+.danger-btn{
+    background:#fff5f5;
+    border:1px solid #feb2b2;
+    color:#c53030;
+}
+
+@media(max-width:992px){
+
+    .order-main-grid{
+        grid-template-columns:1fr;
+    }
+
+    .summary-card{
+        position:static;
+    }
+
+}
+
+@media(max-width:768px){
+
+    .order-product-row{
+        grid-template-columns:1fr;
+    }
+
+    .price-column{
+        text-align:left;
+    }
+
+    .product-image{
+        width:100%;
+        height:250px;
+    }
+
+}
+
+</style>
+
+<div class="order-detail-section">
+
+    <div class="order-detail-wrapper">
+
+        <!-- TOP -->
+
+        <div class="order-top-bar">
+
+            <div class="order-page-title">
+                <h2>Order Details</h2>
+                <p>Track products, invoice details and shipping information.</p>
+            </div>
+
+            <a href="javascript:history.back()" class="back-btn">
+                <i class="fa fa-arrow-left"></i>
+                Back
+            </a>
+
+        </div>
+<!-- ORDER TRACKING -->
+
+<div class="tracking-wrapper">
+
+    <h3 class="tracking-title">
+        Track Your Order
+    </h3>
+
+    <div class="tracking-progress">
+
+        <!-- ORDER PLACED -->
+
+        <div class="track-step completed">
+
+            <div class="track-icon">
+                <i class="fa fa-check"></i>
+            </div>
+
+            <div class="track-label">
+                Order Placed
+            </div>
+
+            <div class="track-date">
+                {{ order.created_at|date:"d M Y" }}
+            </div>
+
+        </div>
+
+        <!-- ACCEPTED -->
+
+        <div class="track-step 
+            {% if order.status == 'Accepted' or order.status == 'Packed' or order.status == 'Shipped' or order.status == 'Out For Delivery' or order.status == 'Delivered' %}
+                completed
+            {% endif %}
+        ">
+
+            <div class="track-icon">
+                <i class="fa fa-box-open"></i>
+            </div>
+
+            <div class="track-label">
+                Accepted
+            </div>
+
+            <div class="track-date">
+                Order confirmed
+            </div>
+
+        </div>
+
+        <!-- PACKED -->
+
+        <div class="track-step
+            {% if order.status == 'Packed' or order.status == 'Shipped' or order.status == 'Out For Delivery' or order.status == 'Delivered' %}
+                completed
+            {% endif %}
+        ">
+
+            <div class="track-icon">
+                <i class="fa fa-box"></i>
+            </div>
+
+            <div class="track-label">
+                Packed
+            </div>
+
+            <div class="track-date">
+                Warehouse packed
+            </div>
+
+        </div>
+
+        <!-- SHIPPED -->
+
+        <div class="track-step
+            {% if order.status == 'Shipped' or order.status == 'Out For Delivery' or order.status == 'Delivered' %}
+                completed
+            {% endif %}
+        ">
+
+            <div class="track-icon">
+                <i class="fa fa-truck"></i>
+            </div>
+
+            <div class="track-label">
+                Shipped
+            </div>
+
+            <div class="track-date">
+                On the way
+            </div>
+
+        </div>
+
+        <!-- OUT FOR DELIVERY -->
+
+        <div class="track-step
+            {% if order.status == 'Out For Delivery' or order.status == 'Delivered' %}
+                completed
+            {% endif %}
+        ">
+
+            <div class="track-icon">
+                <i class="fa fa-shipping-fast"></i>
+            </div>
+
+            <div class="track-label">
+                Out For Delivery
+            </div>
+
+            <div class="track-date">
+                Reaching soon
+            </div>
+
+        </div>
+
+        <!-- DELIVERED -->
+
+        <div class="track-step
+            {% if order.status == 'Delivered' %}
+                completed
+            {% endif %}
+        ">
+
+            <div class="track-icon">
+                <i class="fa fa-home"></i>
+            </div>
+
+            <div class="track-label">
+                Delivered
+            </div>
+
+            <div class="track-date">
+                Completed
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+        <div class="order-main-grid">
+
+            <!-- LEFT -->
+
+            <div class="order-items-card" style="overflow:hidden;">
+
+                <div class="order-card-header" style="
+    background:linear-gradient(135deg,#ffffff,#f8fafc);
+">
+
+                    <div>
+                        <div class="order-id">
+                            #ORD-{{ order.id }}
+                        </div>
+
+                        <div class="order-date">
+                            Ordered on {{ order.created_at|date:"d M Y , h:i A" }}
+                        </div>
+                    </div>
+
+                    <div>
+
+                        {% if order.status == "Delivered" %}
+                            <span class="status-badge status-delivered">
+                                Delivered
+                            </span>
+
+                        {% elif order.status == "Cancelled" %}
+                            <span class="status-badge status-cancelled">
+                                Cancelled
+                            </span>
+
+                        {% else %}
+                            <span class="status-badge status-pending">
+                                {{ order.status }}
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <!-- ITEMS -->
+
+                {% for item in order.items.all %}
+
+                <div class="order-product-row">
+
+                    <div>
+
+                        {% if item.product.images.first %}
+                            <img src="{{ item.product.images.first.image.url }}"
+                                 class="product-image">
+                        {% else %}
+                            <img src="{% static 'img/no-image.png' %}"
+                                 class="product-image">
+                        {% endif %}
+
+                    </div>
+
+                    <div>
+
+                        <h3 class="product-title">
+                            {{ item.product.name }}
+                        </h3>
+
+                        <div class="meta-group">
+
+                            <div class="meta-pill">
+                                Qty : {{ item.quantity }}
+                            </div>
+
+                            <div class="meta-pill">
+                                Price : ₹{{ item.price }}
+                            </div>
+
+                            {% if item.size %}
+                            <div class="meta-pill">
+                                Size : {{ item.size }}
+                            </div>
+                            {% endif %}
+
+                            {% if item.color %}
+                            <div class="meta-pill">
+                                Color : {{ item.color }}
+                            </div>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    <div class="price-column">
+
+                        <h4>
+                            ₹{% widthratio item.price 1 item.quantity %}
+                        </h4>
+
+                        <p>
+                            {{ item.quantity }} × ₹{{ item.price }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            <!-- RIGHT -->
+
+            <!-- =========================================
+RIGHT SIDE SUMMARY CARD REPLACE FULL
+========================================= -->
+
+<div class="summary-card">
+
+    <!-- TOP SUMMARY -->
+
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:25px;gap:15px;">
+
+        <div>
+
+            <h3 class="summary-title" style="margin-bottom:5px;">
+                Order Summary
+            </h3>
+
+            <p style="font-size:13px;color:#64748b;margin:0;">
+                Order placed on
+                {{ order.created_at|date:"d M Y" }}
+            </p>
+
+        </div>
+
+        {% if order.status == "Delivered" %}
+
+            <span class="status-badge status-delivered">
+                Delivered
+            </span>
+
+        {% elif order.status == "Cancelled" %}
+
+            <span class="status-badge status-cancelled">
+                Cancelled
+            </span>
+
+        {% else %}
+
+            <span class="status-badge status-pending">
+                {{ order.status }}
+            </span>
+
+        {% endif %}
+
+    </div>
+
+    <!-- QUICK INFO CARDS -->
+
+    <div style="
+        display:grid;
+        grid-template-columns:repeat(2,1fr);
+        gap:12px;
+        margin-bottom:25px;
+    ">
+
+        <div style="
+            background:#f8fafc;
+            border:1px solid #e2e8f0;
+            border-radius:16px;
+            padding:16px;
+        ">
+
+            <div style="
+                width:40px;
+                height:40px;
+                border-radius:12px;
+                background:#eff6ff;
+                color:#2563eb;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                margin-bottom:12px;
+            ">
+
+                <i class="fa fa-box"></i>
+
+            </div>
+
+            <h5 style="
+                font-size:13px;
+                font-weight:700;
+                margin-bottom:4px;
+                color:#0f172a;
+            ">
+                Total Items
+            </h5>
+
+            <p style="
+                margin:0;
+                font-size:22px;
+                font-weight:800;
+                color:#0f172a;
+            ">
+                {{ order.items.count }}
+            </p>
+
+        </div>
+
+        <div style="
+            background:#f8fafc;
+            border:1px solid #e2e8f0;
+            border-radius:16px;
+            padding:16px;
+        ">
+
+            <div style="
+                width:40px;
+                height:40px;
+                border-radius:12px;
+                background:#ecfdf5;
+                color:#16a34a;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                margin-bottom:12px;
+            ">
+
+                <i class="fa fa-wallet"></i>
+
+            </div>
+
+            <h5 style="
+                font-size:13px;
+                font-weight:700;
+                margin-bottom:4px;
+                color:#0f172a;
+            ">
+                Grand Total
+            </h5>
+
+            <p style="
+                margin:0;
+                font-size:22px;
+                font-weight:800;
+                color:#0f172a;
+            ">
+                ₹{{ order.total_price }}
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- DELIVERY MESSAGE -->
+
+    <div style="
+        background:linear-gradient(135deg,#eff6ff,#f8fafc);
+        border:1px solid #dbeafe;
+        padding:18px;
+        border-radius:16px;
+        margin-bottom:22px;
+    ">
+
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+
+            <div style="
+                width:42px;
+                height:42px;
+                min-width:42px;
+                border-radius:12px;
+                background:#2563eb;
+                color:white;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+            ">
+
+                <i class="fa fa-truck"></i>
+
+            </div>
+
+            <div>
+
+                <h5 style="
+                    font-size:14px;
+                    font-weight:700;
+                    margin-bottom:5px;
+                    color:#0f172a;
+                ">
+                    Shipping Update
+                </h5>
+
+                <p style="
+                    margin:0;
+                    font-size:13px;
+                    line-height:1.6;
+                    color:#475569;
+                ">
+
+                    {% if order.status == "Pending" %}
+                        Your order is waiting for confirmation from the seller.
+                    {% elif order.status == "Accepted" %}
+                        Seller accepted your order successfully.
+                    {% elif order.status == "Packed" %}
+                        Your products are packed and ready to ship.
+                    {% elif order.status == "Shipped" %}
+                        Your package is currently in transit.
+                    {% elif order.status == "Out For Delivery" %}
+                        Delivery partner is arriving today.
+                    {% elif order.status == "Delivered" %}
+                        Order delivered successfully.
+                    {% elif order.status == "Cancelled" %}
+                        This order has been cancelled.
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- PAYMENT DETAILS -->
+
+    <div>
+
+        <h4 style="
+            font-size:16px;
+            font-weight:800;
+            margin-bottom:20px;
+            color:#0f172a;
+        ">
+            Payment Details
+        </h4>
+
+        <div class="summary-row">
+            <span>Order ID</span>
+            <span>#ORD-{{ order.id }}</span>
+        </div>
+
+        <div class="summary-row">
+            <span>Payment Method</span>
+            <span>Cash On Delivery</span>
+        </div>
+
+        <div class="summary-row">
+            <span>Items Total</span>
+            <span>₹{{ order.total_price }}</span>
+        </div>
+
+        <div class="summary-row">
+            <span>Shipping Fee</span>
+            <span style="color:#16a34a;font-weight:700;">
+                FREE
+            </span>
+        </div>
+
+        <div class="summary-row">
+            <span>Platform Fee</span>
+            <span>₹0</span>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-row summary-total">
+            <span>Total Payable</span>
+            <span>₹{{ order.total_price }}</span>
+        </div>
+
+    </div>
+
+    <!-- ADDRESS -->
+
+    <div class="address-box">
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:15px;
+        ">
+
+            <h4 style="margin:0;">
+                Delivery Address
+            </h4>
+
+            <span style="
+                background:#ecfdf5;
+                color:#15803d;
+                font-size:11px;
+                font-weight:700;
+                padding:5px 10px;
+                border-radius:30px;
+            ">
+                HOME
+            </span>
+
+        </div>
+
+        {% if order.address %}
+
+        <div style="display:flex;gap:14px;">
+
+            <div style="
+                width:42px;
+                height:42px;
+                border-radius:12px;
+                background:#0f172a;
+                color:white;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                min-width:42px;
+            ">
+
+                <i class="fa fa-map-marker-alt"></i>
+
+            </div>
+
+            <div>
+
+                <h5 style="
+                    font-size:14px;
+                    font-weight:700;
+                    margin-bottom:5px;
+                    color:#0f172a;
+                ">
+                    {{ order.address.full_name }}
+                </h5>
+
+                <p style="
+                    margin:0;
+                    font-size:13px;
+                    line-height:1.7;
+                    color:#475569;
+                ">
+
+                    {{ order.address.phone }}
+
+                    <br><br>
+
+                    {{ order.address.address }},
+                    {{ order.address.city }},
+                    {{ order.address.state }}
+
+                    -
+
+                    {{ order.address.pincode }}
+
+                </p>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <p style="margin:0;color:#64748b;">
+            Address not available.
+        </p>
+
+        {% endif %}
+
+    </div>
+
+    <!-- ACTIONS -->
+
+    <div class="action-group">
+
+        <a href="#"
+           class="action-btn primary-btn">
+
+            <i class="fa fa-file-invoice"></i>
+            Download Invoice
+
+        </a>
+
+        <a href="#"
+           class="action-btn secondary-btn">
+
+            <i class="fa fa-headset"></i>
+            Need Help
+
+        </a>
+
+        {% if order.status == "Pending" %}
+
+        <button
+            type="button"
+            class="action-btn secondary-btn"
+            onclick="window.scrollTo({top:0,behavior:'smooth'})">
+
+            <i class="fa fa-truck"></i>
+            Track Order
+
+        </button>
+
+        <form method="POST"
+              action=""
+              onsubmit="return confirm('Cancel this order?')">
+
+            {% csrf_token %}
+
+            <button type="submit"
+                    class="action-btn danger-btn"
+                    style="
+                        width:100%;
+                        border:none;
+                        cursor:pointer;
+                    ">
+
+                <i class="fa fa-ban"></i>
+                Cancel Order
+
+            </button>
+
+        </form>
+
+        {% endif %}
+
+        {% if order.status == "Delivered" %}
+
+        <a href="#"
+           class="action-btn secondary-btn">
+
+            <i class="fa fa-star"></i>
+            Write Review
+
+        </a>
+
+        <a href="#"
+           class="action-btn secondary-btn">
+
+            <i class="fa fa-rotate"></i>
+            Buy Again
+
+        </a>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

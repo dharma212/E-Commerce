@@ -1,0 +1,171 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+/* =========================================
+   MATCHED WISHLIST THEME IMPLEMENTATION
+   ========================================= */
+.content-wrapper { 
+    background: #f5f6fa; 
+    min-height: 100vh; 
+    padding: 25px; 
+}
+
+/* MATCHED HEADING BOX */
+.page-title-box { 
+    background: #fff; 
+    padding: 25px; 
+    border-radius: 14px; 
+    margin-bottom: 20px; 
+    box-shadow: 0 2px 10px rgba(0,0,0,.05); 
+}
+.page-title-box h2 { 
+    margin: 0; 
+    font-size: 28px; 
+    font-weight: 700; 
+    color: #111827; 
+}
+.page-title-box p { 
+    margin: 8px 0 0; 
+    color: #6b7280; 
+}
+
+/* MATCHED TABLE CONTAINER CARD */
+.table-card { 
+    background: #fff; 
+    border-radius: 14px; 
+    padding: 20px; 
+    box-shadow: 0 2px 10px rgba(0,0,0,.05); 
+}
+
+#cartTable { 
+    width: 100% !important; 
+    border-collapse: collapse !important; 
+}
+#cartTable thead th { 
+    background: #111827; 
+    color: #fff; 
+    padding: 15px; 
+    border: none !important; 
+    font-size: 14px; 
+}
+#cartTable tbody td { 
+    padding: 15px; 
+    vertical-align: middle; 
+    font-size: 14px; 
+    color: #374151;
+}
+#cartTable tbody tr:nth-child(even) { 
+    background: #f9fafb; 
+}
+
+/* LAYOUT STRUCTURAL BLOCKS */
+.product-box { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+}
+.product-img { 
+    width: 55px; 
+    height: 55px; 
+    border-radius: 8px; 
+    object-fit: cover; 
+    border: 1px solid #ddd; 
+}
+
+/* UNIFORM BADGES */
+.status-badge-blue { 
+    background: #dbeafe; 
+    color: #1e40af; 
+    padding: 6px 12px; 
+    border-radius: 30px; 
+    font-size: 12px; 
+    font-weight: 600; 
+}
+
+/* DATATABLES DESIGN OVERRIDES MATCHING WISHLIST */
+.dataTables_filter { 
+    margin-bottom: 15px; 
+}
+.dataTables_filter input { 
+    border: 1px solid #ddd !important; 
+    border-radius: 8px !important; 
+    padding: 8px 12px !important; 
+    outline: none !important; 
+}
+.dataTables_length select { 
+    border: 1px solid #ddd !important; 
+    border-radius: 8px !important; 
+    padding: 5px !important; 
+}
+
+@media(max-width:991px){ 
+    .table-responsive { overflow-x: auto; } 
+    #cartTable { min-width: 900px; } 
+}
+</style>
+
+<!-- DATATABLE EXTERNAL STYLE SHEET -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+<div class="content-wrapper">
+    <!-- HEADING (Same to Same Wishlist Style) -->
+    <div class="page-title-box">
+        <h2>Cart Management</h2>
+        <p>All users cart products list managed from the admin dashboard.</p>
+    </div>
+
+    <!-- TABLE CARD -->
+    <div class="table-card">
+        <div class="table-responsive">
+            <table id="cartTable" class="display">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>User</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                        <th>Date Added</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_data %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><strong>{{ item.cart.user.username }}</strong></td>
+                        <td>
+                            <div class="product-box">
+                                {% if item.product.images.first %}
+                                <img src="{{ item.product.images.first.image.url }}" class="product-img">
+                                {% else %}
+                                <img src="{% static 'images/no-image.png' %}" class="product-img">
+                                {% endif %}
+                                <span>{{ item.product.name|truncatechars:40 }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge-blue">{{ item.quantity }} Items</span>
+                        </td>
+                        <td><strong>₹{{ item.total_price }}</strong></td>
+                        <td>{{ item.created_at|date:"d M Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">No Cart Data Found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<!-- Core DataTables Engine CDN -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<!-- JavaScript Connection Script File -->
+<script src="{% static 'dashboard/js/cart_datatable.js' %}"></script>
+{% endblock %}

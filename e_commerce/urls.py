@@ -112,6 +112,31 @@ urlpatterns = [
         SetDefaultAddressView.as_view(),
         name='set_default_address'
     ),
+    path(
+        "dashboard/wishlist/",
+        WishlistDashboardView.as_view(),
+        name="dashboard_wishlist"
+    ),
+    path(
+        "dashboard/cart/",
+        AdminCartView.as_view(),
+        name="admin_cart"
+    ),
+    path(
+        "order/<int:pk>/",
+        OrderDetailView.as_view(),
+        name="order_details"
+    ),
+      path(
+        'users/',
+        UserListView.as_view(),
+        name='user_list'
+    ),
+      path(
+        'orders/',
+        adminOrderListView.as_view(),
+        name='order_list'
+    ),
 ]
 
 # =========================

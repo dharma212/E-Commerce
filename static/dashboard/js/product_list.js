@@ -1,8 +1,6 @@
-
 fetch('/api/products/')
 .then(res => res.json())
 .then(data => {
-
 
     let tbody = '';
 
@@ -10,106 +8,196 @@ fetch('/api/products/')
 
         let imageUrl = '';
 
+        // FIRST IMAGE
         if(item.images && item.images.length > 0){
-            imageUrl = 'http://127.0.0.1:8000' + item.images[0].image;
+
+            imageUrl = item.images[0].image;
+
         }
 
         tbody += `
         <tr>
 
-            <td>${index + 1}</td>
+            <!-- ID -->
+            <td>
+                ${index + 1}
+            </td>
 
             <!-- IMAGE -->
             <td>
+
                 ${
-                    imageUrl 
-                    ? `<img src="${imageUrl}" class="product-img" onclick='openImageGallery(${JSON.stringify(item.images)})'>`
-                    : `<span class="no-img">No Image</span>`
+                    imageUrl
+
+                    ?
+
+                        `<img src="${imageUrl}"
+                              class="product-img"
+                              onclick='openImageGallery(${JSON.stringify(item.images)})'>`
+
+                    :
+
+                        `<div class="no-img-box">
+
+                            <i class="bi bi-image"></i>
+
+                        </div>`
                 }
+
             </td>
 
-            <!-- PRODUCT NAME -->
+            <!-- PRODUCT -->
             <td class="product-name">
-                ${item.name}
+
+                <div class="product-title">
+
+                    ${
+                        item.name.length > 40
+
+                        ?
+
+                        item.name.substring(0, 40) + '...'
+
+                        :
+
+                        item.name
+                    }
+
+                </div>
 
                 ${
                     item.discount > 0
-                    ? `<span style="
-                        background:#28a745;
-                        color:#fff;
-                        font-size:10px;
-                        padding:2px 6px;
-                        border-radius:4px;
-                        margin-left:5px;
-                    ">${item.discount_percent}% OFF</span>`
+
+                    ?
+
+                    `<span class="discount-badge">
+
+                        ${item.discount_percent}% OFF
+
+                    </span>`
+
                     : ''
                 }
+
             </td>
 
-            <td>${item.category_name}</td>
-            <td>${item.type_name}</td>
+            <!-- CATEGORY -->
+            <td>
+
+                ${item.category_name}
+
+            </td>
+
+            <!-- TYPE -->
+            <td>
+
+                ${item.type_name}
+
+            </td>
+
             <!-- COLOR -->
             <td>
-                <span style="
-                    background:${item.color_name?.toLowerCase() || '#333'};
-                    color:white;
-                    padding:4px 10px;
-                    border-radius:20px;
-                    font-size:12px;
-                    font-weight:600;
-                ">
+
+                <span class="color-badge"
+                      style="background:${item.color_name?.toLowerCase() || '#333'}">
+
                     ${item.color_name || 'N/A'}
+
                 </span>
+
             </td>
 
             <!-- SIZE -->
             <td>
-                <span style="
-                    background:#f1f1f1;
-                    color:#333;
-                    padding:4px 10px;
-                    border-radius:6px;
-                    font-size:12px;
-                    font-weight:600;
-                ">
+
+                <span class="size-badge">
+
                     ${item.size_name || 'N/A'}
+
                 </span>
+
             </td>
 
-            <!-- PRICE COLUMN -->
+            <!-- PRICE -->
             <td class="price">
 
                 ${
-                    item.discount > 0 
-                    ? `
-                        <div>₹ ${item.final_price}</div>
-                        <div style="font-size:12px;color:#888;">
-                            <del>₹ ${item.mrp}</del>
+                    item.discount > 0
+
+                    ?
+
+                    `
+                        <div class="final-price">
+
+                            ₹ ${item.final_price}
+
                         </div>
-                      `
-                    : `₹ ${item.price}`
+
+                        <div class="mrp-price">
+
+                            <del>₹ ${item.mrp}</del>
+
+                        </div>
+                    `
+
+                    :
+
+                    `<div class="final-price">
+
+                        ₹ ${item.price}
+
+                    </div>`
                 }
 
             </td>
 
-            <!-- DISCOUNT COLUMN -->
+            <!-- DISCOUNT -->
             <td>
 
                 ${
-                    item.discount > 0 
-                    ? `<span style="color:#28a745;font-weight:600;">
+                    item.discount > 0
+
+                    ?
+
+                    `<span class="green-text">
+
                         ${item.discount_percent}% OFF
-                       </span>`
-                    : `<span style="color:#aaa;">No Discount</span>`
+
+                    </span>`
+
+                    :
+
+                    `<span class="gray-text">
+
+                        No Discount
+
+                    </span>`
                 }
 
             </td>
 
-            <td>${item.stock}</td>
-
+            <!-- STOCK -->
             <td>
-                <button class="btn btn-sm btn-primary"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+
+                ${item.stock}
+
+            </td>
+
+            <!-- ACTION -->
+            <td>
+
+                <button class="btn btn-sm btn-primary">
+
+                    <i class="bi bi-pencil"></i>
+
+                </button>
+
+                <button class="btn btn-sm btn-danger">
+
+                    <i class="bi bi-trash"></i>
+
+                </button>
+
             </td>
 
         </tr>
@@ -117,14 +205,23 @@ fetch('/api/products/')
     });
 
     $('#productTable tbody').html(tbody);
-    if ($.fn.DataTable) {
+
+    // DATATABLE
+    if($.fn.DataTable){
+
         $('#productTable').DataTable({
-            pageLength: 5,
-            lengthChange: false,
-            info: false
+
+            destroy:true,
+            pageLength:5,
+            lengthChange:false,
+            info:false
+
         });
+
     }
+
 });
+
 
 // CLOSE MODAL
 const closeBtn = document.querySelector(".close-btn");
@@ -136,12 +233,15 @@ if(closeBtn){
         const modal = document.getElementById("imageModal");
 
         if(modal){
+
             modal.style.display = "none";
+
         }
 
     };
 
 }
+
 
 // IMAGE GALLERY
 function openImageGallery(images){
@@ -151,31 +251,41 @@ function openImageGallery(images){
     let thumbContainer = document.getElementById("thumbnailContainer");
 
     modal.style.display = "block";
+
     thumbContainer.innerHTML = "";
 
     if(!images || images.length === 0) return;
 
-    let firstImg = 'http://127.0.0.1:8000' + images[0].image;
-    mainImg.src = firstImg;
+    // FIRST IMAGE
+    mainImg.src = images[0].image;
 
     images.forEach((imgObj, index) => {
 
-        let imgUrl = 'http://127.0.0.1:8000' + imgObj.image;
-
         let thumb = document.createElement("img");
-        thumb.src = imgUrl;
+
+        thumb.src = imgObj.image;
+
         thumb.className = "thumb-img";
 
         if(index === 0){
+
             thumb.classList.add("active");
+
         }
 
         thumb.onclick = () => {
-            mainImg.src = imgUrl;
-            document.querySelectorAll(".thumb-img").forEach(el => el.classList.remove("active"));
+
+            mainImg.src = imgObj.image;
+
+            document.querySelectorAll(".thumb-img")
+            .forEach(el => el.classList.remove("active"));
+
             thumb.classList.add("active");
+
         };
 
         thumbContainer.appendChild(thumb);
+
     });
+
 }

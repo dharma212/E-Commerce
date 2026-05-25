@@ -413,14 +413,26 @@ class detailview(TemplateView):
 # ====================================
 # Product Detail View
 # ====================================
+# ====================================
+# Product Detail View
+# ====================================
+
 class ProductDetailView(View):
 
     def get(self, request, id):
+
+        # =========================
+        # PRODUCT
+        # =========================
 
         product = get_object_or_404(
             Product,
             id=id
         )
+
+        # =========================
+        # RELATED PRODUCTS
+        # =========================
 
         related_products = Product.objects.filter(
             category=product.category
@@ -429,20 +441,90 @@ class ProductDetailView(View):
         )[:8]
 
         # =========================
-        # CHECK PRODUCT IN CART
+        # DEFAULT VALUES
         # =========================
 
         in_cart = False
 
+        in_wishlist = False
+
+        cart_quantity = 1
+
+        cart_product_ids = []
+
+        wishlist_product_ids = []
+
+        # =========================
+        # LOGIN USER
+        # =========================
+
         if request.user.is_authenticated:
 
-            in_cart = CartItem.objects.filter(
+            # =========================
+            # CART ITEM
+            # =========================
+
+            cart_item = CartItem.objects.filter(
 
                 cart__user=request.user,
 
                 product=product
 
-            ).exists()
+            ).first()
+
+            # PRODUCT IN CART
+            if cart_item:
+
+                in_cart = True
+
+                cart_quantity = cart_item.quantity
+
+            # =========================
+            # ALL CART PRODUCTS
+            # =========================
+
+            cart_product_ids = list(
+
+                CartItem.objects.filter(
+
+                    cart__user=request.user
+
+                ).values_list(
+
+                    "product_id",
+
+                    flat=True
+
+                )
+
+            )
+
+            # =========================
+            # WISHLIST PRODUCTS
+            # =========================
+
+            wishlist_product_ids = list(
+
+                Wishlist.objects.filter(
+
+                    user=request.user
+
+                ).values_list(
+
+                    "product_id",
+
+                    flat=True
+
+                )
+
+            )
+
+            # PRODUCT IN WISHLIST
+            in_wishlist = product.id in wishlist_product_ids
+
+        # =========================
+        # CONTEXT
+        # =========================
 
         context = {
 
@@ -450,14 +532,26 @@ class ProductDetailView(View):
 
             "related_products": related_products,
 
-            "in_cart": in_cart
+            "in_cart": in_cart,
+
+            "in_wishlist": in_wishlist,
+
+            "cart_quantity": cart_quantity,
+
+            "cart_product_ids": cart_product_ids,
+
+            "wishlist_product_ids": wishlist_product_ids
 
         }
 
         return render(
+
             request,
+
             "detail.html",
+
             context
+
         )
     
 # ====================================
@@ -1470,18 +1564,66 @@ class CartView(LoginRequiredMixin, TemplateView):
 # ADD TO CART
 # =========================================
 
+import json
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+from .models import Product, Cart, CartItem
+
+
 class AddToCartView(LoginRequiredMixin, View):
 
     def post(self, request, product_id):
+
+        # =========================
+        # PRODUCT
+        # =========================
 
         product = get_object_or_404(
             Product,
             id=product_id
         )
 
+        # =========================
+        # CART
+        # =========================
+
         cart, created = Cart.objects.get_or_create(
             user=request.user
         )
+
+        # =========================
+        # JSON DATA
+        # =========================
+
+        try:
+
+            data = json.loads(request.body)
+
+            quantity = int(
+                data.get("quantity", 1)
+            )
+
+        except:
+
+            quantity = 1
+
+        # =========================
+        # STOCK LIMIT
+        # =========================
+
+        if quantity < 1:
+            quantity = 1
+
+        if quantity > product.stock:
+            quantity = product.stock
+
+        # =========================
+        # CHECK CART ITEM
+        # =========================
 
         cart_item = CartItem.objects.filter(
             cart=cart,
@@ -1518,7 +1660,7 @@ class AddToCartView(LoginRequiredMixin, View):
 
             product=product,
 
-            quantity=1
+            quantity=quantity
 
         )
 
@@ -1530,7 +1672,9 @@ class AddToCartView(LoginRequiredMixin, View):
 
             "status": "added",
 
-            "cart_count": cart_count
+            "cart_count": cart_count,
+
+            "quantity": quantity
 
         })
 
@@ -1807,3 +1951,149 @@ class SetDefaultAddressView(LoginRequiredMixin, View):
                 "status": "error",
                 "message": "Address not found"
             })
+    
+    
+# ===========================================================================================
+# Dashboard Wishlist 
+# ===========================================================================================
+# from django.views.generic import TemplateView
+# from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Count
+
+# from accounts.models import CustomUser
+# from products.models import Wishlist
+
+
+class WishlistDashboardView(LoginRequiredMixin, TemplateView):
+
+    template_name = "dashboard/wishlist.html"
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        wishlist_data = (
+            Wishlist.objects
+            .select_related("user", "product")
+            .order_by("-id")
+        )
+
+        # TOTAL WISHLIST COUNT
+        total_wishlist = Wishlist.objects.count()
+
+        # TOTAL USERS USING WISHLIST
+        total_users = (
+            Wishlist.objects.values("user")
+            .distinct()
+            .count()
+        )
+
+        # MOST WISHLISTED PRODUCTS
+        popular_products = (
+            Wishlist.objects
+            .values("product__name")
+            .annotate(total=Count("id"))
+            .order_by("-total")[:10]
+        )
+
+        context["wishlist_data"] = wishlist_data
+        context["total_wishlist"] = total_wishlist
+        context["total_users"] = total_users
+        context["popular_products"] = popular_products
+
+        return context
+    
+from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
+
+from .models import CartItem
+
+
+class AdminCartView(LoginRequiredMixin, TemplateView):
+
+    template_name = "dashboard/add_to_cart.html"
+
+    def dispatch(self, request, *args, **kwargs):
+
+        # ADMIN ONLY
+        if not request.user.is_superuser:
+            return redirect("home")
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        # CART ITEMS
+        cart_data = CartItem.objects.select_related(
+            "cart",
+            "cart__user",
+            "product"
+        ).prefetch_related(
+            "product__images"
+        ).order_by("-id")
+
+        # TOTAL CART ITEMS
+        total_cart = cart_data.count()
+
+        # TOTAL USERS
+        total_users = cart_data.values(
+            "cart__user"
+        ).distinct().count()
+
+        # TOTAL AMOUNT
+        total_amount = 0
+
+        for item in cart_data:
+
+            total_amount += item.total_price
+
+        context["cart_data"] = cart_data
+        context["total_cart"] = total_cart
+        context["total_users"] = total_users
+        context["total_amount"] = total_amount
+
+        return context
+    
+# views.py
+
+from django.views.generic import DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404
+
+from .models import Order
+
+
+class OrderDetailView(LoginRequiredMixin, DetailView):
+    model = Order
+    template_name = "order_details.html"
+    context_object_name = "order"
+
+    def get_object(self):
+        return get_object_or_404(
+            Order,
+            id=self.kwargs["pk"],
+            user=self.request.user
+        )
+        
+class UserListView(ListView):
+
+    model = User
+
+    template_name = "dashboard/user_list.html"
+
+    context_object_name = "users"
+
+    ordering = ['-id']
+    
+class adminOrderListView(ListView):
+
+    model = Order
+
+    template_name = "dashboard/order_list.html"
+
+    context_object_name = "orders"
+
+    ordering = ['-id']

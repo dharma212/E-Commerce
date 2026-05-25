@@ -1,4 +1,4 @@
-console.log("WISHLIST JS LOADED");
+console.log("GLOBAL WISHLIST LOADED");
 
 
 /* =========================================
@@ -217,7 +217,7 @@ document.head.appendChild(
 WISHLIST FUNCTION
 ========================================= */
 
-function toggleWishlist(
+async function toggleWishlist(
     productId,
     currentButton,
     removeCard=false
@@ -233,44 +233,46 @@ function toggleWishlist(
     currentButton.dataset.loading =
         "true";
 
-    fetch(
+    try{
 
-        "/api/wishlist/",
+        const response =
+            await fetch(
 
-        {
+                "/api/wishlist/",
 
-            method: "POST",
+                {
 
-            headers: {
+                    method: "POST",
 
-                "X-CSRFToken":
-                getCSRFToken(),
+                    headers: {
 
-                "Content-Type":
-                "application/x-www-form-urlencoded",
+                        "X-CSRFToken":
+                        getCSRFToken(),
 
-            },
+                        "Content-Type":
+                        "application/x-www-form-urlencoded",
 
-            body: new URLSearchParams({
+                    },
 
-                product_id: productId
+                    body: new URLSearchParams({
 
-            })
+                        product_id: productId
 
-        }
+                    })
 
-    )
+                }
 
-    .then(response => response.json())
+            );
 
-    .then(data => {
+        const data =
+            await response.json();
 
-        let icon =
+        const icon =
             currentButton.querySelector("i");
 
-        // =========================
-        // UPDATE COUNT
-        // =========================
+        /* =====================================
+        UPDATE COUNT
+        ===================================== */
 
         const wishlistCount =
             document.getElementById(
@@ -287,15 +289,11 @@ function toggleWishlist(
 
         }
 
-        // =========================
-        // ADD
-        // =========================
+        /* =====================================
+        ADDED
+        ===================================== */
 
         if(data.status === "added"){
-
-            currentButton.classList.add(
-                "active"
-            );
 
             currentButton.classList.remove(
                 "btn-outline-dark"
@@ -303,6 +301,10 @@ function toggleWishlist(
 
             currentButton.classList.add(
                 "btn-danger"
+            );
+
+            currentButton.classList.add(
+                "active"
             );
 
             if(icon){
@@ -324,20 +326,20 @@ function toggleWishlist(
 
         }
 
-        // =========================
-        // REMOVE
-        // =========================
+        /* =====================================
+        REMOVED
+        ===================================== */
 
         else if(
             data.status === "removed"
         ){
 
             currentButton.classList.remove(
-                "active"
+                "btn-danger"
             );
 
             currentButton.classList.remove(
-                "btn-danger"
+                "active"
             );
 
             currentButton.classList.add(
@@ -392,9 +394,9 @@ function toggleWishlist(
 
         }
 
-    })
+    }
 
-    .catch(error => {
+    catch(error){
 
         console.log(error);
 
@@ -403,77 +405,51 @@ function toggleWishlist(
             "error"
         );
 
-    })
+    }
 
-    .finally(() => {
+    finally{
 
         currentButton.dataset.loading =
             "false";
 
-    });
+    }
 
 }
 
 
 
 /* =========================================
-BUTTON EVENTS
+GLOBAL CLICK
 ========================================= */
 
 document.addEventListener(
-    "DOMContentLoaded",
-    function(){
+    "click",
+    function(e){
 
-        // WISHLIST BUTTONS
-        document.querySelectorAll(
-            ".wishlist-btn"
-        )
-
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                function(){
-
-                    toggleWishlist(
-
-                        this.dataset.productId,
-
-                        this
-
-                    );
-
-                }
+        const button =
+            e.target.closest(
+                ".wishlist-btn, .remove-wishlist-btn"
             );
 
-        });
+        if(!button){
+            return;
+        }
 
+        e.preventDefault();
 
-        // REMOVE BUTTONS
-        document.querySelectorAll(
-            ".remove-wishlist-btn"
-        )
+        const productId =
+            button.dataset.productId;
 
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                function(){
-
-                    toggleWishlist(
-
-                        this.dataset.productId,
-
-                        this,
-
-                        true
-
-                    );
-
-                }
+        const removeCard =
+            button.classList.contains(
+                "remove-wishlist-btn"
             );
 
-        });
+        toggleWishlist(
+            productId,
+            button,
+            removeCard
+        );
 
     }
 );
