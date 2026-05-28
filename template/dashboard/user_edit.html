@@ -1,0 +1,363 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid">
+
+  <!-- ===== Header ===== -->
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+
+    <h4 class="mb-0">
+
+      <i class="bi bi-pencil-square"></i>
+
+      Edit User
+
+    </h4>
+
+  </div>
+
+  <!-- ===== Card ===== -->
+
+  <div class="card shadow-sm border-0">
+
+    <div class="card-body">
+
+      <form id="editUserForm">
+    {% csrf_token %}
+
+        <div class="row">
+
+          <!-- IMAGE -->
+
+          <div class="col-md-12 mb-4 text-center">
+
+            {% if profile.image %}
+
+              <img src="{{ profile.image.url }}"
+                   width="120"
+                   height="120"
+                   style="border-radius:50%;object-fit:cover;">
+
+            {% else %}
+
+              <img src="{% static 'img/profile_icon.webp' %}"
+                   width="120"
+                   height="120"
+                   style="border-radius:50%;object-fit:cover;">
+
+            {% endif %}
+
+          </div>
+
+          <div class="col-md-6 mb-3">
+
+            <label class="form-label">
+
+              First Name
+
+            </label>
+
+            <input type="text"
+                   name="first_name"
+                   value="{{ edit_user.first_name }}"
+                   class="form-control">
+
+          </div>
+
+          <div class="col-md-6 mb-3">
+
+            <label class="form-label">
+
+              Last Name
+
+            </label>
+
+            <input type="text"
+                   name="last_name"
+                   value="{{ edit_user.last_name }}"
+                   class="form-control">
+
+          </div>
+
+          <div class="col-md-6 mb-3">
+
+            <label class="form-label">
+
+              Email
+
+            </label>
+
+            <input type="email"
+                   name="email"
+                   value="{{ edit_user.email }}"
+                   class="form-control">
+
+          </div>
+
+          <div class="col-md-6 mb-3">
+
+            <label class="form-label">
+
+              Username
+
+            </label>
+
+            <input type="text"
+                   name="username"
+                   value="{{ edit_user.username }}"
+                   class="form-control">
+
+          </div>
+
+          <div class="col-md-6 mb-3">
+
+            <label class="form-label">
+
+              Phone
+
+            </label>
+
+            <input type="text"
+                   name="phone"
+                   value="{{ profile.phone }}"
+                   class="form-control">
+
+          </div>
+
+          <div class="col-md-6 mb-3">
+
+            <label class="form-label">
+
+              City
+
+            </label>
+
+            <input type="text"
+                   name="city"
+                   value="{{ profile.city }}"
+                   class="form-control">
+
+          </div>
+
+          <div class="col-md-12 mb-3">
+
+            <label class="form-label">
+
+              Bio
+
+            </label>
+
+            <textarea name="bio"
+                      rows="4"
+                      class="form-control">{{ profile.bio }}</textarea>
+
+          </div>
+
+          <div class="col-md-12 mb-3">
+
+            <label class="form-label">
+
+              Profile Image
+
+            </label>
+
+            <input type="file"
+                   name="image"
+                   class="form-control">
+
+          </div>
+
+          <!-- ADDRESS -->
+
+          <div class="col-md-6 mb-3">
+
+            <label class="form-label">
+
+              Full Name
+
+            </label>
+
+            <input type="text"
+                   name="full_name"
+                   value="{{ address.full_name }}"
+                   class="form-control">
+
+          </div>
+
+          <div class="col-md-6 mb-3">
+
+            <label class="form-label">
+
+              Address Phone
+
+            </label>
+
+            <input type="text"
+                   name="address_phone"
+                   value="{{ address.phone }}"
+                   class="form-control">
+
+          </div>
+
+          <div class="col-md-12 mb-3">
+
+            <label class="form-label">
+
+              Address
+
+            </label>
+
+            <textarea name="address"
+                      rows="3"
+                      class="form-control">{{ address.address }}</textarea>
+
+          </div>
+
+          <div class="col-md-4 mb-3">
+
+            <label class="form-label">
+
+              Address City
+
+            </label>
+
+            <input type="text"
+                   name="address_city"
+                   value="{{ address.city }}"
+                   class="form-control">
+
+          </div>
+
+          <div class="col-md-4 mb-3">
+
+            <label class="form-label">
+
+              State
+
+            </label>
+
+            <input type="text"
+                   name="state"
+                   value="{{ address.state }}"
+                   class="form-control">
+
+          </div>
+
+          <div class="col-md-4 mb-3">
+
+            <label class="form-label">
+
+              Pincode
+
+            </label>
+
+            <input type="text"
+                   name="pincode"
+                   value="{{ address.pincode }}"
+                   class="form-control">
+
+          </div>
+
+        </div>
+
+        <!-- BUTTONS -->
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+
+          <a href="{% url 'user_list' %}"
+             class="btn btn-secondary">
+
+            <i class="bi bi-arrow-left me-1"></i>
+
+            Back
+
+          </a>
+
+          <button type="submit"
+                  class="btn btn-success">
+
+            <i class="bi bi-save me-1"></i>
+
+            Save Changes
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script>
+
+$(document).ready(function(){
+
+    $('#editUserForm').submit(function(e){
+
+        e.preventDefault();
+
+        let formData = new FormData(this);
+
+        $.ajax({
+
+            url: "{% url 'user_detail_api' edit_user.id %}",
+
+            type: "POST",
+
+            data: formData,
+
+            processData: false,
+
+            contentType: false,
+
+            headers: {
+                "X-CSRFToken": $('[name=csrfmiddlewaretoken]').val()
+            },
+
+            success: function(response){
+
+                if(response.status == "success"){
+
+                    toastr.success("User updated successfully");
+
+                    setTimeout(function(){
+
+                        window.location.href = "{% url 'user_list' %}";
+
+                    },1000);
+
+                }
+
+            },
+
+            error: function(xhr){
+
+                console.log(xhr.responseText);
+
+                toastr.error("Something went wrong");
+
+            }
+
+        });
+
+    });
+
+});
+
+</script>
+
+{% endblock extra_js %}

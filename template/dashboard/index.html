@@ -1,668 +1,924 @@
 {% extends 'dashboard/base.html' %}
-{% block content %}
 {% load static %}
-          <div class="content-wrapper">
-            <div class="row">
-              <div class="col-12 grid-margin stretch-card">
-                <div class="card corona-gradient-card">
-                  <div class="card-body py-0 px-0 px-sm-3">
-                    <div class="row align-items-center">
-                      <div class="col-4 col-sm-3 col-xl-2">
-                        {% comment %} <img src="assets/images/dashboard/Group126@2x.png" class="gradient-corona-img img-fluid" alt=""> {% endcomment %}
-                      </div>
-                      <div class="col-5 col-sm-7 col-xl-8 p-0">
-                        <h4 class="mb-1 mb-sm-0">Want even more features?</h4>
-                        <p class="mb-0 font-weight-normal d-none d-sm-block">Check out our Pro version with 5 unique layouts!</p>
-                      </div>
-                      <div class="col-3 col-sm-2 col-xl-2 pl-0 text-center">
-                        <span>
-                          <a href="https://www.bootstrapdash.com/product/corona-admin-template/" target="_blank" class="btn btn-outline-light btn-rounded get-started-btn">Upgrade to PRO</a>
+{% block content %}
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+/* =========================
+   MAIN
+========================= */
+
+.dashboard-page{
+    background:#f4f7fc;
+    min-height:100vh;
+    padding:25px;
+}
+
+/* =========================
+   TOP WELCOME
+========================= */
+
+.welcome-card{
+    background:linear-gradient(135deg,#4f46e5,#7c3aed);
+    border-radius:22px;
+    padding:35px;
+    color:#fff;
+    margin-bottom:25px;
+    position:relative;
+    overflow:hidden;
+}
+
+.welcome-card h2{
+    font-size:34px;
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+.welcome-card p{
+    opacity:0.9;
+    margin:0;
+    font-size:15px;
+}
+
+/* =========================
+   STATS
+========================= */
+
+.stats-card{
+    background:#fff;
+    border-radius:20px;
+    padding:24px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.06);
+    transition:0.3s;
+    height:100%;
+}
+
+.stats-card:hover{
+    transform:translateY(-5px);
+}
+
+.stats-flex{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.stats-title{
+    font-size:14px;
+    color:#777;
+    margin-bottom:8px;
+}
+
+.stats-value{
+    font-size:32px;
+    font-weight:700;
+    color:#111827;
+    margin-bottom:5px;
+}
+
+.stats-growth{
+    font-size:13px;
+    color:#22c55e;
+    font-weight:600;
+}
+
+.stats-icon{
+    width:60px;
+    height:60px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+    color:#fff;
+}
+
+.users-bg{
+    background:#3b82f6;
+}
+
+.orders-bg{
+    background:#22c55e;
+}
+
+.products-bg{
+    background:#f59e0b;
+}
+
+.revenue-bg{
+    background:#ef4444;
+}
+
+/* =========================
+   COMMON CARD
+========================= */
+
+.dashboard-card{
+    background:#fff;
+    border-radius:22px;
+    padding:25px;
+    margin-top:25px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.06);
+}
+
+.card-title-main{
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:25px;
+    color:#111827;
+}
+
+/* =========================
+   CHART SECTION
+========================= */
+
+.chart-wrapper{
+    display:flex;
+    gap:25px;
+    flex-wrap:wrap;
+}
+
+.chart-card{
+    flex:1;
+    min-width:300px;
+}
+
+.small-chart{
+    width:320px;
+    margin:auto;
+}
+
+.small-chart canvas{
+    max-width:100%;
+    max-height:260px !important;
+}
+
+/* =========================
+   BEST SELLING PRODUCT
+========================= */
+
+.best-product-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 0;
+    border-bottom:1px solid #eee;
+}
+
+.best-product-left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.best-product-img{
+    width:60px;
+    height:60px;
+    border-radius:14px;
+    object-fit:cover;
+}
+
+.best-product-name{
+    font-size:15px;
+    font-weight:600;
+    color:#111;
+}
+
+.best-product-sold{
+    font-size:13px;
+    color:#777;
+}
+
+.progress{
+    width:140px;
+    height:8px;
+    border-radius:30px;
+    background:#e5e7eb;
+    overflow:hidden;
+}
+
+.progress-bar{
+    height:100%;
+    background:linear-gradient(to right,#4f46e5,#7c3aed);
+    border-radius:30px;
+}
+
+/* =========================
+   LOW STOCK
+========================= */
+
+.stock-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:16px 0;
+    border-bottom:1px solid #eee;
+}
+
+.stock-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.stock-badge{
+    background:#ef4444;
+    color:#fff;
+    padding:6px 12px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:600;
+}
+
+/* =========================
+   PENDING ORDERS
+========================= */
+
+.order-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.order-table thead th{
+    background:#111827;
+    color:#fff;
+    padding:14px;
+    font-size:14px;
+}
+
+.order-table tbody td{
+    padding:15px;
+    border-bottom:1px solid #eee;
+}
+
+.pending-badge{
+    background:#f59e0b;
+    color:#fff;
+    padding:6px 12px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:600;
+}
+
+/* =========================
+   EXTRA SMALL CARDS
+========================= */
+
+.mini-card{
+    background:#fff;
+    border-radius:18px;
+    padding:20px;
+    text-align:center;
+    box-shadow:0 5px 20px rgba(0,0,0,0.06);
+}
+
+.mini-card h4{
+    font-size:28px;
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+.mini-card p{
+    margin:0;
+    color:#777;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:768px){
+
+    .welcome-card h2{
+        font-size:26px;
+    }
+
+    .stats-value{
+        font-size:25px;
+    }
+
+    .small-chart{
+        width:100%;
+    }
+
+}
+.chart-wrapper{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.chart-card{
+    flex:1;
+    min-width:280px;
+    background:#fff;
+    border-radius:18px;
+    padding:20px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.06);
+}
+
+.chart-card h3{
+    font-size:18px;
+    margin-bottom:15px;
+}
+</style>
+
+<div class="dashboard-page">
+
+    <!-- WELCOME -->
+
+    <div class="welcome-card">
+
+        <h2>
+
+            Ecommerce Dashboard
+
+        </h2>
+
+        <p>
+
+            Monitor orders, products, revenue and customer activity.
+
+        </p>
+
+    </div>
+
+    <!-- STATS -->
+
+    <div class="row">
+
+        <div class="col-xl-3 col-md-6 mb-4">
+
+            <div class="stats-card">
+
+                <div class="stats-flex">
+
+                    <div>
+
+                        <p class="stats-title">
+
+                            Total Users
+
+                        </p>
+
+                        <h2 class="stats-value">
+
+                            {{ total_users }}
+
+                        </h2>
+
+                        <span class="stats-growth">
+
+                            +12% this month
+
                         </span>
-                      </div>
+
                     </div>
-                  </div>
+
+                    <div class="stats-icon users-bg">
+
+                        <i class="fa fa-users"></i>
+
+                    </div>
+
                 </div>
-              </div>
+
             </div>
-            <div class="row">
-              <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <div class="row">
-                      <div class="col-9">
-                        <div class="d-flex align-items-center align-self-start">
-                          <h3 class="mb-0">$12.34</h3>
-                          <p class="text-success ml-2 mb-0 font-weight-medium">+3.5%</p>
-                        </div>
-                      </div>
-                      <div class="col-3">
-                        <div class="icon icon-box-success ">
-                          <span class="mdi mdi-arrow-top-right icon-item"></span>
-                        </div>
-                      </div>
+
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+
+            <div class="stats-card">
+
+                <div class="stats-flex">
+
+                    <div>
+
+                        <p class="stats-title">
+
+                            Orders
+
+                        </p>
+
+                        <h2 class="stats-value">
+
+                            {{ total_orders }}
+
+                        </h2>
+
+                        <span class="stats-growth">
+
+                            +8% this week
+
+                        </span>
+
                     </div>
-                    <h6 class="text-muted font-weight-normal">Potential growth</h6>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <div class="row">
-                      <div class="col-9">
-                        <div class="d-flex align-items-center align-self-start">
-                          <h3 class="mb-0">$17.34</h3>
-                          <p class="text-success ml-2 mb-0 font-weight-medium">+11%</p>
-                        </div>
-                      </div>
-                      <div class="col-3">
-                        <div class="icon icon-box-success">
-                          <span class="mdi mdi-arrow-top-right icon-item"></span>
-                        </div>
-                      </div>
+
+                    <div class="stats-icon orders-bg">
+
+                        <i class="fa fa-cart-shopping"></i>
+
                     </div>
-                    <h6 class="text-muted font-weight-normal">Revenue current</h6>
-                  </div>
+
                 </div>
-              </div>
-              <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <div class="row">
-                      <div class="col-9">
-                        <div class="d-flex align-items-center align-self-start">
-                          <h3 class="mb-0">$12.34</h3>
-                          <p class="text-danger ml-2 mb-0 font-weight-medium">-2.4%</p>
-                        </div>
-                      </div>
-                      <div class="col-3">
-                        <div class="icon icon-box-danger">
-                          <span class="mdi mdi-arrow-bottom-left icon-item"></span>
-                        </div>
-                      </div>
-                    </div>
-                    <h6 class="text-muted font-weight-normal">Daily Income</h6>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <div class="row">
-                      <div class="col-9">
-                        <div class="d-flex align-items-center align-self-start">
-                          <h3 class="mb-0">$31.53</h3>
-                          <p class="text-success ml-2 mb-0 font-weight-medium">+3.5%</p>
-                        </div>
-                      </div>
-                      <div class="col-3">
-                        <div class="icon icon-box-success ">
-                          <span class="mdi mdi-arrow-top-right icon-item"></span>
-                        </div>
-                      </div>
-                    </div>
-                    <h6 class="text-muted font-weight-normal">Expense current</h6>
-                  </div>
-                </div>
-              </div>
+
             </div>
-            <div class="row">
-              <div class="col-md-4 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Transaction History</h4>
-                    <canvas id="transaction-history" class="transaction-chart"></canvas>
-                    <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
-                      <div class="text-md-center text-xl-left">
-                        <h6 class="mb-1">Transfer to Paypal</h6>
-                        <p class="text-muted mb-0">07 Jan 2019, 09:12AM</p>
-                      </div>
-                      <div class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
-                        <h6 class="font-weight-bold mb-0">$236</h6>
-                      </div>
+
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+
+            <div class="stats-card">
+
+                <div class="stats-flex">
+
+                    <div>
+
+                        <p class="stats-title">
+
+                            Products
+
+                        </p>
+
+                        <h2 class="stats-value">
+
+                            {{ total_products }}
+
+                        </h2>
+
+                        <span class="stats-growth">
+
+                            +5 new added
+
+                        </span>
+
                     </div>
-                    <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
-                      <div class="text-md-center text-xl-left">
-                        <h6 class="mb-1">Tranfer to Stripe</h6>
-                        <p class="text-muted mb-0">07 Jan 2019, 09:12AM</p>
-                      </div>
-                      <div class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
-                        <h6 class="font-weight-bold mb-0">$593</h6>
-                      </div>
+
+                    <div class="stats-icon products-bg">
+
+                        <i class="fa fa-box"></i>
+
                     </div>
-                  </div>
+
                 </div>
-              </div>
-              <div class="col-md-8 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <div class="d-flex flex-row justify-content-between">
-                      <h4 class="card-title mb-1">Open Projects</h4>
-                      <p class="text-muted mb-1">Your data status</p>
-                    </div>
-                    <div class="row">
-                      <div class="col-12">
-                        <div class="preview-list">
-                          <div class="preview-item border-bottom">
-                            <div class="preview-thumbnail">
-                              <div class="preview-icon bg-primary">
-                                <i class="mdi mdi-file-document"></i>
-                              </div>
-                            </div>
-                            <div class="preview-item-content d-sm-flex flex-grow">
-                              <div class="flex-grow">
-                                <h6 class="preview-subject">Admin dashboard design</h6>
-                                <p class="text-muted mb-0">Broadcast web app mockup</p>
-                              </div>
-                              <div class="mr-auto text-sm-right pt-2 pt-sm-0">
-                                <p class="text-muted">15 minutes ago</p>
-                                <p class="text-muted mb-0">30 tasks, 5 issues </p>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="preview-item border-bottom">
-                            <div class="preview-thumbnail">
-                              <div class="preview-icon bg-success">
-                                <i class="mdi mdi-cloud-download"></i>
-                              </div>
-                            </div>
-                            <div class="preview-item-content d-sm-flex flex-grow">
-                              <div class="flex-grow">
-                                <h6 class="preview-subject">Wordpress Development</h6>
-                                <p class="text-muted mb-0">Upload new design</p>
-                              </div>
-                              <div class="mr-auto text-sm-right pt-2 pt-sm-0">
-                                <p class="text-muted">1 hour ago</p>
-                                <p class="text-muted mb-0">23 tasks, 5 issues </p>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="preview-item border-bottom">
-                            <div class="preview-thumbnail">
-                              <div class="preview-icon bg-info">
-                                <i class="mdi mdi-clock"></i>
-                              </div>
-                            </div>
-                            <div class="preview-item-content d-sm-flex flex-grow">
-                              <div class="flex-grow">
-                                <h6 class="preview-subject">Project meeting</h6>
-                                <p class="text-muted mb-0">New project discussion</p>
-                              </div>
-                              <div class="mr-auto text-sm-right pt-2 pt-sm-0">
-                                <p class="text-muted">35 minutes ago</p>
-                                <p class="text-muted mb-0">15 tasks, 2 issues</p>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="preview-item border-bottom">
-                            <div class="preview-thumbnail">
-                              <div class="preview-icon bg-danger">
-                                <i class="mdi mdi-email-open"></i>
-                              </div>
-                            </div>
-                            <div class="preview-item-content d-sm-flex flex-grow">
-                              <div class="flex-grow">
-                                <h6 class="preview-subject">Broadcast Mail</h6>
-                                <p class="text-muted mb-0">Sent release details to team</p>
-                              </div>
-                              <div class="mr-auto text-sm-right pt-2 pt-sm-0">
-                                <p class="text-muted">55 minutes ago</p>
-                                <p class="text-muted mb-0">35 tasks, 7 issues </p>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="preview-item">
-                            <div class="preview-thumbnail">
-                              <div class="preview-icon bg-warning">
-                                <i class="mdi mdi-chart-pie"></i>
-                              </div>
-                            </div>
-                            <div class="preview-item-content d-sm-flex flex-grow">
-                              <div class="flex-grow">
-                                <h6 class="preview-subject">UI Design</h6>
-                                <p class="text-muted mb-0">New application planning</p>
-                              </div>
-                              <div class="mr-auto text-sm-right pt-2 pt-sm-0">
-                                <p class="text-muted">50 minutes ago</p>
-                                <p class="text-muted mb-0">27 tasks, 4 issues </p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
             </div>
-            <div class="row">
-              <div class="col-sm-4 grid-margin">
-                <div class="card">
-                  <div class="card-body">
-                    <h5>Revenue</h5>
-                    <div class="row">
-                      <div class="col-8 col-sm-12 col-xl-8 my-auto">
-                        <div class="d-flex d-sm-block d-md-flex align-items-center">
-                          <h2 class="mb-0">$32123</h2>
-                          <p class="text-success ml-2 mb-0 font-weight-medium">+3.5%</p>
-                        </div>
-                        <h6 class="text-muted font-weight-normal">11.38% Since last month</h6>
-                      </div>
-                      <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
-                        <i class="icon-lg mdi mdi-codepen text-primary ml-auto"></i>
-                      </div>
+
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+
+            <div class="stats-card">
+
+                <div class="stats-flex">
+
+                    <div>
+
+                        <p class="stats-title">
+
+                            Revenue
+
+                        </p>
+
+                        <h2 class="stats-value">
+
+                            ₹{{ total_revenue }}
+
+                        </h2>
+
+                        <span class="stats-growth">
+
+                            +18% growth
+
+                        </span>
+
                     </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-sm-4 grid-margin">
-                <div class="card">
-                  <div class="card-body">
-                    <h5>Sales</h5>
-                    <div class="row">
-                      <div class="col-8 col-sm-12 col-xl-8 my-auto">
-                        <div class="d-flex d-sm-block d-md-flex align-items-center">
-                          <h2 class="mb-0">$45850</h2>
-                          <p class="text-success ml-2 mb-0 font-weight-medium">+8.3%</p>
-                        </div>
-                        <h6 class="text-muted font-weight-normal"> 9.61% Since last month</h6>
-                      </div>
-                      <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
-                        <i class="icon-lg mdi mdi-wallet-travel text-danger ml-auto"></i>
-                      </div>
+
+                    <div class="stats-icon revenue-bg">
+
+                        <i class="fa fa-indian-rupee-sign"></i>
+
                     </div>
-                  </div>
+
                 </div>
-              </div>
-              <div class="col-sm-4 grid-margin">
-                <div class="card">
-                  <div class="card-body">
-                    <h5>Purchase</h5>
-                    <div class="row">
-                      <div class="col-8 col-sm-12 col-xl-8 my-auto">
-                        <div class="d-flex d-sm-block d-md-flex align-items-center">
-                          <h2 class="mb-0">$2039</h2>
-                          <p class="text-danger ml-2 mb-0 font-weight-medium">-2.1% </p>
-                        </div>
-                        <h6 class="text-muted font-weight-normal">2.27% Since last month</h6>
-                      </div>
-                      <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
-                        <i class="icon-lg mdi mdi-monitor text-success ml-auto"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
             </div>
-            <div class="row ">
-              <div class="col-12 grid-margin">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Order Status</h4>
-                    <div class="table-responsive">
-                      <table class="table">
-                        <thead>
-                          <tr>
-                            <th>
-                              <div class="form-check form-check-muted m-0">
-                                <label class="form-check-label">
-                                  <input type="checkbox" class="form-check-input">
-                                </label>
-                              </div>
-                            </th>
-                            <th> Client Name </th>
-                            <th> Order No </th>
-                            <th> Product Cost </th>
-                            <th> Project </th>
-                            <th> Payment Mode </th>
-                            <th> Start Date </th>
-                            <th> Payment Status </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>
-                              <div class="form-check form-check-muted m-0">
-                                <label class="form-check-label">
-                                  <input type="checkbox" class="form-check-input">
-                                </label>
-                              </div>
-                            </td>
-                            <td>
-                              {% comment %} <img src="{% static 'dashboard/images/faces/face1.jpg' %}" alt="image" /> {% endcomment %}
-                              <span class="pl-2">Henry Klein</span>
-                            </td>
-                            <td> 02312 </td>
-                            <td> $14,500 </td>
-                            <td> Dashboard </td>
-                            <td> Credit card </td>
-                            <td> 04 Dec 2019 </td>
-                            <td>
-                              <div class="badge badge-outline-success">Approved</div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div class="form-check form-check-muted m-0">
-                                <label class="form-check-label">
-                                  <input type="checkbox" class="form-check-input">
-                                </label>
-                              </div>
-                            </td>
-                            <td>
-                              {% comment %} <img src="assets/images/faces/face2.jpg" alt="image" /> {% endcomment %}
-                              <span class="pl-2">Estella Bryan</span>
-                            </td>
-                            <td> 02312 </td>
-                            <td> $14,500 </td>
-                            <td> Website </td>
-                            <td> Cash on delivered </td>
-                            <td> 04 Dec 2019 </td>
-                            <td>
-                              <div class="badge badge-outline-warning">Pending</div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div class="form-check form-check-muted m-0">
-                                <label class="form-check-label">
-                                  <input type="checkbox" class="form-check-input">
-                                </label>
-                              </div>
-                            </td>
-                            <td>
-                              {% comment %} <img src="assets/images/faces/face5.jpg" alt="image" /> {% endcomment %}
-                              <span class="pl-2">Lucy Abbott</span>
-                            </td>
-                            <td> 02312 </td>
-                            <td> $14,500 </td>
-                            <td> App design </td>
-                            <td> Credit card </td>
-                            <td> 04 Dec 2019 </td>
-                            <td>
-                              <div class="badge badge-outline-danger">Rejected</div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div class="form-check form-check-muted m-0">
-                                <label class="form-check-label">
-                                  <input type="checkbox" class="form-check-input">
-                                </label>
-                              </div>
-                            </td>
-                            <td>
-                              {% comment %} <img src="assets/images/faces/face3.jpg" alt="image" /> {% endcomment %}
-                              <span class="pl-2">Peter Gill</span>
-                            </td>
-                            <td> 02312 </td>
-                            <td> $14,500 </td>
-                            <td> Development </td>
-                            <td> Online Payment </td>
-                            <td> 04 Dec 2019 </td>
-                            <td>
-                              <div class="badge badge-outline-success">Approved</div>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              <div class="form-check form-check-muted m-0">
-                                <label class="form-check-label">
-                                  <input type="checkbox" class="form-check-input">
-                                </label>
-                              </div>
-                            </td>
-                            <td>
-                              {% comment %} <img src="assets/images/faces/face4.jpg" alt="image" /> {% endcomment %}
-                              <span class="pl-2">Sallie Reyes</span>
-                            </td>
-                            <td> 02312 </td>
-                            <td> $14,500 </td>
-                            <td> Website </td>
-                            <td> Credit card </td>
-                            <td> 04 Dec 2019 </td>
-                            <td>
-                              <div class="badge badge-outline-success">Approved</div>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
+        </div>
+
+    </div>
+
+    <!-- CHARTS -->
+<div class="dashboard-card">
+
+    <div class="chart-wrapper">
+
+        <!-- ORDER GRAPH -->
+        <div class="chart-card">
+
+            <h3 class="card-title-main">
+                Order Status
+            </h3>
+
+            <!-- FIX SIZE BOX -->
+            <div style="height:240px; width:100%; max-width:320px; margin:auto;">
+                <canvas id="orderChart"></canvas>
             </div>
-            <div class="row">
-              <div class="col-md-6 col-xl-4 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <div class="d-flex flex-row justify-content-between">
-                      <h4 class="card-title">Messages</h4>
-                      <p class="text-muted mb-1 small">View all</p>
-                    </div>
-                    <div class="preview-list">
-                      <div class="preview-item border-bottom">
-                        <div class="preview-thumbnail">
-                          {% comment %} <img src="assets/images/faces/face6.jpg" alt="image" class="rounded-circle" /> {% endcomment %}
-                        </div>
-                        <div class="preview-item-content d-flex flex-grow">
-                          <div class="flex-grow">
-                            <div class="d-flex d-md-block d-xl-flex justify-content-between">
-                              <h6 class="preview-subject">Leonard</h6>
-                              <p class="text-muted text-small">5 minutes ago</p>
-                            </div>
-                            <p class="text-muted">Well, it seems to be working now.</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="preview-item border-bottom">
-                        <div class="preview-thumbnail">
-                          {% comment %} <img src="assets/images/faces/face8.jpg" alt="image" class="rounded-circle" /> {% endcomment %}
-                        </div>
-                        <div class="preview-item-content d-flex flex-grow">
-                          <div class="flex-grow">
-                            <div class="d-flex d-md-block d-xl-flex justify-content-between">
-                              <h6 class="preview-subject">Luella Mills</h6>
-                              <p class="text-muted text-small">10 Minutes Ago</p>
-                            </div>
-                            <p class="text-muted">Well, it seems to be working now.</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="preview-item border-bottom">
-                        <div class="preview-thumbnail">
-                          {% comment %} <img src="assets/images/faces/face9.jpg" alt="image" class="rounded-circle" /> {% endcomment %}
-                        </div>
-                        <div class="preview-item-content d-flex flex-grow">
-                          <div class="flex-grow">
-                            <div class="d-flex d-md-block d-xl-flex justify-content-between">
-                              <h6 class="preview-subject">Ethel Kelly</h6>
-                              <p class="text-muted text-small">2 Hours Ago</p>
-                            </div>
-                            <p class="text-muted">Please review the tickets</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="preview-item border-bottom">
-                        <div class="preview-thumbnail">
-                          {% comment %} <img src="assets/images/faces/face11.jpg" alt="image" class="rounded-circle" /> {% endcomment %}
-                        </div>
-                        <div class="preview-item-content d-flex flex-grow">
-                          <div class="flex-grow">
-                            <div class="d-flex d-md-block d-xl-flex justify-content-between">
-                              <h6 class="preview-subject">Herman May</h6>
-                              <p class="text-muted text-small">4 Hours Ago</p>
-                            </div>
-                            <p class="text-muted">Thanks a lot. It was easy to fix it .</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6 col-xl-4 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Portfolio Slide</h4>
-                    <div class="owl-carousel owl-theme full-width owl-carousel-dash portfolio-carousel" id="owl-carousel-basic">
-                      <div class="item">
-                        {% comment %} <img src="assets/images/dashboard/Rectangle.jpg" alt=""> {% endcomment %}
-                      </div>
-                      <div class="item">
-                        {% comment %} <img src="assets/images/dashboard/Img_5.jpg" alt=""> {% endcomment %}
-                      </div>
-                      <div class="item">
-                        {% comment %} <img src="assets/images/dashboard/img_6.jpg" alt=""> {% endcomment %}
-                      </div>
-                    </div>
-                    <div class="d-flex py-4">
-                      <div class="preview-list w-100">
-                        <div class="preview-item p-0">
-                          <div class="preview-thumbnail">
-                            {% comment %} <img src="{% static 'dashboard/assets/images/faces/face12.jpg' %}" class="rounded-circle" alt=""> {% endcomment %}
-                          </div>
-                          <div class="preview-item-content d-flex flex-grow">
-                            <div class="flex-grow">
-                              <div class="d-flex d-md-block d-xl-flex justify-content-between">
-                                <h6 class="preview-subject">CeeCee Bass</h6>
-                                <p class="text-muted text-small">4 Hours Ago</p>
-                              </div>
-                              <p class="text-muted">Well, it seems to be working now.</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <p class="text-muted">Well, it seems to be working now. </p>
-                    <div class="progress progress-md portfolio-progress">
-                      <div class="progress-bar bg-success" role="progressbar" style="width: 50%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-12 col-xl-4 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">To do list</h4>
-                    <div class="add-items d-flex">
-                      <input type="text" class="form-control todo-list-input" placeholder="enter task..">
-                      <button class="add btn btn-primary todo-list-add-btn">Add</button>
-                    </div>
-                    <div class="list-wrapper">
-                      <ul class="d-flex flex-column-reverse text-white todo-list todo-list-custom">
-                        <li>
-                          <div class="form-check form-check-primary">
-                            <label class="form-check-label">
-                              <input class="checkbox" type="checkbox"> Create invoice </label>
-                          </div>
-                          <i class="remove mdi mdi-close-box"></i>
-                        </li>
-                        <li>
-                          <div class="form-check form-check-primary">
-                            <label class="form-check-label">
-                              <input class="checkbox" type="checkbox"> Meeting with Alita </label>
-                          </div>
-                          <i class="remove mdi mdi-close-box"></i>
-                        </li>
-                        <li class="completed">
-                          <div class="form-check form-check-primary">
-                            <label class="form-check-label">
-                              <input class="checkbox" type="checkbox" checked> Prepare for presentation </label>
-                          </div>
-                          <i class="remove mdi mdi-close-box"></i>
-                        </li>
-                        <li>
-                          <div class="form-check form-check-primary">
-                            <label class="form-check-label">
-                              <input class="checkbox" type="checkbox"> Plan weekend outing </label>
-                          </div>
-                          <i class="remove mdi mdi-close-box"></i>
-                        </li>
-                        <li>
-                          <div class="form-check form-check-primary">
-                            <label class="form-check-label">
-                              <input class="checkbox" type="checkbox"> Pick up kids from school </label>
-                          </div>
-                          <i class="remove mdi mdi-close-box"></i>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
+        </div>
+
+        <!-- STOCK BAR GRAPH -->
+        <div class="chart-card">
+
+            <h3 class="card-title-main">
+                Product Performance
+            </h3>
+
+            <div style="height:240px; width:100%;">
+
+                <canvas id="bestSellingChart"></canvas>
+
             </div>
-            <div class="row">
-              <div class="col-12">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Visitors by Countries</h4>
-                    <div class="row">
-                      <div class="col-md-5">
-                        <div class="table-responsive">
-                          <table class="table">
-                            <tbody>
-                              <tr>
-                                <td>
-                                  <i class="flag-icon flag-icon-us"></i>
-                                </td>
-                                <td>USA</td>
-                                <td class="text-right"> 1500 </td>
-                                <td class="text-right font-weight-medium"> 56.35% </td>
-                              </tr>
-                              <tr>
-                                <td>
-                                  <i class="flag-icon flag-icon-de"></i>
-                                </td>
-                                <td>Germany</td>
-                                <td class="text-right"> 800 </td>
-                                <td class="text-right font-weight-medium"> 33.25% </td>
-                              </tr>
-                              <tr>
-                                <td>
-                                  <i class="flag-icon flag-icon-au"></i>
-                                </td>
-                                <td>Australia</td>
-                                <td class="text-right"> 760 </td>
-                                <td class="text-right font-weight-medium"> 15.45% </td>
-                              </tr>
-                              <tr>
-                                <td>
-                                  <i class="flag-icon flag-icon-gb"></i>
-                                </td>
-                                <td>United Kingdom</td>
-                                <td class="text-right"> 450 </td>
-                                <td class="text-right font-weight-medium"> 25.00% </td>
-                              </tr>
-                              <tr>
-                                <td>
-                                  <i class="flag-icon flag-icon-ro"></i>
-                                </td>
-                                <td>Romania</td>
-                                <td class="text-right"> 620 </td>
-                                <td class="text-right font-weight-medium"> 10.25% </td>
-                              </tr>
-                              <tr>
-                                <td>
-                                  <i class="flag-icon flag-icon-br"></i>
-                                </td>
-                                <td>Brasil</td>
-                                <td class="text-right"> 230 </td>
-                                <td class="text-right font-weight-medium"> 75.00% </td>
-                              </tr>
-                            </tbody>
-                          </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+    <!-- LOW STOCK + EXTRA -->
+
+    <div class="row">
+
+        <div class="col-lg-6">
+
+            <div class="dashboard-card">
+
+                <h3 class="card-title-main">
+
+                    Low Stock Products
+
+                </h3>
+
+                {% for product in low_stock_products %}
+
+                <div class="stock-item">
+
+                    <div class="stock-left">
+
+                        {% if product.image %}
+
+                        <img src="{{ product.image.url }}"
+                             class="best-product-img">
+
+                        {% endif %}
+
+                        <div>
+
+                            <div class="best-product-name">
+
+                                {{ product.name }}
+
+                            </div>
+
+                            <div class="best-product-sold">
+
+                                Only {{ product.stock }} left
+
+                            </div>
+
                         </div>
-                      </div>
-                      <div class="col-md-7">
-                        <div id="audience-map" class="vector-map"></div>
-                      </div>
+
                     </div>
-                  </div>
+
+                    <span class="stock-badge">
+
+                        Low Stock
+
+                    </span>
+
                 </div>
-              </div>
+
+                {% endfor %}
+
             </div>
-          </div>
-          <!-- content-wrapper ends -->
-         
-{% endblock content %}
+
+        </div>
+
+        <!-- QUICK INFO -->
+
+        <div class="col-lg-6">
+
+            <div class="dashboard-card">
+
+                <h3 class="card-title-main">
+
+                    Store Overview
+
+                </h3>
+
+                <div class="row">
+
+                    <div class="col-6 mb-4">
+
+                        <div class="mini-card">
+
+                            <h4>
+
+                                {{ pending_count }}
+
+                            </h4>
+
+                            <p>
+
+                                Pending Orders
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-6 mb-4">
+
+                        <div class="mini-card">
+
+                            <h4>
+
+                                {{ delivered_count }}
+
+                            </h4>
+
+                            <p>
+
+                                Delivered Orders
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-6">
+
+                        <div class="mini-card">
+
+                            <h4>
+
+                                {{ cancelled_count }}
+
+                            </h4>
+
+                            <p>
+
+                                Cancelled Orders
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-6">
+
+                        <div class="mini-card">
+
+                            <h4>
+
+                                {{ total_products }}
+
+                            </h4>
+
+                            <p>
+
+                                Active Products
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- PENDING ORDERS -->
+
+    <div class="dashboard-card">
+
+        <h3 class="card-title-main">
+
+            Latest Pending Orders
+
+        </h3>
+
+        <div class="table-responsive">
+
+            <table class="order-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for order in pending_orders %}
+
+                    <tr>
+
+                        <td>
+
+                            #{{ order.id }}
+
+                        </td>
+
+                        <td>
+
+                            {{ order.user.username }}
+
+                        </td>
+
+                        <td>
+
+                            ₹{{ order.total_price }}
+
+                        </td>
+
+                        <td>
+
+                            <span class="pending-badge">
+
+                                Pending
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            {{ order.created_at|date:"d M Y" }}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+new Chart(document.getElementById('orderChart'), {
+
+    type: 'doughnut',
+
+    data: {
+        labels: ['Pending', 'Delivered', 'Cancelled'],
+
+        datasets: [{
+            data: [
+                {{ pending_count }},
+                {{ delivered_count }},
+                {{ cancelled_count }}
+            ],
+
+            backgroundColor: [
+                '#f59e0b',
+                '#22c55e',
+                '#ef4444'
+            ],
+
+            borderWidth: 0,
+
+            cutout: '70%',
+        }]
+    },
+
+    options: {
+
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    padding: 12
+                }
+            }
+        }
+
+    }
+
+});
+
+new Chart(document.getElementById('bestSellingChart'), {
+
+    type: 'bar',
+
+    data: {
+
+        labels: [
+            {% for product in best_selling_products %}
+                "{{ product.type|truncatechars:12 }}",
+            {% endfor %}
+        ],
+
+        datasets: [
+
+            {
+                label: 'Sold',
+                data: [
+                    {% for product in best_selling_products %}
+                        {{ product.total_sold|default:0 }},
+                    {% endfor %}
+                ],
+
+                backgroundColor: '#ef4444',
+                borderRadius: 8,
+                barThickness: 18
+            },
+
+            {
+                label: 'Available',
+                data: [
+                    {% for product in best_selling_products %}
+                        {{ product.stock|default:0 }},
+                    {% endfor %}
+                ],
+
+                backgroundColor: '#22c55e',
+                borderRadius: 8,
+                barThickness: 18
+            }
+
+        ]
+
+    },
+
+    options: {
+
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    usePointStyle: true
+                }
+            }
+        },
+
+        scales: {
+
+            x: {
+                grid: {
+                    display: false
+                }
+            },
+
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(0,0,0,0.05)'
+                }
+            }
+
+        }
+
+    }
+
+});
+</script>
+
+{% endblock %}

@@ -2,147 +2,6 @@
 {% load static %}
 {% block content %}
 
-<style>
-/* =========================================
-   TAMARA EXISTING STYLES (NO CHANGE)
-   ========================================= */
-html, body{ margin:0; padding:0; background:#f5f5f5; font-family:'Poppins',sans-serif; overflow-x:hidden; }
-.checkout-page-wrapper{ max-width:1350px; margin:35px auto; padding:0 18px; }
-.checkout-steps{ position:relative; display:flex; justify-content:space-between; margin-bottom:35px; padding:0 15px; }
-.checkout-steps::before{ content:""; position:absolute; top:22px; left:55px; right:55px; height:5px; background:#e3e3e3; border-radius:50px; }
-.checkout-progress-line{ position:absolute; top:22px; left:55px; width:0%; height:5px; background:linear-gradient(90deg, #FFD333, #ffbc00); border-radius:50px; transition:.4s; }
-.step-item{ width:25%; text-align:center; position:relative; z-index:2; }
-.step-circle{ width:50px; height:50px; border-radius:50%; background:#ddd; display:flex; align-items:center; justify-content:center; margin:auto; font-weight:700; transition:.3s; }
-.step-label{ margin-top:10px; font-size:13px; font-weight:600; color:#777; }
-.step-item.active .step-circle{ background:#FFD333; color:#000; transform:scale(1.1); }
-.step-item.completed .step-circle{ background:#212529; color:#fff; }
-.checkout-main-layout{ display:flex; gap:25px; align-items:flex-start; }
-.checkout-left-side{ flex:1; }
-.checkout-right-side{ width:390px; position:sticky; top:20px; }
-.checkout-card, .checkout-right-side{ background:#fff; border-radius:20px; padding:28px; box-shadow:0 6px 25px rgba(0,0,0,.05); }
-.checkout-title{ font-size:24px; font-weight:700; margin-bottom:24px; }
-.step-content{ display:none; }
-.step-content.active-step{ display:block; animation:fade .4s ease; }
-@keyframes fade{ from{ opacity:0; transform:translateY(20px); } to{ opacity:1; transform:translateY(0); } }
-.order-item{ display:flex; justify-content:space-between; align-items:center; padding:18px 0; border-bottom:1px solid #eee; }
-.order-left{ display:flex; align-items:center; gap:15px; }
-.order-img{ width:70px; height:70px; border-radius:14px; object-fit:cover; }
-.order-name{ font-size:15px; font-weight:700; }
-.order-meta{ font-size:13px; color:#777; }
-.order-price{ font-weight:700; }
-
-/* =========================================
-   ADDRESS CARD - PARAGRAPH STYLE (UPDATED)
-   ========================================= */
-.selected-address-main-card {
-    border: 2px solid #FFD333;
-    border-radius: 20px;
-    padding: 25px;
-    background: #fffdf6;
-}
-
-.address-text-paragraph {
-    font-size: 15px;
-    line-height: 1.8;
-    color: #444;
-    margin-bottom: 20px; /* Space for the button below */
-}
-
-.address-text-paragraph strong {
-    color: #000;
-    font-size: 16px;
-}
-
-.change-address-main-btn {
-    border: none;
-    background: #212529;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 14px;
-    transition: .3s;
-    display: inline-block;
-}
-
-.change-address-main-btn:hover {
-    background: #000;
-    color: #FFD333;
-}
-
-/* =========================================
-   OTHER STYLES (NO CHANGE)
-   ========================================= */
-.default-address-badge{ display:inline-block; background:#FFD333; padding:6px 14px; border-radius:30px; font-size:12px; font-weight:700; margin-bottom:15px;}
-.selected-user-details{ margin-top:25px; padding-top:25px; border-top:1px dashed #ddd; display:none; } /* Hidden as requested */
-.payment-option{ display:flex; align-items:center; border:2px solid #eee; padding:18px; border-radius:16px; margin-bottom:16px; cursor:pointer; transition:.3s; }
-.payment-option:hover{ border-color:#FFD333; background:#fffdf6; }
-.payment-icon{ font-size:22px; width:40px; text-align:center; margin-right:12px; }
-.total-box{ background:#fafafa; border-radius:18px; padding:20px; margin-bottom:20px; }
-.total-line{ display:flex; justify-content:space-between; margin-bottom:14px; }
-.total-line.final{ border-top:1px solid #ddd; padding-top:15px; font-size:22px; font-weight:700; }
-.btn-theme{ border:none; background:linear-gradient(135deg, #FFD333, #ffbc00); padding:15px; border-radius:14px; font-weight:700; width:100%; }
-.btn-outline-theme{ border:1px solid #ddd; background:#fff; padding:14px; border-radius:14px; font-weight:600; width:100%; }
-.address-modal-content{ border:none; border-radius:22px; }
-.popup-address-card{ border:2px solid #eee; border-radius:16px; padding:18px; display:flex; justify-content:space-between; margin-bottom:10px; cursor:pointer; }
-.active-popup-address{ border-color: #FFD333; background: #fffdf6; }
-
-@media(max-width:991px){ .checkout-main-layout{ flex-direction:column; } .checkout-right-side{ width:100%; position:static; } }
-/* Payment & Final Step Enhancements */
-.payment-option {
-    position: relative;
-    padding: 20px 20px 20px 50px;
-    border: 2px solid #f0f0f0;
-    overflow: hidden;
-}
-
-.payment-option input[type="radio"] {
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 18px;
-    height: 18px;
-    accent-color: #FFD333;
-}
-
-.payment-option.active-payment {
-    border-color: #FFD333;
-    background: #fffdf6;
-}
-
-.success-icon-circle {
-    width: 80px;
-    height: 80px;
-    background: #f8f9fa;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-    color: #28a745;
-    font-size: 35px;
-    border: 2px solid #e9ecef;
-}
-
-.order-confirm-box {
-    border: 1px dashed #ccc;
-    padding: 20px;
-    border-radius: 15px;
-    background: #fafafa;
-}
-
-.confirm-label { color: #777; font-size: 13px; margin-bottom: 2px; }
-.confirm-value { font-weight: 600; color: #222; font-size: 15px; }
-
-/* Modal Radio UI Fix */
-.popup-radio {
-    width: 20px;
-    height: 20px;
-    accent-color: #FFD333;
-}
-</style>
-
 <div class="checkout-page-wrapper">
     <div class="checkout-steps">
         <div class="checkout-progress-line" id="progressLine"></div>
@@ -154,6 +13,8 @@ html, body{ margin:0; padding:0; background:#f5f5f5; font-family:'Poppins',sans-
 
     <form method="POST" class="checkout-main-layout">
         {% csrf_token %}
+        <input type="hidden" name="buy_now_id" value="{{ buy_now_id|default:'' }}">
+        <input type="hidden" name="buy_now_qty" value="{{ buy_now_qty|default:'' }}">
         <div class="checkout-left-side">
             <div class="step-content active-step" id="step1">
 

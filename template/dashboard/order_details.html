@@ -1,0 +1,706 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+/* =========================
+   PAGE BACKGROUND
+========================= */
+.manage-order-page{
+    background:linear-gradient(135deg,#f5f6fa,#eef2f7);
+    min-height:100vh;
+    padding:30px 20px;
+    font-family:'Segoe UI',sans-serif;
+}
+
+/* =========================
+   MAIN CARD
+========================= */
+.manage-order-card{
+    background:#fff;
+    border-radius:20px;
+    padding:30px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    border:1px solid #eef2f7;
+}
+
+/* =========================
+   TITLE
+========================= */
+.order-main-title{
+    font-size:26px;
+    font-weight:800;
+    color:#111827;
+    margin-bottom:25px;
+    letter-spacing:0.5px;
+}
+
+/* =========================
+   LEFT SIDE
+========================= */
+.order-left-side{
+    padding-right:30px;
+    border-right:1px solid #e5e7eb;
+}
+
+/* =========================
+   SECTION TITLE
+========================= */
+.order-section-title{
+    font-size:13px;
+    font-weight:700;
+    color:#6b7280;
+    text-transform:uppercase;
+    margin-bottom:18px;
+    letter-spacing:1px;
+}
+
+/* =========================
+   PRODUCT CARD (IMPORTANT)
+========================= */
+.order-product-box{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    background:#f9fafb;
+    padding:14px;
+    border-radius:14px;
+    margin-bottom:14px;
+    border:1px solid #ececec;
+    transition:0.25s ease;
+}
+
+.order-product-box:hover{
+    transform:translateY(-3px);
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+    border-color:#dbeafe;
+}
+
+/* =========================
+   PRODUCT IMAGE (NEW)
+========================= */
+.order-product-image{
+    width:70px;
+    height:70px;
+    min-width:70px;
+    border-radius:12px;
+    object-fit:cover;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    padding:4px;
+    transition:0.3s ease;
+}
+
+.order-product-box:hover .order-product-image{
+    transform:scale(1.05);
+}
+
+/* =========================
+   PRODUCT INFO
+========================= */
+.product-detail-content{
+    flex:1;
+    overflow:hidden;
+}
+
+.order-product-name{
+    font-size:15px;
+    font-weight:700;
+    color:#111827;
+    line-height:1.3;
+    margin-bottom:6px;
+
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+}
+
+.order-product-meta{
+    font-size:13px;
+    color:#6b7280;
+}
+
+/* =========================
+   RIGHT SIDE
+========================= */
+.order-right-side{
+    padding-left:30px;
+}
+
+/* =========================
+   STATUS CARD
+========================= */
+.order-status-card{
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    padding:18px;
+    margin-bottom:20px;
+    transition:0.3s;
+}
+
+.order-status-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 20px rgba(0,0,0,0.06);
+}
+
+/* =========================
+   STATUS BADGE
+========================= */
+.order-status-badge{
+    display:inline-block;
+    padding:7px 16px;
+    border-radius:30px;
+    font-size:13px;
+    font-weight:700;
+    color:#fff;
+    text-transform:capitalize;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+    background-color: yellow;
+}
+
+/* STATUS COLORS */
+.pending{ background:#2563eb; }
+.accepted{ background:#0ea5e9; }
+.shipped{ background:#6366f1; }
+.delivered{ background:#22c55e; }
+.cancelled{ background:#ef4444; }
+
+/* =========================
+   FORM
+========================= */
+.order-select{
+    width:100%;
+    height:50px;
+    border:2px solid #2563eb;
+    border-radius:12px;
+    padding:0 15px;
+    font-size:15px;
+    outline:none;
+    transition:0.3s;
+}
+
+.order-select:focus{
+    border-color:#1d4ed8;
+    box-shadow:0 0 0 3px rgba(37,99,235,0.15);
+}
+
+/* =========================
+   BUTTON
+========================= */
+.order-update-btn{
+    width:100%;
+    height:50px;
+    border:none;
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    color:#fff;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:700;
+    margin-top:12px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.order-update-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 20px rgba(37,99,235,0.25);
+}
+
+/* =========================
+   BACK BUTTON
+========================= */
+.order-back-btn{
+    display:block;
+    text-align:center;
+    margin-top:18px;
+    color:#111827;
+    font-weight:600;
+    text-decoration:none;
+}
+
+.order-back-btn:hover{
+    color:#2563eb;
+}
+
+/* =========================
+   VIEW MORE BUTTON
+========================= */
+.view-more-btn{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    background:#111827;
+    color:#fff;
+    font-weight:700;
+    margin-top:10px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.view-more-btn:hover{
+    background:#1f2937;
+    transform:translateY(-2px);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media(max-width:991px){
+
+    .order-left-side{
+        border-right:none;
+        padding-right:0;
+        margin-bottom:20px;
+    }
+
+    .order-right-side{
+        padding-left:0;
+    }
+}
+
+/* =========================
+   TOAST CONTAINER
+========================= */
+#toastBox{
+    position:fixed;
+    top:20px;
+    right:20px;
+    z-index:999999;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+/* =========================
+   TOAST
+========================= */
+.custom-toast{
+    min-width:320px;
+    background:#fff;
+    border-radius:14px;
+    padding:16px 18px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.12);
+    border-left:5px solid #2563eb;
+    animation:toastSlide 0.35s ease;
+}
+
+/* SUCCESS */
+.custom-toast.success{
+    border-color:#22c55e;
+}
+
+/* ERROR */
+.custom-toast.error{
+    border-color:#ef4444;
+}
+
+/* WARNING */
+.custom-toast.warning{
+    border-color:#f59e0b;
+}
+
+/* ICON */
+.toast-icon{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+    color:#fff;
+    flex-shrink:0;
+}
+
+.custom-toast.success .toast-icon{
+    background:#22c55e;
+}
+
+.custom-toast.error .toast-icon{
+    background:#ef4444;
+}
+
+.custom-toast.warning .toast-icon{
+    background:#f59e0b;
+}
+
+/* TEXT */
+.toast-text{
+    flex:1;
+}
+
+.toast-title{
+    font-size:15px;
+    font-weight:700;
+    color:#111827;
+    margin-bottom:3px;
+}
+
+.toast-message{
+    font-size:13px;
+    color:#6b7280;
+}
+
+/* ANIMATION */
+@keyframes toastSlide{
+
+    from{
+        opacity:0;
+        transform:translateX(100%);
+    }
+
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+}
+.custom-toast.success{
+    border-left:5px solid #22c55e !important;
+    background:#f0fdf4 !important;
+}
+
+.custom-toast.error{
+    border-left:5px solid #ef4444 !important;
+    background:#fef2f2 !important;
+}
+
+.custom-toast.warning{
+    border-left:5px solid #f59e0b !important;
+    background:#fffbeb !important;
+}
+
+/* status fix (important) */
+.out-for-delivery{
+    background:#f59e0b !important;
+}
+
+.packed{
+    background:#8b5cf6 !important;
+}
+</style>
+
+<div class="manage-order-page">
+
+    <div class="manage-order-card">
+
+        <!-- TITLE -->
+        <h2 class="order-main-title" id="orderTitle">ORDER DETAILS</h2>
+
+        <div class="row">
+
+            <!-- LEFT SIDE -->
+            <div class="col-lg-7 order-left-side">
+
+                <h6 class="order-section-title">Items in this Order</h6>
+
+                <div id="productList"></div>
+
+                <button id="toggleBtn" class="view-more-btn" style="display:none;">
+                    View more products
+                </button>
+
+                <hr>
+
+                <div class="order-info-box">
+                    <p><strong>Customer:</strong> <span id="customer"></span></p>
+                    <p><strong>Address:</strong> <span id="address"></span></p>
+                    <p><strong>Phone:</strong> <span id="phone"></span></p>
+                </div>
+
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="col-lg-5 order-right-side">
+
+                <div class="order-status-card">
+
+                    <div style="margin-bottom:10px;">Current Status</div>
+
+                    <span id="statusBadge" class="order-status-badge"></span>
+
+                </div>
+
+                <label class="order-section-title">Change Status</label>
+
+                <select id="statusSelect" class="order-select"></select>
+
+                <button class="order-update-btn" onclick="updateStatus()">
+                    UPDATE STATUS
+                </button>
+
+                <a href="/dashboard/orders/" style="display:block;text-align:center;margin-top:15px;">
+                    Back to List
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<div id="toastBox"></div>
+
+<script>
+// =======================
+// ORDER ID
+// =======================
+const pathParts = window.location.pathname.split("/").filter(Boolean);
+const orderId = pathParts[pathParts.length - 1];
+
+// =======================
+// GLOBAL STATE
+// =======================
+let items = [];
+let isLoading = false;
+
+// =======================
+// ORDER FLOW (TIMELINE)
+// =======================
+const flow = [
+    "Pending",
+    "Accepted",
+    "Packed",
+    "Shipped",
+    "Out For Delivery",
+    "Delivered",
+    "Cancelled"
+];
+
+// =======================
+// STATUS NORMALIZER (IMPORTANT FIX)
+// =======================
+function normalizeStatus(status){
+
+    if(!status) return "Pending";
+
+    const s = status.toString().trim().toLowerCase();
+
+    const map = {
+        pending: "Pending",
+        accept: "Accepted",
+        accepted: "Accepted",
+        pack: "Packed",
+        packed: "Packed",
+        shipped: "Shipped",
+        out_for_delivery: "Out For Delivery",
+        "out for delivery": "Out For Delivery",
+        delivered: "Delivered",
+        cancel: "Cancelled",
+        cancelled: "Cancelled"
+    };
+
+    return map[s] || "Pending";
+}
+
+// =======================
+// STATUS CLASS FIX
+// =======================
+function statusClass(status){
+    return status.toLowerCase().replace(/ /g, "-");
+}
+
+// =======================
+// TOAST (FIXED COLORS)
+// =======================
+function showToast(type, message){
+
+    const box = document.getElementById("toastBox");
+
+    const iconMap = {
+        success: "fa-check",
+        error: "fa-xmark",
+        warning: "fa-triangle-exclamation"
+    };
+
+    const toast = document.createElement("div");
+
+    toast.className = `custom-toast ${type}`;
+
+    toast.innerHTML = `
+        <div class="toast-icon">
+            <i class="fa-solid ${iconMap[type] || "fa-info"}"></i>
+        </div>
+        <div class="toast-text">
+            <div class="toast-title">${type.toUpperCase()}</div>
+            <div class="toast-message">${message}</div>
+        </div>
+    `;
+
+    box.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 2500);
+}
+
+// =======================
+// FETCH ORDER (NO DOUBLE CALL FIX)
+// =======================
+async function loadOrder(){
+
+    if(isLoading) return;
+    isLoading = true;
+
+    try{
+
+        const res = await fetch(`/api/orders/${orderId}/`);
+
+        if(!res.ok) throw new Error("API error");
+
+        const data = await res.json();
+
+        const status = normalizeStatus(data.status);
+
+        // TITLE
+        document.getElementById("orderTitle").innerText =
+            `ORDER #${data.id}`;
+
+        // CUSTOMER
+        document.getElementById("customer").innerText =
+            data.user_name || "-";
+
+        document.getElementById("address").innerText =
+            data.address || "-";
+
+        document.getElementById("phone").innerText =
+            data.phone || "-";
+
+        // BADGE FIX
+        const badge = document.getElementById("statusBadge");
+        badge.innerText = status;
+        badge.className = "order-status-badge " + statusClass(status);
+
+        // SELECT
+        const select = document.getElementById("statusSelect");
+        select.innerHTML = "";
+
+        flow.forEach(s => {
+            const opt = document.createElement("option");
+            opt.value = s;
+            opt.textContent = s;
+            if(s === status) opt.selected = true;
+            select.appendChild(opt);
+        });
+
+        // ITEMS FIX
+        items = Array.isArray(data.items) ? data.items : [];
+
+        renderItems();
+
+    }catch(err){
+        console.error(err);
+        showToast("error", "Failed to load order");
+    }
+
+    isLoading = false;
+}
+
+// =======================
+// PRICE FIX (MAIN FIX HERE)
+// =======================
+function renderItems(){
+
+    const container = document.getElementById("productList");
+    container.innerHTML = "";
+
+    items.forEach(item => {
+
+        const product = item.product || {};
+
+        const price =
+            Number(
+                item.price ??
+                item.product_price ??
+                product.price ??
+                product.mrp ??
+                0
+            );
+
+        const qty = Number(item.quantity || 1);
+
+        const name =
+            item.product_name ??
+            product.name ??
+            "Unknown Product";
+
+        const image =
+            item.product_image ??
+            product.image ??
+            "/static/images/no-image.png";
+
+        const total = price * qty;
+
+        const div = document.createElement("div");
+        div.className = "order-product-box";
+
+        div.innerHTML = `
+            <img src="${image}" class="order-product-image">
+
+            <div class="product-detail-content">
+
+                <div class="order-product-name">${name}</div>
+
+                <div class="order-product-meta">
+                    Qty: ${qty} | ₹${price} | Total: ₹${total}
+                </div>
+
+            </div>
+        `;
+
+        container.appendChild(div);
+    });
+}
+
+// =======================
+// STATUS UPDATE
+// =======================
+async function updateStatus(){
+
+    try{
+
+        const res = await fetch(`/api/orders/${orderId}/status/`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken()
+            },
+            body: JSON.stringify({
+                status: document.getElementById("statusSelect").value
+            })
+        });
+
+        if(!res.ok) throw new Error();
+
+        showToast("Order updated");
+
+        setTimeout(() => location.reload(), 1000);
+
+    }catch(err){
+        showToast("error", "Update failed");
+    }
+}
+
+// =======================
+// CSRF
+// =======================
+function getCSRFToken(){
+    return document.cookie
+        .split("; ")
+        .find(r => r.startsWith("csrftoken="))
+        ?.split("=")[1];
+}
+
+// =======================
+// INIT (IMPORTANT FIX)
+// =======================
+document.addEventListener("DOMContentLoaded", loadOrder);
+</script>
+
+{% endblock %}

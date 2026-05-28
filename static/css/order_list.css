@@ -1,0 +1,439 @@
+/* =========================================
+   PREMIUM SLATE & GLASS CHECKOUT LAYOUT
+   ========================================= */
+body {
+    background: #fdfdfd;
+    font-family: 'Inter', 'Poppins', sans-serif;
+    color: #2b2f3a;
+}
+
+.orders-section {
+    padding: 50px 0;
+    min-height: 100vh;
+}
+
+.orders-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* Two-Column Split Pane (Matches High-End Checkout Modules) */
+.layout-split-grid {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+/* =========================================
+   LEFT SIDEBAR: ANALYTICS & INTERACTIVE FILTER
+   ========================================= */
+.checkout-control-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 30px;
+    position: sticky;
+    top: 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
+}
+
+.panel-header-title h2 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+.panel-header-title p {
+    font-size: 13.5px;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+/* Integrated Search & Select Pill Systems */
+.interactive-search-form {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.interactive-search-form input {
+    width: 100%;
+    height: 52px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0 16px 0 46px;
+    font-size: 14px;
+    color: #0f172a;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
+}
+
+.interactive-search-form input:focus {
+    background: #ffffff;
+    border-color: #0f172a;
+    box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.06);
+    outline: none;
+}
+
+.interactive-search-form i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 15px;
+}
+
+.custom-select-element {
+    width: 100%;
+    height: 52px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0 16px;
+    font-size: 14px;
+    color: #334155;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%2364748b' viewBox='0 0 16 16'><path d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: calc(100% - 18px) center;
+}
+
+.custom-select-element:focus {
+    border-color: #0f172a;
+    background-color: #ffffff;
+}
+
+.pane-divider {
+    height: 1px;
+    background: #edf2f7;
+    margin: 25px 0;
+}
+
+/* Account Summary Dashboard Blocks */
+.metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 13.5px;
+}
+.metric-label { color: #64748b; font-weight: 500; }
+.metric-value { font-weight: 700; color: #0f172a; }
+
+/* =========================================
+   RIGHT SIDEBAR: ACTIVE ORDERS STREAM
+   ========================================= */
+.orders-stream-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.slate-order-wrapper-row {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.25s ease;
+}
+
+.slate-order-wrapper-row:hover {
+    box-shadow: 0 12px 30px rgba(0,0,0,0.025);
+    border-color: #cbd5e1;
+}
+
+/* Order Meta Top Header Strip */
+.order-strip-header {
+    background: #f8fafc;
+    padding: 22px 30px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-headline-meta-grid {
+    display: flex;
+    align-items: center;
+    gap: 35px;
+}
+
+.headline-block .cap {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #94a3b8;
+    margin-bottom: 5px;
+}
+
+.headline-block .det {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.headline-block .det.order-id-accent {
+    color: #0284c7;
+    font-family: monospace;
+    font-size: 15px;
+}
+
+/* Pill Status Configs */
+.badge-pill-status {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    display: inline-block;
+}
+.badge-pill-status.st-delivered { background: #dcfce7; color: #15803d; }
+.badge-pill-status.st-pending { background: #fef9c3; color: #a16207; }
+.badge-pill-status.st-cancelled { background: #fee2e2; color: #b91c1c; }
+
+/* Product Rows Inside Canvas */
+.order-canvas-body {
+    padding: 30px;
+}
+
+.nested-item-flex-row {
+    display: grid;
+    grid-template-columns: 85px 1fr auto;
+    gap: 25px;
+    align-items: center;
+    padding-bottom: 25px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.nested-item-flex-row:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.product-avatar {
+    width: 85px;
+    height: 85px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.product-meta-details h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    color: #0f172a;
+}
+
+.product-attribute-pills {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.attribute-tag {
+    background: #f1f5f9;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #475569;
+}
+
+.attribute-tag.color-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.color-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ccc;
+    display: inline-block;
+}
+
+.product-price-bracket {
+    text-align: right;
+}
+
+.product-price-bracket .item-unit-price {
+    font-size: 17px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.product-price-bracket .item-multiplier-label {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 3px;
+}
+
+/* =========================================
+   BOTTOM WORKFLOW FOOTER & ACTIONS PANEL
+   ========================================= */
+.order-footer-workflow-strip {
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    padding: 24px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+}
+
+/* Address Card Sub-Component */
+.address-delivery-block {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    max-width: 55%;
+}
+
+.address-delivery-block i {
+    color: #64748b;
+    font-size: 16px;
+    margin-top: 3px;
+}
+
+.address-text-wrapper {
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.5;
+}
+
+.address-text-wrapper .customer-name {
+    font-weight: 700;
+    color: #0f172a;
+    display: block;
+    margin-bottom: 2px;
+    font-size: 13.5px;
+}
+
+/* Checkout Functional Buttons */
+.checkout-actions-cluster {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.action-btn-checkout {
+    height: 42px;
+    padding: 0 18px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none !important;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.btn-checkout-primary { background: #0f172a; color: #ffffff; }
+.btn-checkout-primary:hover { background: #000000; }
+
+.btn-checkout-secondary { background: #ffffff; border-color: #cbd5e1; color: #334155; }
+.btn-checkout-secondary:hover { background: #f8fafc; border-color: #94a3b8; color: #0f172a; }
+
+.btn-checkout-alert { background: #fff5f5; color: #c53030; border-color: #feb2b2; }
+.btn-checkout-alert:hover { background: #fff5f5; border-color: #9b2c2c; }
+
+.btn-checkout-success { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+.btn-checkout-success:hover { background: #dcfce7; }
+
+/* =========================================
+   BLANK ARCHIVE LAYOUT
+   ========================================= */
+.minimalist-blank-panel {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 90px 40px;
+    text-align: center;
+}
+
+.minimalist-blank-panel i {
+    font-size: 56px;
+    color: #cbd5e1;
+    margin-bottom: 24px;
+}
+
+.minimalist-blank-panel h3 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+.minimalist-blank-panel p {
+    font-size: 14.5px;
+    color: #64748b;
+    margin-bottom: 30px;
+}
+
+/* =========================================
+   MEDIA QUERY LAYOUT FIXES
+   ========================================= */
+@media (max-width: 1024px) {
+    .layout-split-grid {
+        grid-template-columns: 1fr;
+    }
+    .checkout-control-card {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .order-strip-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    .order-headline-meta-grid {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    .order-footer-workflow-strip {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .address-delivery-block {
+        max-width: 100%;
+    }
+    .checkout-actions-cluster {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    .action-btn-checkout {
+        flex: 1 1 calc(50% - 10px);
+    }
+    .nested-item-flex-row {
+        grid-template-columns: auto 1fr;
+    }
+    .product-price-bracket {
+        grid-column: 2;
+        text-align: left;
+        margin-top: 5px;
+    }
+}

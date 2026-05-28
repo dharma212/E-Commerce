@@ -430,7 +430,145 @@ body{
 }
 
 </style>
+<style>
+.tracking-wrapper{
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:22px;
+    padding:30px;
+    margin-bottom:30px;
+}
 
+.tracking-title{
+    font-size:22px;
+    font-weight:800;
+    color:#0f172a;
+    margin-bottom:30px;
+}
+
+/* TRACK LINE */
+.tracking-progress{
+    display:flex;
+    justify-content:space-between;
+    position:relative;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+/* BASE LINE */
+.tracking-progress::before{
+    content:'';
+    position:absolute;
+    top:24px;
+    left:0;
+    width:100%;
+    height:4px;
+    background:#e2e8f0;
+    z-index:1;
+}
+
+/* PROGRESS LINE (IMPORTANT FIX) */
+.tracking-progress::after{
+    content:'';
+    position:absolute;
+    top:24px;
+    left:0;
+    height:4px;
+    width:var(--progress,0%);
+    background:#22c55e;
+    z-index:2;
+    transition:0.4s ease;
+}
+
+.track-step{
+    position:relative;
+    z-index:3;
+    flex:1;
+    text-align:center;
+    min-width:120px;
+}
+
+.track-icon{
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    background:#e2e8f0;
+    color:#94a3b8;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    margin-bottom:12px;
+    border:4px solid #fff;
+    transition:0.3s;
+}
+
+/* ACTIVE */
+.track-step.active .track-icon{
+    background:#0f172a;
+    color:#fff;
+}
+
+/* COMPLETED */
+.track-step.completed .track-icon{
+    background:#22c55e;
+    color:#fff;
+}
+
+/* CANCELLED */
+.track-step.cancelled .track-icon{
+    background:#ef4444 !important;
+    color:#fff;
+}
+
+.track-label{
+    font-size:13px;
+    font-weight:700;
+    color:#334155;
+}
+/* STEP POP ANIMATION */
+.track-step{
+    transition: all 0.4s ease;
+}
+
+.track-step.completed .track-icon{
+    animation: pop 0.4s ease;
+    box-shadow: 0 0 0 6px rgba(34,197,94,0.15);
+}
+
+.track-step.active .track-icon{
+    animation: pulse 1.2s infinite;
+}
+
+/* POP EFFECT */
+@keyframes pop{
+    0%{
+        transform: scale(0.6);
+        opacity: 0;
+    }
+    100%{
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ACTIVE PULSE */
+@keyframes pulse{
+    0%{
+        box-shadow: 0 0 0 0 rgba(15,23,42,0.4);
+    }
+    70%{
+        box-shadow: 0 0 0 10px rgba(15,23,42,0);
+    }
+    100%{
+        box-shadow: 0 0 0 0 rgba(15,23,42,0);
+    }
+}
+.tracking-progress::after{
+    transition: width 0.6s ease-in-out;
+}
+</style>
 <div class="order-detail-section">
 
     <div class="order-detail-wrapper">
@@ -460,135 +598,37 @@ body{
 
     <div class="tracking-progress">
 
-        <!-- ORDER PLACED -->
-
-        <div class="track-step completed">
-
-            <div class="track-icon">
-                <i class="fa fa-check"></i>
-            </div>
-
-            <div class="track-label">
-                Order Placed
-            </div>
-
-            <div class="track-date">
-                {{ order.created_at|date:"d M Y" }}
-            </div>
-
-        </div>
-
-        <!-- ACCEPTED -->
-
-        <div class="track-step 
-            {% if order.status == 'Accepted' or order.status == 'Packed' or order.status == 'Shipped' or order.status == 'Out For Delivery' or order.status == 'Delivered' %}
-                completed
-            {% endif %}
-        ">
-
-            <div class="track-icon">
-                <i class="fa fa-box-open"></i>
-            </div>
-
-            <div class="track-label">
-                Accepted
-            </div>
-
-            <div class="track-date">
-                Order confirmed
-            </div>
-
-        </div>
-
-        <!-- PACKED -->
-
-        <div class="track-step
-            {% if order.status == 'Packed' or order.status == 'Shipped' or order.status == 'Out For Delivery' or order.status == 'Delivered' %}
-                completed
-            {% endif %}
-        ">
-
-            <div class="track-icon">
-                <i class="fa fa-box"></i>
-            </div>
-
-            <div class="track-label">
-                Packed
-            </div>
-
-            <div class="track-date">
-                Warehouse packed
-            </div>
-
-        </div>
-
-        <!-- SHIPPED -->
-
-        <div class="track-step
-            {% if order.status == 'Shipped' or order.status == 'Out For Delivery' or order.status == 'Delivered' %}
-                completed
-            {% endif %}
-        ">
-
-            <div class="track-icon">
-                <i class="fa fa-truck"></i>
-            </div>
-
-            <div class="track-label">
-                Shipped
-            </div>
-
-            <div class="track-date">
-                On the way
-            </div>
-
-        </div>
-
-        <!-- OUT FOR DELIVERY -->
-
-        <div class="track-step
-            {% if order.status == 'Out For Delivery' or order.status == 'Delivered' %}
-                completed
-            {% endif %}
-        ">
-
-            <div class="track-icon">
-                <i class="fa fa-shipping-fast"></i>
-            </div>
-
-            <div class="track-label">
-                Out For Delivery
-            </div>
-
-            <div class="track-date">
-                Reaching soon
-            </div>
-
-        </div>
-
-        <!-- DELIVERED -->
-
-        <div class="track-step
-            {% if order.status == 'Delivered' %}
-                completed
-            {% endif %}
-        ">
-
-            <div class="track-icon">
-                <i class="fa fa-home"></i>
-            </div>
-
-            <div class="track-label">
-                Delivered
-            </div>
-
-            <div class="track-date">
-                Completed
-            </div>
-
-        </div>
-
+    <div class="track-step">
+        <div class="track-icon"><i class="fa fa-check"></i></div>
+        <div class="track-label">Order Placed</div>
     </div>
+
+    <div class="track-step">
+        <div class="track-icon"><i class="fa fa-box"></i></div>
+        <div class="track-label">Accepted</div>
+    </div>
+
+    <div class="track-step">
+        <div class="track-icon"><i class="fa fa-box"></i></div>
+        <div class="track-label">Packed</div>
+    </div>
+
+    <div class="track-step">
+        <div class="track-icon"><i class="fa fa-truck"></i></div>
+        <div class="track-label">Shipped</div>
+    </div>
+
+    <div class="track-step">
+        <div class="track-icon"><i class="fa fa-shipping-fast"></i></div>
+        <div class="track-label">Out For Delivery</div>
+    </div>
+
+    <div class="track-step">
+        <div class="track-icon"><i class="fa fa-home"></i></div>
+        <div class="track-label">Delivered</div>
+    </div>
+
+</div>
 
 </div>
         <div class="order-main-grid">
@@ -1143,5 +1183,68 @@ RIGHT SIDE SUMMARY CARD REPLACE FULL
     </div>
 
 </div>
+<script>
 
+const url = window.location.href;
+
+const flow = [
+    "Pending",
+    "Accepted",
+    "Packed",
+    "Shipped",
+    "Out For Delivery",
+    "Delivered"
+];
+
+function updateStatus(){
+
+    fetch(window.location.href, {
+        headers: {
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        const status = data.status;
+        const currentIndex = flow.indexOf(status);
+
+        if(currentIndex === -1) return;
+
+        const steps = document.querySelectorAll(".track-step");
+
+        // STEP UPDATE
+        steps.forEach((step, index) => {
+
+            if(index < currentIndex){
+                step.classList.add("completed");
+                step.classList.remove("active");
+            }
+            else if(index === currentIndex){
+                step.classList.add("active");
+                step.classList.remove("completed");
+            }
+            else{
+                step.classList.remove("completed","active");
+            }
+        });
+
+        // 🔥 IMPORTANT: PROGRESS LINE FIX
+        const percent = (currentIndex / (flow.length - 1)) * 100;
+
+        document.querySelector(".tracking-progress")
+            .style.setProperty("--progress", percent + "%");
+
+        // STATUS BADGE LIVE UPDATE
+        document.querySelectorAll(".status-badge").forEach(el => {
+            el.innerText = status;
+        });
+
+    });
+}
+
+setInterval(updateStatus, 3000);
+updateStatus();
+
+</script>
 {% endblock %}

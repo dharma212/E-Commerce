@@ -264,7 +264,7 @@
     background: #f1f1f1;
 }
 </style>
-<script>
+{% comment %} <script>
 
 // ================= CSRF =================
 function getCSRFToken() {
@@ -286,6 +286,47 @@ function getCSRFToken() {
     }
 
     return "";
+
+}
+
+
+// ================= TOAST =================
+function showToast(message, type="success"){
+
+    let oldToast = document.querySelector(".custom-toast");
+
+    if(oldToast){
+        oldToast.remove();
+    }
+
+    let toast = document.createElement("div");
+
+    toast.className = "custom-toast";
+
+    toast.innerText = message;
+
+    toast.style.position = "fixed";
+    toast.style.top = "20px";
+    toast.style.right = "20px";
+    toast.style.padding = "12px 20px";
+    toast.style.color = "#fff";
+    toast.style.fontWeight = "600";
+    toast.style.borderRadius = "8px";
+    toast.style.zIndex = "999999";
+
+    if(type === "success"){
+        toast.style.background = "#198754";
+    }else{
+        toast.style.background = "#dc3545";
+    }
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+
+        toast.remove();
+
+    }, 3000);
 
 }
 
@@ -359,8 +400,6 @@ function setupSearch(inputId, resultId, hiddenId){
 
         clearFieldError(hiddenId);
 
-        let found = false;
-
         items.forEach(item => {
 
             const name = (item.dataset.name || "").toLowerCase();
@@ -368,8 +407,6 @@ function setupSearch(inputId, resultId, hiddenId){
             if(name.includes(value)){
 
                 item.style.display = "block";
-
-                found = true;
 
             }else{
 
@@ -384,7 +421,6 @@ function setupSearch(inputId, resultId, hiddenId){
     // ================= CLICK EVENT =================
     resultBox.addEventListener("click", function(e){
 
-        // ================= SELECT ITEM =================
         const item = e.target.closest(".search-item");
 
         if(item){
@@ -403,7 +439,6 @@ function setupSearch(inputId, resultId, hiddenId){
 
         }
 
-        // ================= ADD NEW =================
         const addBtn = e.target.closest(".search-add-more");
 
         if(addBtn){
@@ -412,7 +447,6 @@ function setupSearch(inputId, resultId, hiddenId){
 
             const value = input.value.trim();
 
-            // ERROR
             if(!value){
 
                 showFieldError(
@@ -438,11 +472,11 @@ function setupSearch(inputId, resultId, hiddenId){
 
                 body: JSON.stringify({
 
-    name: value,
+                    name: value,
 
-    category_id: document.getElementById("category").value
+                    category_id: document.getElementById("category").value
 
-})
+                })
 
             })
 
@@ -450,7 +484,6 @@ function setupSearch(inputId, resultId, hiddenId){
 
             .then(data => {
 
-                // DUPLICATE ERROR
                 if(data.error){
 
                     showFieldError(
@@ -462,7 +495,6 @@ function setupSearch(inputId, resultId, hiddenId){
 
                 }
 
-                // CREATE ITEM
                 const div = document.createElement("div");
 
                 div.className = "search-item";
@@ -473,9 +505,9 @@ function setupSearch(inputId, resultId, hiddenId){
                 );
 
                 div.setAttribute(
-    "data-name",
-    (data.name || "").toLowerCase()
-);
+                    "data-name",
+                    (data.name || "").toLowerCase()
+                );
 
                 div.innerText = data.name;
 
@@ -484,7 +516,6 @@ function setupSearch(inputId, resultId, hiddenId){
                     addBtn
                 );
 
-                // AUTO SELECT
                 input.value = data.name;
 
                 hiddenInput.value = data.id;
@@ -655,5 +686,275 @@ setupSearch(
     "type"
 );
 
-</script>
+
+// ========================================
+// EDIT PRODUCT AUTO FILL
+// ========================================
+
+const urlParams = new URLSearchParams(window.location.search);
+
+const productId = urlParams.get("edit");
+
+if(productId){
+
+    // TITLE
+    document.querySelector(".mb-0").innerText =
+        "Edit Product";
+
+    // BUTTON
+    document.getElementById("submitBtn").innerText =
+        "Update Product";
+
+    // ================= FETCH PRODUCT =================
+
+    fetch('/api/products/')
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        const product = data.find(
+            item => item.id == productId
+        );
+
+        console.log(product);
+
+        if(!product){
+
+            showToast("Product not found", "error");
+
+            return;
+
+        }
+
+        // ================= TEXT =================
+
+        document.getElementById("name").value =
+            product.name || "";
+
+        document.getElementById("mrp").value =
+            product.mrp || "";
+
+        document.getElementById("discount").value =
+            product.discount || "";
+
+        document.getElementById("stock").value =
+            product.stock || "";
+
+        document.getElementById("description").value =
+            product.description || "";
+
+        // ================= CATEGORY =================
+
+        document.getElementById("category").value =
+            product.category_id || "";
+
+        document.getElementById("categoryInput").value =
+            product.category_name || "";
+
+        // ================= TYPE =================
+
+        document.getElementById("type").value =
+            product.type_id || "";
+
+        document.getElementById("typeInput").value =
+            product.type_name || "";
+
+        // ================= COLOR =================
+
+        document.getElementById("color").value =
+            product.color_id || "";
+
+        document.getElementById("colorInput").value =
+            product.color_name || "";
+
+        // ================= SIZE =================
+
+        document.getElementById("size").value =
+            product.size_id || "";
+
+        document.getElementById("sizeInput").value =
+            product.size_name || "";
+
+        // ================= FINAL PRICE =================
+
+        let finalPrice =
+            parseFloat(product.mrp || 0)
+            -
+            parseFloat(product.discount || 0);
+
+        document.getElementById("final_price").value =
+            finalPrice;
+
+        // ================= DISCOUNT PERCENT =================
+
+        let percent = 0;
+
+        if(product.mrp > 0){
+
+            percent =
+                (
+                    (
+                        product.discount
+                        /
+                        product.mrp
+                    ) * 100
+                ).toFixed(2);
+
+        }
+
+        document.getElementById("discount_percent").value =
+            percent + "%";
+
+        // ================= OLD IMAGES =================
+
+        const previewContainer =
+            document.getElementById("previewContainer");
+
+        previewContainer.innerHTML = "";
+
+        if(product.images){
+
+            product.images.forEach((img, index) => {
+
+                previewContainer.innerHTML += `
+
+                    <div class="img-box">
+
+                        ${
+                            index === 0
+                            ?
+                            `<div class="main-badge">
+                                Main Image
+                            </div>`
+                            :
+                            ""
+                        }
+
+                        <img src="${img.image}"
+                             style="width:100px;
+                                    height:100px;
+                                    object-fit:cover;
+                                    border-radius:10px;">
+
+                    </div>
+
+                `;
+
+            });
+
+        }
+
+    });
+
+}
+
+
+// ========================================
+// UPDATE PRODUCT
+// ========================================
+
+document
+.getElementById("submitBtn")
+.addEventListener("click", function(){
+
+    if(productId){
+
+        let formData = new FormData();
+
+        formData.append(
+            "name",
+            document.getElementById("name").value
+        );
+
+        formData.append(
+            "category",
+            document.getElementById("category").value
+        );
+
+        formData.append(
+            "type",
+            document.getElementById("type").value
+        );
+
+        formData.append(
+            "color",
+            document.getElementById("color").value
+        );
+
+        formData.append(
+            "size",
+            document.getElementById("size").value
+        );
+
+        formData.append(
+            "mrp",
+            document.getElementById("mrp").value
+        );
+
+        formData.append(
+            "discount",
+            document.getElementById("discount").value
+        );
+
+        formData.append(
+            "stock",
+            document.getElementById("stock").value
+        );
+
+        formData.append(
+            "description",
+            document.getElementById("description").value
+        );
+
+        fetch(`/api/products/${productId}/update/`, {
+
+            method: "PATCH",
+
+            headers: {
+
+                "X-CSRFToken": getCSRFToken()
+
+            },
+
+            body: formData
+
+        })
+
+        .then(res => res.json())
+
+        .then(data => {
+
+            if(data.success){
+
+                showToast(
+                    "Product updated successfully",
+                    "success"
+                );
+
+            }else{
+
+                showToast(
+                    "Update failed",
+                    "error"
+                );
+
+            }
+
+        })
+
+        .catch(() => {
+
+            showToast(
+                "Something went wrong",
+                "error"
+            );
+
+        });
+
+    }
+
+});
+
+</script> {% endcomment %}
 {% endblock %}

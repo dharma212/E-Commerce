@@ -1,9 +1,650 @@
 {% extends "dashboard/base.html" %}
 {% block content %}
+{% load static %}
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<style>
+/* =========================================
+   PRODUCT LIST PAGE
+========================================= */
+
+.custom-card{
+    background:#ffffff;
+    border-radius:22px;
+    padding:28px;
+    box-shadow:0 12px 35px rgba(0,0,0,0.06);
+    overflow:hidden;
+    border:1px solid #f1f1f1;
+}
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:22px;
+}
+
+.page-title{
+    font-size:28px;
+    font-weight:700;
+    color:#111827;
+    margin:0;
+}
+
+/* =========================================
+   TABLE
+========================================= */
+
+#productTable{
+    width:100% !important;
+    border-collapse:separate !important;
+    border-spacing:0 14px !important;
+}
+
+#productTable thead th{
+    background:#111827;
+    color:#fff;
+    padding:16px 14px;
+    font-size:13px;
+    font-weight:700;
+    border:none !important;
+    white-space:nowrap;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+}
+
+#productTable thead th:first-child{
+    border-radius:14px 0 0 14px;
+}
+
+#productTable thead th:last-child{
+    border-radius:0 14px 14px 0;
+}
+
+#productTable tbody tr{
+    background:#fff;
+    transition:0.3s ease;
+    box-shadow:0 5px 18px rgba(0,0,0,0.05);
+}
+
+#productTable tbody tr:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+
+#productTable tbody td{
+    padding:18px 14px;
+    vertical-align:middle;
+    border:none !important;
+    font-size:14px;
+    color:#374151;
+}
+
+#productTable tbody td:first-child{
+    border-radius:14px 0 0 14px;
+}
+
+#productTable tbody td:last-child{
+    border-radius:0 14px 14px 0;
+}
+
+/* =========================================
+   PRODUCT IMAGE
+========================================= */
+
+.product-img{
+    width:70px;
+    height:70px;
+    object-fit:cover;
+    border-radius:14px;
+    border:2px solid #f3f4f6;
+    cursor:pointer;
+    transition:0.3s ease;
+}
+
+.product-img:hover{
+    transform:scale(1.08);
+}
+
+.no-img-box{
+    width:70px;
+    height:70px;
+    border-radius:14px;
+    background:#f3f4f6;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    color:#9ca3af;
+}
+
+/* =========================================
+   PRODUCT INFO
+========================================= */
+
+.product-title{
+    font-size:15px;
+    font-weight:700;
+    color:#111827;
+    margin-bottom:6px;
+    line-height:1.4;
+}
+
+.discount-badge{
+    display:inline-block;
+    padding:5px 10px;
+    border-radius:30px;
+    background:#dcfce7;
+    color:#15803d;
+    font-size:11px;
+    font-weight:700;
+}
+
+/* =========================================
+   BADGES
+========================================= */
+
+.color-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:80px;
+    padding:7px 14px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:700;
+    color:#fff;
+    text-transform:capitalize;
+    box-shadow:0 3px 10px rgba(0,0,0,0.08);
+}
+
+.size-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:45px;
+    height:34px;
+    padding:0 12px;
+    border-radius:10px;
+    background:#eef2ff;
+    color:#4338ca;
+    font-size:13px;
+    font-weight:700;
+}
+
+.green-text{
+    color:#16a34a;
+    font-weight:700;
+    font-size:13px;
+}
+
+.gray-text{
+    color:#6b7280;
+    font-weight:600;
+    font-size:13px;
+}
+
+/* =========================================
+   PRICE
+========================================= */
+
+.price{
+    min-width:120px;
+}
+
+.final-price{
+    font-size:17px;
+    font-weight:800;
+    color:#111827;
+    margin-bottom:3px;
+}
+
+.mrp-price{
+    font-size:12px;
+    color:#9ca3af;
+}
+
+/* =========================================
+   STOCK
+========================================= */
+
+.stock-badge{
+    display:inline-block;
+    padding:7px 14px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:700;
+}
+
+.stock-in{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.stock-low{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+.stock-out{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+/* =========================================
+   ACTION BUTTONS
+========================================= */
+
+.action-wrapper{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+/* COMMON BUTTON */
+
+.icon-btn{
+    width:42px;
+    height:42px;
+    border:none;
+    outline:none;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    text-decoration:none;
+    transition:0.3s ease;
+    font-size:16px;
+    position:relative;
+    overflow:hidden;
+}
+
+/* ICON */
+
+.icon-btn i{
+    position:relative;
+    z-index:2;
+}
+
+/* HOVER EFFECT */
+
+.icon-btn::before{
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    top:0;
+    left:-100%;
+    transition:0.3s;
+    background:rgba(255,255,255,0.15);
+}
+
+.icon-btn:hover::before{
+    left:0;
+}
+
+.icon-btn:hover{
+    transform:translateY(-3px) scale(1.04);
+}
+
+/* EDIT BUTTON */
+
+.edit-btn{
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    color:#fff !important;
+    box-shadow:0 8px 18px rgba(37,99,235,0.25);
+}
+
+.edit-btn:hover{
+    box-shadow:0 12px 24px rgba(37,99,235,0.35);
+}
+
+/* DELETE BUTTON */
+
+.delete-btn{
+    background:linear-gradient(135deg,#ef4444,#dc2626);
+    color:#fff !important;
+    box-shadow:0 8px 18px rgba(239,68,68,0.25);
+}
+
+.delete-btn:hover{
+    box-shadow:0 12px 24px rgba(239,68,68,0.35);
+}
+
+/* =========================================
+   DATATABLE DESIGN
+========================================= */
+
+.dataTables_wrapper{
+    margin-top:10px;
+}
+
+/* SEARCH */
+
+.dataTables_filter{
+    margin-bottom:20px;
+}
+
+.dataTables_filter label{
+    font-weight:600;
+    color:#374151;
+}
+
+.dataTables_filter input{
+    border:1px solid #d1d5db !important;
+    border-radius:12px !important;
+    padding:10px 14px !important;
+    outline:none !important;
+    margin-left:10px !important;
+    transition:0.3s;
+    min-width:250px;
+}
+
+.dataTables_filter input:focus{
+    border-color:#2563eb !important;
+    box-shadow:0 0 0 4px rgba(37,99,235,0.12);
+}
+
+/* PAGINATION */
+
+.dataTables_paginate{
+    margin-top:18px !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button{
+    border:none !important;
+    background:#f3f4f6 !important;
+    border-radius:10px !important;
+    padding:8px 14px !important;
+    margin:0 4px !important;
+    transition:0.3s;
+    color:#111827 !important;
+    font-weight:600;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover{
+    background:#2563eb !important;
+    color:#fff !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current{
+    background:#2563eb !important;
+    color:#fff !important;
+}
+
+/* INFO */
+
+.dataTables_info{
+    color:#6b7280 !important;
+    font-size:13px;
+    margin-top:15px !important;
+}
+
+/* =========================================
+   IMAGE MODAL
+========================================= */
+
+.img-modal{
+    display:none;
+    position:fixed;
+    z-index:999999;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    overflow:auto;
+    background:rgba(0,0,0,0.92);
+    backdrop-filter:blur(5px);
+    padding-top:35px;
+}
+
+.modal-content{
+    display:block;
+    margin:auto;
+    max-width:75%;
+    max-height:75vh;
+    border-radius:18px;
+    animation:zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn{
+
+    from{
+        transform:scale(0.8);
+        opacity:0;
+    }
+
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+.close-btn{
+    position:absolute;
+    top:20px;
+    right:35px;
+    color:#fff;
+    font-size:42px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.close-btn:hover{
+    transform:rotate(90deg);
+}
+
+/* THUMBNAILS */
+
+.thumb-container{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin-top:24px;
+    flex-wrap:wrap;
+}
+
+.thumb-img{
+    width:90px;
+    height:90px;
+    object-fit:cover;
+    border-radius:12px;
+    border:3px solid transparent;
+    cursor:pointer;
+    transition:0.3s ease;
+}
+
+.thumb-img:hover{
+    transform:scale(1.08);
+}
+
+.thumb-img.active{
+    border-color:#2563eb;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media(max-width:1200px){
+
+    #productTable{
+        min-width:1300px;
+    }
+}
+
+@media(max-width:768px){
+
+    .custom-card{
+        padding:18px;
+    }
+
+    .page-title{
+        font-size:22px;
+    }
+
+    .dataTables_filter input{
+        min-width:180px;
+    }
+}
+/* =========================
+   FIX TABLE ALIGNMENT
+========================= */
+
+#productTable{
+    width:100% !important;
+    table-layout:fixed !important;
+    border-collapse:separate !important;
+    border-spacing:0 12px !important;
+}
+
+/* HEADER ALIGN */
+#productTable thead th{
+    text-align:center;
+    font-size:12px;
+    padding:12px 8px;
+    white-space:nowrap;
+}
+
+/* BODY ALIGN */
+#productTable tbody td{
+    text-align:center;
+    vertical-align:middle;
+    padding:10px 8px;
+    font-size:12px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+/* =========================
+   IMAGE FIX (IMPORTANT)
+========================= */
+
+.product-img{
+    width:55px !important;
+    height:55px !important;
+    object-fit:cover;
+    border-radius:12px;
+    border:2px solid #eee;
+    display:block;
+    margin:auto;
+}
+
+.no-img-box{
+    width:55px;
+    height:55px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:auto;
+    border-radius:12px;
+    background:#f3f4f6;
+    font-size:18px;
+    color:#999;
+}
+
+/* =========================
+   PRODUCT COLUMN FIX
+========================= */
+
+.product-name{
+    width:200px;
+    max-width:200px;
+    text-align:left !important;
+}
+
+.product-title{
+    font-size:13px;
+    font-weight:700;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+/* =========================
+   COLOR BADGE FIX
+========================= */
+
+.color-badge{
+    min-width:70px;
+    padding:6px 10px;
+    border-radius:20px;
+    font-size:11px;
+}
+
+/* =========================
+   SIZE BADGE FIX
+========================= */
+
+.size-badge{
+    min-width:40px;
+    height:28px;
+    font-size:11px;
+    padding:4px 8px;
+}
+
+/* =========================
+   PRICE FIX
+========================= */
+
+.final-price{
+    font-size:14px;
+    font-weight:700;
+}
+
+.mrp-price{
+    font-size:11px;
+}
+
+/* =========================
+   ACTION BUTTON FIX (MAIN)
+========================= */
+
+.action-wrapper{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:6px;
+}
+
+.icon-btn{
+    width:32px !important;
+    height:32px !important;
+    border-radius:8px;
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+/* EDIT BUTTON */
+.edit-btn{
+    background:#2563eb;
+    color:#fff !important;
+}
+
+/* DELETE BUTTON */
+.delete-btn{
+    background:#ef4444;
+    color:#fff !important;
+}
+
+.dataTables_wrapper{
+    overflow:hidden !important;
+}
+
+.custom-card{
+    overflow:hidden !important;
+}
+
+#productTable tbody tr{
+    background:#fff;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+</style>
 <div class="content-wrapper">
 
   <div class="custom-card">
@@ -44,4 +685,11 @@
   </div>
 
 </div>
-{% endblock content %}
+{% endblock  %}
+
+{% block extra_js %}
+<!-- Core DataTables Engine CDN -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<!-- JavaScript Connection Script File -->
+{% comment %} <script src="{% static 'dashboard/js/product_list_datatable.js' %}"></script> {% endcomment %}
+{% endblock %}

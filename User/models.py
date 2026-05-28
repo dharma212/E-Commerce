@@ -83,8 +83,6 @@ class Product(models.Model):
         on_delete=models.CASCADE
     )
 
-    price = models.IntegerField()
-
     discount = models.IntegerField(default=0)
 
     stock = models.IntegerField()
@@ -328,6 +326,10 @@ class Order(models.Model):
 
     STATUS_CHOICES = (
         ('Pending', 'Pending'),
+        ('Accepted', 'Accepted'),
+        ('Packed', 'Packed'),
+        ('Shipped', 'Shipped'),
+        ('Out For Delivery', 'Out For Delivery'),
         ('Delivered', 'Delivered'),
         ('Cancelled', 'Cancelled'),
     )
@@ -356,6 +358,7 @@ class Order(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
+    payment_method = models.CharField(max_length=50) 
 
     def __str__(self):
 

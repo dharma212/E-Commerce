@@ -3,937 +3,637 @@ HEADER START
 ========================= -->
 <style>
     @media (min-width: 992px) {
-
-        /* Show the product menu when hovering over the category item */
         .nav-item.dropdown.dropright:hover>.dropdown-menu {
             display: block;
             top: 0;
             left: 100%;
-            /* Positions it to the right of the category list */
             margin-top: 0;
         }
     }
 
-    /* Style for the product images inside the category hover menu */
     .dropdown-item img {
         border-radius: 3px;
         border: 1px solid #ddd;
     }
+
+    /* ===================================================
+       ULTRA-MODERN REDESIGNED MOBILE HEADER & STICKY STYLES
+       =================================================== */
+    @media (max-width: 991.98px) {
+        .mobile-hide-navbar-row {
+            display: none !important;
+        }
+
+        /* Luxury Mobile Header Shell */
+        .mobile-header-wrapper {
+            background: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            z-index: 1040;
+            position: relative;
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Clean High-End Row Layout - Fixed side gaps */
+        .mobile-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 15px; /* Adjusted padding to remove large gaps */
+            background: #ffffff;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* PERFECT STICKY: Smooth Slide-down animation when active */
+        .mobile-header-wrapper.sticky-active {
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.12);
+            animation: headerSlideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        @keyframes headerSlideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        
+        /* Auto hides search panel inside sticky state */
+        .mobile-header-wrapper.sticky-active .mobile-search-container {
+            display: none !important;
+        }
+        
+        /* Premium Brand Transformation in Sticky Mode */
+        .mobile-header-wrapper.sticky-active .mobile-top-bar {
+            padding: 12px 15px;
+            background: #111111; /* Sleek dark bar when sticky */
+        }
+
+        /* Inverts logo colors perfectly inside dark sticky bar */
+        .mobile-header-wrapper.sticky-active .mobile-top-bar .text-dark {
+            color: #ffffff !important; 
+        }
+
+        /* Minimalist Curved Search Bar Container - Fixed padding for full width stretch */
+        .mobile-search-container {
+            padding: 0 15px 18px 15px;
+            background: #ffffff;
+        }
+        
+        .mobile-search-container .input-group {
+            background: #f1f3f5;
+            border-radius: 30px; /* Modern fully rounded capsule design */
+            padding: 2px 6px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-search-container .input-group:focus-within {
+            border-color: #ffd333;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(255, 211, 51, 0.2);
+        }
+        
+        .mobile-search-container .form-control {
+            background: transparent !important;
+            border: none !important;
+            height: 40px;
+            font-size: 14px;
+            color: #333;
+            padding-left: 15px;
+        }
+        
+        .mobile-search-container .form-control:focus {
+            box-shadow: none !important;
+        }
+        
+        .mobile-search-container .input-group-text {
+            background: transparent !important;
+            border: none !important;
+            color: #718096 !important;
+            font-size: 16px;
+            padding-right: 15px;
+        }
+
+        /* Designer Styled Burger Button */
+        .mobile-burger-btn {
+            background: #111111;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%; /* Circular high-end button */
+            color: #ffd333; /* Theme contrast accent */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mobile-header-wrapper.sticky-active .mobile-burger-btn {
+            background: #ffd333;
+            color: #111111;
+            box-shadow: 0 4px 10px rgba(255,211,51,0.2);
+        }
+
+        .mobile-burger-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* APP-STYLE SIDEBAR DRAWER */
+        .navbar-collapse {
+            position: fixed;
+            top: 0;
+            left: -100%; 
+            width: 300px;
+            height: 100vh;
+            background-color: #111111 !important; 
+            z-index: 1060;
+            transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: block !important; 
+            overflow-y: auto;
+            padding: 30px 24px;
+            box-shadow: 10px 0 40px rgba(0,0,0,0.4);
+        }
+
+        .navbar-collapse.show {
+            left: 0 !important;
+        }
+
+        /* DRAWER NAVIGATION LINKS & DROP-DOWNS */
+        .navbar-nav .nav-link {
+            padding: 16px 0 !important;
+            border-bottom: 1px solid #1f1f1f;
+            color: #ffffff !important;
+            font-weight: 500;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: #ffd333 !important;
+        }
+        
+        /* FIX: Full clarity colors inside pages drawer menu */
+        .navbar-nav .dropdown-menu {
+            background-color: #1a1a1a !important;
+            padding-left: 15px;
+            border: none !important;
+            margin: 0 !important;
+        }
+        
+        .navbar-nav .dropdown-item {
+            color: #bbbbbb !important; /* Soft light tone for high contrast visibility */
+            padding: 12px 0;
+            font-size: 14px;
+            background: transparent !important;
+            border-bottom: 1px solid #262626;
+        }
+        
+        .navbar-nav .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .navbar-nav .dropdown-item:hover {
+            color: #ffd333 !important;
+        }
+        
+        .navbar-nav .dropdown-toggle::after {
+            color: #ffd333;
+            float: right;
+            margin-top: 8px;
+        }
+
+        /* ADVANCED GLASS-MORPHISM BACKDROP OVERLAY */
+        .navbar-collapse-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.4);
+            z-index: 1050;
+            display: none;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        body.menu-open {
+            overflow: hidden;
+        }
+    }
 </style>
+
 <div id="main-header">
 
-    <!-- TOPBAR -->
+    <!-- TOPBAR (LAPTOP ONLY) -->
     <div class="container-fluid">
-
         <div class="row bg-secondary py-1 px-xl-5 d-none d-lg-flex">
-
             <div class="col-lg-6 d-none d-lg-block">
-
                 <div class="d-inline-flex align-items-center h-100">
-
-                    <a class="text-body mr-3" href="">
-                        About
-                    </a>
-
-                    <a class="text-body mr-3" href="">
-                        Contact
-                    </a>
-
-                    <a class="text-body mr-3" href="">
-                        Help
-                    </a>
-
-                    <a class="text-body mr-3" href="">
-                        FAQs
-                    </a>
-
+                    <a class="text-body mr-3" href="">About</a>
+                    <a class="text-body mr-3" href="">Contact</a>
+                    <a class="text-body mr-3" href="">Help</a>
+                    <a class="text-body mr-3" href="">FAQs</a>
                 </div>
-
             </div>
-
             <div class="col-lg-6 text-center text-lg-right">
-
                 <div class="d-inline-flex align-items-center">
-
                     {% if request.user.is_authenticated %}
-
-                    <span class="mr-2 font-weight-bold">
-                        Hello, {{ request.user.username }}
-                    </span>
-
-                    <button class="btn btn-sm btn-info mr-2" onclick="goToProfile()">
-
-                        Profile
-
-                    </button>
-
-                    <button class="btn btn-sm btn-danger" onclick="logout()">
-
-                        Logout
-
-                    </button>
-
+                    <span class="mr-2 font-weight-bold">Hello, {{ request.user.username }}</span>
+                    <button class="btn btn-sm btn-info mr-2" onclick="goToProfile()">Profile</button>
+                    <button class="btn btn-sm btn-danger" onclick="logout()">Logout</button>
                     {% else %}
-
-                    <button class="btn btn-sm btn-primary" onclick="openLoginModal()">
-
-                        Login
-
-                    </button>
-
+                    <button class="btn btn-sm btn-primary" onclick="openLoginModal()">Login</button>
                     {% endif %}
-
                 </div>
-
             </div>
-
         </div>
 
-        <!-- LOGO SECTION -->
-        <div class="row align-items-center bg-light py-3 px-xl-5 d-none d-lg-flex" id="top-header">
-
-            <div class="col-lg-4">
-
+        <!-- NEWLY REDESIGNED LUXURY MOBILE NAVIGATION HEADER -->
+        <div class="d-block d-lg-none mobile-header-wrapper" id="mobileHeaderWrapper">
+            <!-- Action Navbar: Identity Branding & Controller Toggle -->
+            <div class="mobile-top-bar">
                 <a href="{% url 'index' %}" class="text-decoration-none">
-
-                    <span class="h1 text-uppercase text-primary bg-dark px-2">
-                        Multi
-                    </span>
-
-                    <span class="h1 text-uppercase text-dark bg-primary px-2 ml-n1">
-                        Shop
-                    </span>
-
+                    <span class="h2 text-uppercase text-primary bg-dark px-2" style="font-weight:900; letter-spacing:0.5px;">Multi</span>
+                    <span class="h2 text-uppercase text-dark bg-primary px-2 ml-n1" style="font-weight:900; letter-spacing:0.5px;">Shop</span>
                 </a>
-
+                <button type="button" class="mobile-burger-btn" id="mobileMenuBtn">
+                    <i class="fa fa-bars"></i>
+                </button>
             </div>
 
-            <div class="col-lg-4 col-6 text-left">
-
+            <!-- Content Navbar: Minimal Capsule Live Search Panel -->
+            <div class="mobile-search-container">
                 <div class="position-relative w-100">
-
                     <div class="input-group">
-
-                        <input type="text" id="search-input" class="form-control" placeholder="Search for products"
-                            autocomplete="off">
-
+                        <input type="text" id="search-input-mobile" class="form-control" placeholder="Search brands, products..." autocomplete="off">
                         <div class="input-group-append">
-
-                            <span class="input-group-text bg-transparent text-primary">
-
+                            <span class="input-group-text">
                                 <i class="fa fa-search"></i>
-
                             </span>
-
                         </div>
-
                     </div>
+                    <!-- INSTANT AJAX INPUT SUGGESTIONS -->
+                    <div id="search-result-box-mobile" class="custom-search-results"></div>
+                </div>
+            </div>
+        </div>
 
-                    <!-- SEARCH RESULT -->
-                    <div id="search-result-box">
-
+        <!-- DESKTOP LOGO & SEARCH AREA (Hidden on Mobile) -->
+        <div class="row align-items-center bg-light py-3 px-xl-5 d-none d-lg-flex" id="top-header">
+            <div class="col-lg-4">
+                <a href="{% url 'index' %}" class="text-decoration-none">
+                    <span class="h1 text-uppercase text-primary bg-dark px-2">Multi</span>
+                    <span class="h1 text-uppercase text-dark bg-primary px-2 ml-n1">Shop</span>
+                </a>
+            </div>
+            <div class="col-lg-4 text-left">
+                <div class="position-relative w-100">
+                    <div class="input-group">
+                        <input type="text" id="search-input" class="form-control" placeholder="Search for products" autocomplete="off">
+                        <div class="input-group-append">
+                            <span class="input-group-text bg-transparent text-primary">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
                     </div>
+                    <div id="search-result-box"></div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-right">
+                <p class="m-0">Customer Service</p>
+                <h5 class="m-0">+012 345 6789</h5>
+            </div>
+        </div>
+    </div>
 
+    <!-- MAIN NAVBAR ROW -->
+    <div class="container-fluid bg-dark mobile-hide-navbar-row" id="navbar-sticky">
+        <div class="row px-xl-5">
+            <div class="col-lg-3 d-none d-lg-block">
+                <a class="btn d-flex align-items-center justify-content-between bg-primary w-100" data-toggle="collapse" href="#navbar-vertical" style="height:65px;padding:0 30px;">
+                    <h6 class="text-dark m-0"><i class="fa fa-bars mr-2"></i>Categories</h6>
+                    <i class="fa fa-angle-down text-dark"></i>
+                </a>
+                <nav class="collapse position-absolute navbar navbar-vertical navbar-light align-items-start p-0 bg-light" id="navbar-vertical" style="width: calc(100% - 30px); z-index:999;">
+                    <div class="navbar-nav w-100">
+                        {% for category in categories %}
+                        <div class="nav-item mega-category-wrapper">
+                            <a href="{% url 'shop' %}?category={{ category.id }}" class="nav-link mega-category-link">
+                                {{ category.name }} <i class="fa fa-angle-right float-right mt-1"></i>
+                            </a>
+                            <div class="mega-type-dropdown">
+                                {% for type in category.types.all %}
+                                <div class="mega-type-wrapper">
+                                    <a href="{% url 'shop' %}?type={{ type.id }}" class="mega-type-link">
+                                        {{ type.name }} <i class="fa fa-angle-right float-right mt-1"></i>
+                                    </a>
+                                    <div class="mega-product-dropdown">
+                                        <div class="mega-product-header">{{ type.name }} Products</div>
+                                        {% for product in type.product_set.all|slice:":6" %}
+                                        <a href="{% url 'product_detail' product.id %}" class="mega-product-item">
+                                            <div class="mega-product-info">
+                                                <div class="mega-product-name">{{ product.name }}</div>
+                                            </div>
+                                        </a>
+                                        {% empty %}
+                                        <div class="p-3 text-muted">No Products Found</div>
+                                        {% endfor %}
+                                        <a href="{% url 'shop' %}?type={{ type.id }}" class="mega-view-all">View All Products</a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </nav>
+            </div>
+
+            <div class="col-lg-9 d-none d-lg-block">
+                <nav class="navbar navbar-expand-lg bg-dark navbar-dark py-3 py-lg-0 px-0 d-flex justify-content-between">
+                    <div class="navbar-nav mr-auto py-0">
+                        <a href="{% url 'index' %}" class="nav-item nav-link">Home</a>
+                        <a href="{% url 'shop' %}" class="nav-item nav-link">Shop</a>
+                        
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages <i class="fa fa-angle-down ml-1"></i></a>
+                            <div class="dropdown-menu bg-primary rounded-0 border-0 m-0">
+                                <a href="{% url 'cart' %}" class="dropdown-item">Shopping Cart</a>
+                                <a href="{% url 'checkout' %}" class="dropdown-item">Checkout</a>
+                            </div>
+                        </div>
+                        <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
+                        
+                        <a href="{% url 'my_orders' %}" class="nav-item nav-link">Order</a>
+                        {% if request.user.is_authenticated and request.user.is_superuser %}
+                        <a href="{% url 'dashboard' %}" class="nav-item nav-link">Dashboard</a>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="navbar-nav ml-auto py-0">
+                        {% if request.user.is_authenticated %}
+                        <a href="{% url 'wishlist' %}" class="btn px-0">
+                            <i class="fas fa-heart text-primary"></i>
+                            <span id="wishlist-count" class="badge text-secondary border border-secondary rounded-circle" style="padding-bottom:2px;">{{ wishlist_count|default:0 }}</span>
+                        </a>
+                        <a href="{% url 'cart' %}" class="btn px-0 ml-3">
+                            <i class="fas fa-shopping-cart text-primary"></i>
+                            <span id="cart-count" class="badge text-secondary border border-secondary rounded-circle" style="padding-bottom:2px;">{{ cart_count|default:0 }}</span>
+                        </a>
+                        {% else %}
+                        <a href="javascript:void(0)" onclick="openLoginModal()" class="btn px-0">
+                            <i class="fas fa-heart text-primary"></i>
+                            <span class="badge text-secondary border border-secondary rounded-circle" style="padding-bottom:2px;">0</span>
+                        </a>
+                        <a href="javascript:void(0)" onclick="openLoginModal()" class="btn px-0 ml-3">
+                            <i class="fas fa-shopping-cart text-primary"></i>
+                            <span class="badge text-secondary border border-secondary rounded-circle" style="padding-bottom:2px;">0</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRESTIGE MOBILE LEFT SIDEBAR DRAWER -->
+    <nav class="navbar navbar-dark p-0">
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3" style="border-color: #262626 !important;">
+                <h5 class="text-white m-0" style="font-weight: 600; letter-spacing: 0.5px;">Navigation Menu</h5>
+                <button type="button" class="close text-white" id="closeMenuBtn" style="font-size: 28px; line-height: 1; background: none; border: none; opacity: 0.8;">&times;</button>
+            </div>
+
+            <div class="navbar-nav">
+                <a href="{% url 'index' %}" class="nav-item nav-link">Home</a>
+                
+                {% if request.user.is_authenticated %}
+                <a href="{% url 'shop' %}" class="nav-item nav-link">Shop</a>
+                {% else %}
+                <a href="javascript:void(0)" onclick="openLoginModal()" class="nav-item nav-link">Shop</a>
+                {% endif %}
+
+                <!-- Added drop icon here for mobile layout clarity -->
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages <i class="fa fa-angle-down float-right mt-2"></i></a>
+                    <div class="dropdown-menu">
+                        {% if request.user.is_authenticated %}
+                        <a href="{% url 'cart' %}" class="dropdown-item">Shopping Cart</a>
+                        <a href="{% url 'checkout' %}" class="dropdown-item">Checkout</a>
+                        {% else %}
+                        <a href="javascript:void(0)" onclick="openLoginModal()" class="dropdown-item">Shopping Cart</a>
+                        <a href="javascript:void(0)" onclick="openLoginModal()" class="dropdown-item">Checkout</a>
+                        {% endif %}
+                    </div>
                 </div>
 
+                {% if request.user.is_authenticated %}
+                <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
+                <a href="{% url 'my_orders' %}" class="nav-item nav-link">Orders</a>
+                {% else %}
+                <a href="javascript:void(0)" onclick="openLoginModal()" class="nav-item nav-link">Contact</a>
+                <a href="javascript:void(0)" onclick="openLoginModal()" class="nav-item nav-link">Orders</a>
+                {% endif %}
+
+                {% if request.user.is_authenticated and request.user.is_superuser %}
+                <a href="{% url 'dashboard' %}" class="nav-item nav-link">Dashboard</a>
+                {% endif %}
+                
+                <div class="mt-4 border-top pt-3" style="border-color: #262626 !important;">
+                    {% if request.user.is_authenticated %}
+                    <a href="javascript:void(0)" onclick="goToProfile()" class="nav-item nav-link"><i class="fa fa-user mr-2 text-primary"></i>Profile</a>
+                    <a href="javascript:void(0)" onclick="logout()" class="nav-item nav-link text-danger"><i class="fa fa-sign-out-alt mr-2"></i>Logout</a>
+                    {% else %}
+                    <a href="javascript:void(0)" onclick="openLoginModal()" class="nav-item nav-link text-primary"><i class="fa fa-lock mr-2"></i>Login / Register</a>
+                    {% endif %}
+                </div>
             </div>
-
-            <div class="col-lg-4 col-6 text-right">
-
-                <p class="m-0">
-                    Customer Service
-                </p>
-
-                <h5 class="m-0">
-                    +012 345 6789
-                </h5>
-
-            </div>
-
         </div>
-
-    </div>
-
-    <!-- NAVBAR -->
-    <div class="container-fluid bg-dark" id="navbar-sticky">
-
-        <div class="row px-xl-5">
-
-            <!-- CATEGORY -->
-            <div class="col-lg-3 d-none d-lg-block">
-
-                <a class="btn d-flex align-items-center justify-content-between bg-primary w-100" data-toggle="collapse"
-                    href="#navbar-vertical" style="height:65px;padding:0 30px;">
-
-                    <h6 class="text-dark m-0">
-
-                        <i class="fa fa-bars mr-2"></i>
-
-                        Categories
-
-                    </h6>
-
-                    <i class="fa fa-angle-down text-dark"></i>
-
-                </a>
-
-                <!-- =========================
-                CATEGORY MENU
-                ========================= -->
-                <nav class="collapse position-absolute navbar navbar-vertical navbar-light align-items-start p-0 bg-light"
-                    id="navbar-vertical" style="width: calc(100% - 30px); z-index:999;">
-
-                    <div class="navbar-nav w-100">
-
-                        {% for category in categories %}
-
-                        <!-- CATEGORY -->
-                        <div class="nav-item mega-category-wrapper">
-
-                            <!-- CATEGORY LINK -->
-                            <a href="{% url 'shop' %}?category={{ category.id }}" class="nav-link mega-category-link">
-
-                                {{ category.name }}
-
-                                <i class="fa fa-angle-right float-right mt-1"></i>
-
-                            </a>
-
-                            <!-- TYPE DROPDOWN -->
-                            <div class="mega-type-dropdown">
-
-                                {% for type in category.types.all %}
-
-                                <!-- TYPE -->
-                                <div class="mega-type-wrapper">
-
-                                    <a href="{% url 'shop' %}?type={{ type.id }}" class="mega-type-link">
-
-                                        {{ type.name }}
-
-                                        <i class="fa fa-angle-right float-right mt-1"></i>
-
-                                    </a>
-
-                                    <!-- PRODUCT DROPDOWN -->
-                                    <div class="mega-product-dropdown">
-
-                                        <div class="mega-product-header">
-
-                                            {{ type.name }} Products
-
-                                        </div>
-
-                                        {% for product in type.product_set.all|slice:":6" %}
-
-                                        <a href="{% url 'product_detail' product.id %}" class="mega-product-item">
-
-                                            <div class="mega-product-info">
-
-                                                <div class="mega-product-name">
-
-                                                    {{ product.name }}
-
-                                                </div>
-
-                                            </div>
-
-                                        </a>
-
-                                        {% empty %}
-
-                                        <div class="p-3 text-muted">
-
-                                            No Products Found
-
-                                        </div>
-
-                                        {% endfor %}
-
-                                        <!-- VIEW ALL -->
-                                        <a href="{% url 'shop' %}?type={{ type.id }}" class="mega-view-all">
-
-                                            View All Products
-
-                                        </a>
-
-                                    </div>
-
-                                </div>
-
-                                {% endfor %}
-
-                            </div>
-
-                        </div>
-
-                        {% endfor %}
-
-                    </div>
-
-                </nav>
-
-            </div>
-
-            <!-- NAVBAR -->
-            <div class="col-lg-9">
-
-                <nav class="navbar navbar-expand-lg bg-dark navbar-dark py-3 py-lg-0 px-0">
-
-                    <a href="" class="text-decoration-none d-block d-lg-none">
-
-                        <span class="h1 text-uppercase text-dark bg-light px-2">
-                            Multi
-                        </span>
-
-                        <span class="h1 text-uppercase text-light bg-primary px-2 ml-n1">
-                            Shop
-                        </span>
-
-                    </a>
-
-                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
-
-                        <span class="navbar-toggler-icon"></span>
-
-                    </button>
-
-                    <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
-
-                        <!-- LEFT MENU -->
-                        <div class="navbar-nav mr-auto py-0">
-
-                            <!-- HOME -->
-                            <a href="{% url 'index' %}" class="nav-item nav-link ">
-
-                                Home
-
-                            </a>
-
-                            <!-- SHOP -->
-                            {% if request.user.is_authenticated %}
-
-                            <a href="{% url 'shop' %}" class="nav-item nav-link">
-
-                                Shop
-
-                            </a>
-
-                            {% else %}
-
-                            <a href="javascript:void(0)" onclick="openLoginModal()" class="nav-item nav-link">
-
-                                Shop
-
-                            </a>
-
-                            {% endif %}
-
-                            <!-- DROPDOWN -->
-                            <div class="nav-item dropdown">
-
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
-
-                                    Pages
-
-                                    <i class="fa fa-angle-down mt-1"></i>
-
-                                </a>
-
-                                <div class="dropdown-menu bg-primary rounded-0 border-0 m-0">
-
-                                    <!-- CART -->
-                                    {% if request.user.is_authenticated %}
-
-                                    <a href="{% url 'cart' %}" class="dropdown-item">
-
-                                        Shopping Cart
-
-                                    </a>
-
-                                    {% else %}
-
-                                    <a href="javascript:void(0)" onclick="openLoginModal()" class="dropdown-item">
-
-                                        Shopping Cart
-
-                                    </a>
-
-                                    {% endif %}
-
-                                    <!-- CHECKOUT -->
-                                    {% if request.user.is_authenticated %}
-
-                                    <a href="{% url 'checkout' %}" class="dropdown-item">
-
-                                        Checkout
-
-                                    </a>
-
-                                    {% else %}
-
-                                    <a href="javascript:void(0)" onclick="openLoginModal()" class="dropdown-item">
-
-                                        Checkout
-
-                                    </a>
-
-                                    {% endif %}
-
-                                </div>
-
-                            </div>
-
-                            <!-- CONTACT -->
-                            {% if request.user.is_authenticated %}
-
-                            <a href="{% url 'contact' %}" class="nav-item nav-link">
-
-                                Contact
-
-                            </a>
-
-                            {% else %}
-
-                            <a href="javascript:void(0)" onclick="openLoginModal()" class="nav-item nav-link">
-
-                                Contact
-
-                            </a>
-
-                            {% endif %}
-
-                            <!-- ORDER -->
-                            {% if request.user.is_authenticated %}
-
-                            <a href="{% url 'my_orders' %}" class="nav-item nav-link">
-
-                                Orders
-
-                            </a>
-
-                            {% else %}
-
-                            <a href="javascript:void(0)" onclick="openLoginModal()" class="nav-item nav-link">
-
-                                Orders
-
-                            </a>
-
-                            {% endif %}
-
-                            <!-- DASHBOARD -->
-                            {% if request.user.is_authenticated and request.user.is_superuser %}
-
-                            <a href="{% url 'dashboard' %}" class="nav-item nav-link">
-
-                                Dashboard
-
-                            </a>
-
-                            {% endif %}
-
-                        </div>
-
-                        <!-- RIGHT ICON -->
-                        <div class="navbar-nav ml-auto py-0 d-none d-lg-block">
-
-                            <!-- WISHLIST -->
-                            {% if request.user.is_authenticated %}
-
-                            <a href="{% url 'wishlist' %}" class="btn px-0">
-
-                                <i class="fas fa-heart text-primary"></i>
-
-                                <span id="wishlist-count"
-                                    class="badge text-secondary border border-secondary rounded-circle"
-                                    style="padding-bottom:2px;">
-
-                                    {{ wishlist_count|default:0 }}
-
-                                </span>
-
-                            </a>
-
-                            {% else %}
-
-                            <a href="javascript:void(0)" onclick="openLoginModal()" class="btn px-0">
-
-                                <i class="fas fa-heart text-primary"></i>
-
-                                <span class="badge text-secondary border border-secondary rounded-circle"
-                                    style="padding-bottom:2px;">
-
-                                    0
-
-                                </span>
-
-                            </a>
-
-                            {% endif %}
-
-                            <!-- CART -->
-                            {% if request.user.is_authenticated %}
-
-                            <a href="{% url 'cart' %}" class="btn px-0 ml-3">
-
-                                <i class="fas fa-shopping-cart text-primary"></i>
-
-                                <span id="cart-count"
-                                    class="badge text-secondary border border-secondary rounded-circle"
-                                    style="padding-bottom:2px;">
-
-                                    {{ cart_count|default:0 }}
-
-                                </span>
-
-                            </a>
-
-                            {% else %}
-
-                            <a href="javascript:void(0)" onclick="openLoginModal()" class="btn px-0 ml-3">
-
-                                <i class="fas fa-shopping-cart text-primary"></i>
-
-                                <span class="badge text-secondary border border-secondary rounded-circle"
-                                    style="padding-bottom:2px;">
-
-                                    0
-
-                                </span>
-
-                            </a>
-
-                            {% endif %}
-
-                        </div>
-
-                    </div>
-
-                </nav>
-
-            </div>
-
-        </div>
-
-    </div>
-
+    </nav>
 </div>
+
+<div class="navbar-collapse-backdrop" id="menuBackdrop"></div>
+
+<script>
+    // CORE OFF-CANVAS CONTROL FUNCTIONS
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+    const navbarCollapse = document.getElementById('navbarCollapse');
+    const menuBackdrop = document.getElementById('menuBackdrop');
+
+    function openMenu() {
+        navbarCollapse.classList.add('show');
+        menuBackdrop.style.display = 'block';
+        document.body.classList.add('menu-open');
+    }
+
+    function closeMenu() {
+        navbarCollapse.classList.remove('show');
+        menuBackdrop.style.display = 'none';
+        document.body.classList.remove('menu-open');
+    }
+
+    if(mobileMenuBtn) mobileMenuBtn.addEventListener('click', openMenu);
+    if(closeMenuBtn) closeMenuBtn.addEventListener('click', closeMenu);
+    if(menuBackdrop) menuBackdrop.addEventListener('click', closeMenu);
+
+    const mobileHeaderWrapper = document.getElementById('mobileHeaderWrapper');
+    const offsetLimit = 90;
+
+    window.addEventListener('scroll', function() {
+        if (window.innerWidth >= 992) {
+            mobileHeaderWrapper.classList.remove('sticky-active');
+            return; 
+        }
+
+        let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (currentScroll > offsetLimit) {
+            mobileHeaderWrapper.classList.add('sticky-active');
+        } else {
+            mobileHeaderWrapper.classList.remove('sticky-active');
+        }
+    });
+</script>
+
 <style>
-    #search-result-box {
-
+    /* Premium Instant Overlay Search Results */
+    #search-result-box, .custom-search-results {
         position: absolute;
-
         width: 100%;
-
         background: white;
-
         top: 100%;
-
         left: 0;
-
         z-index: 9999;
-
-        border-radius: 5px;
-
+        border-radius: 12px;
         overflow: hidden;
-
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
         display: none;
-
+        margin-top: 5px;
     }
 
     .search-product-item {
-
         display: flex;
-
         align-items: center;
-
-        padding: 10px;
-
-        border-bottom: 1px solid #eee;
-
+        padding: 14px 18px;
+        border-bottom: 1px solid #f1f3f5;
         text-decoration: none;
-
-        color: black;
-
-        transition: 0.3s;
-
+        color: #212529;
+        transition: 0.2s;
         background: white;
-
     }
 
     .search-product-item:hover {
-
-        background: #f5f5f5;
-
+        background: #f8f9fa;
         text-decoration: none;
-
+        color: #212529;
     }
 
     .search-product-item img {
-
-        width: 60px;
-
-        height: 60px;
-
+        width: 46px;
+        height: 46px;
         object-fit: cover;
-
-        margin-right: 10px;
-
-        border-radius: 5px;
-
+        margin-right: 15px;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
     }
 
     .search-product-info {
-
         flex: 1;
-
     }
 
     .search-product-name {
-
         font-size: 14px;
-
         font-weight: 600;
-
-        margin-bottom: 3px;
-
+        margin-bottom: 2px;
     }
 
     .search-product-price {
-
-        color: #d19c97;
-
-        font-weight: bold;
-
-        font-size: 14px;
-
-    }
-</style>
-<script>
-
-    const searchInput = document.getElementById(
-        "search-input"
-    );
-
-    const searchResultBox = document.getElementById(
-        "search-result-box"
-    );
-
-    let debounceTimer;
-
-
-    // LIVE SEARCH
-    searchInput.addEventListener("keyup", function () {
-
-        clearTimeout(debounceTimer);
-
-        let search = this.value.trim();
-
-        // HIDE BOX
-        if (search.length < 1) {
-
-            searchResultBox.style.display = "none";
-
-            return;
-
-        }
-
-        // WAIT USER STOP TYPING
-        debounceTimer = setTimeout(() => {
-
-            fetch(`/search-product/?search=${search}`)
-
-                .then(response => response.json())
-
-                .then(data => {
-
-                    let products = data.products;
-
-                    let html = "";
-
-                    if (products.length > 0) {
-
-                        products.forEach(product => {
-
-                            html += `
-
-                    <a href="/product/${product.id}/"
-                        class="search-product-item">
-
-                        <img src="${product.image}">
-
-                        <div class="search-product-info">
-
-                            <div class="search-product-name">
-                                ${product.name}
-                            </div>
-
-                            <div class="search-product-price">
-                                ₹${product.price}
-                            </div>
-
-                        </div>
-
-                    </a>
-
-                    `;
-
-                        });
-
-                    }
-
-                    else {
-
-                        html = `
-
-                <div class="p-3 text-center">
-                    No Product Found
-                </div>
-
-                `;
-
-                    }
-
-                    searchResultBox.innerHTML = html;
-
-                    searchResultBox.style.display = "block";
-
-                });
-
-        }, 500);
-
-    });
-
-
-    // HIDE RESULT WHEN CLICK OUTSIDE
-    document.addEventListener("click", function (e) {
-
-        if (
-            !document.getElementById("main-header")
-                .contains(e.target)
-        ) {
-
-            searchResultBox.style.display = "none";
-
-        }
-
-    });
-
-</script>
-<style>
-    /* =========================
-MEGA MENU MAIN
-========================= */
-
-    #navbar-vertical {
-        border-top: none;
-        overflow: visible;
-    }
-
-    /* =========================
-CATEGORY
-========================= */
-
-    .mega-category-wrapper {
-        position: relative;
-        width: 100%;
-    }
-
-    .mega-category-link {
-        background: #fff;
-        padding: 14px 20px;
-        border-bottom: 1px solid #f5f5f5;
-        color: #333;
-        font-weight: 500;
-        transition: 0.3s;
-    }
-
-    .mega-category-link:hover {
-        background: #f8f8f8;
-        color: #d19c97;
-    }
-
-    /* =========================
-TYPE DROPDOWN
-========================= */
-
-    .mega-type-dropdown {
-        position: absolute;
-        top: 0;
-        left: 100%;
-        width: 260px;
-        background: #fff;
-        border: 1px solid #eee;
-        display: none;
-        min-height: 100%;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-        z-index: 999;
-    }
-
-    .mega-category-wrapper:hover .mega-type-dropdown {
-        display: block;
-        animation: fadeIn 0.25s ease;
-    }
-
-    /* =========================
-TYPE
-========================= */
-
-    .mega-type-wrapper {
-        position: relative;
-    }
-
-    .mega-type-link {
-        display: block;
-        padding: 14px 20px;
-        color: #333;
-        text-decoration: none;
-        border-bottom: 1px solid #f5f5f5;
-        transition: 0.3s;
-        background: #fff;
-        font-weight: 500;
-    }
-
-    .mega-type-link:hover {
-        background: #fafafa;
-        color: #d19c97;
-        text-decoration: none;
-    }
-
-    /* =========================
-PRODUCT DROPDOWN
-========================= */
-
-    .mega-product-dropdown {
-        position: absolute;
-        top: 0;
-        left: 100%;
-        width: 340px;
-        background: #fff;
-        border: 1px solid #eee;
-        display: none;
-        min-height: 100%;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-        z-index: 999;
-    }
-
-    .mega-type-wrapper:hover .mega-product-dropdown {
-        display: block;
-        animation: fadeIn 0.25s ease;
-    }
-
-    /* =========================
-HEADER
-========================= */
-
-    .mega-product-header {
-        padding: 14px 18px;
-        font-size: 16px;
+        color: #ff4757;
         font-weight: 700;
-        border-bottom: 1px solid #f1f1f1;
-        background: #fafafa;
-        color: #222;
+        font-size: 13px;
     }
-
-    /* =========================
-PRODUCT ITEM
-========================= */
-
-    .mega-product-item {
-        display: block;
-        padding: 12px 18px;
-        text-decoration: none;
-        color: #333;
-        border-bottom: 1px solid #f5f5f5;
-        transition: 0.3s;
-        background: #fff;
-    }
-
-    .mega-product-item:hover {
-        background: #fafafa;
-        text-decoration: none;
-        padding-left: 24px;
-    }
-
-
-    /* =========================
-PRODUCT INFO
-========================= */
-
-    .mega-product-info {
-        flex: 1;
-        overflow: hidden;
-    }
-
-    .mega-product-name {
-        font-size: 14px;
-        font-weight: 600;
-        color: #222;
-        line-height: 1.4;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-
-    /* =========================
-VIEW ALL BUTTON
-========================= */
-
-    .mega-view-all {
-        display: block;
-        text-align: center;
-        padding: 12px;
-        background: #ffd333;
-        color: #222;
-        font-weight: 600;
-        text-decoration: none;
-        transition: 0.3s;
-    }
-
-    .mega-view-all:hover {
-        background: #222;
-        color: #ffd333;
-        text-decoration: none;
-    }
-
-    /* =========================
-ANIMATION
-========================= */
-
-    @keyframes fadeIn {
-
-        from {
-            opacity: 0;
-            transform: translateX(10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-    }
-
-    /* =========================
-IMPORTANT FIX
-========================= */
-
-
-    /* REMOVE GLOBAL EFFECT */
-    .dropdown-item img {
-        width: auto;
-        height: auto;
-    }
-
-    /* PREVENT PRODUCT CARD DAMAGE */
-    .product-item img,
-    .product-img img,
-    .card img {
-        width: 100%;
-        height: auto;
-    }
+    
+    /* Global Styles Fixes From Old Layout */
+    .mega-category-wrapper { position: relative; width: 100%; }
+    .mega-category-link { background: #fff; padding: 14px 20px; border-bottom: 1px solid #f5f5f5; color: #333; font-weight: 500; transition: 0.3s; display: block; }
+    .mega-category-link:hover { background: #f8f8f8; color: #d19c97; text-decoration: none; }
+    .mega-type-dropdown { position: absolute; top: 0; left: 100%; width: 260px; background: #fff; border: 1px solid #eee; display: none; min-height: 100%; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08); z-index: 999; }
+    .mega-category-wrapper:hover .mega-type-dropdown { display: block; animation: fadeIn 0.25s ease; }
+    .mega-type-wrapper { position: relative; }
+    .mega-type-link { display: block; padding: 14px 20px; color: #333; text-decoration: none; border-bottom: 1px solid #f5f5f5; transition: 0.3s; background: #fff; font-weight: 500; }
+    .mega-type-link:hover { background: #fafafa; color: #d19c97; text-decoration: none; }
+    .mega-product-dropdown { position: absolute; top: 0; left: 100%; width: 340px; background: #fff; border: 1px solid #eee; display: none; min-height: 100%; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08); z-index: 999; }
+    .mega-type-wrapper:hover .mega-product-dropdown { display: block; animation: fadeIn 0.25s ease; }
+    .mega-product-header { padding: 14px 18px; font-size: 16px; font-weight: 700; border-bottom: 1px solid #f1f1f1; background: #fafafa; color: #222; }
+    .mega-product-item { display: block; padding: 12px 18px; text-decoration: none; color: #333; border-bottom: 1px solid #f5f5f5; transition: 0.3s; background: #fff; }
+    .mega-product-item:hover { background: #fafafa; text-decoration: none; padding-left: 24px; }
+    .mega-product-info { flex: 1; overflow: hidden; }
+    .mega-product-name { font-size: 14px; font-weight: 600; color: #222; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mega-view-all { display: block; text-align: center; padding: 12px; background: #ffd333; color: #222; font-weight: 600; text-decoration: none; transition: 0.3s; }
+    .mega-view-all:hover { background: #222; color: #ffd333; text-decoration: none; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 </style>
+
+<script>
+    // LIVE AUTOCOMPLETE AJAX SEARCH ALGORITHM
+    function setupAsynchronousSearch(fieldId, outputPanelId) {
+        const targetInput = document.getElementById(fieldId);
+        const feedbackBox = document.getElementById(outputPanelId);
+        let liveDebounce;
+
+        if(!targetInput || !feedbackBox) return;
+
+        targetInput.addEventListener("keyup", function () {
+            clearTimeout(liveDebounce);
+            let stringQuery = this.value.trim();
+
+            if (stringQuery.length < 1) {
+                feedbackBox.style.display = "none";
+                return;
+            }
+
+            liveDebounce = setTimeout(() => {
+                fetch(`/search-product/?search=${stringQuery}`)
+                    .then(res => res.json())
+                    .then(collection => {
+                        let matches = collection.products;
+                        let structuralHtml = "";
+
+                        if (matches.length > 0) {
+                            matches.forEach(row => {
+                                structuralHtml += `
+                                <a href="/product/${row.id}/" class="search-product-item">
+                                    <img src="${row.image}">
+                                    <div class="search-product-info">
+                                        <div class="search-product-name">${row.name}</div>
+                                        <div class="search-product-price">₹${row.price}</div>
+                                    </div>
+                                </a>`;
+                            });
+                        } else {
+                            structuralHtml = `<div class="p-3 text-center text-muted">No Product Found</div>`;
+                        }
+
+                        feedbackBox.innerHTML = structuralHtml;
+                        feedbackBox.style.display = "block";
+                    });
+            }, 400);
+        });
+    }
+
+    setupAsynchronousSearch("search-input", "search-result-box");
+    setupAsynchronousSearch("search-input-mobile", "search-result-box-mobile");
+
+    document.addEventListener("click", function (event) {
+        if (!document.getElementById("main-header").contains(event.target)) {
+            const out1 = document.getElementById("search-result-box");
+            const out2 = document.getElementById("search-result-box-mobile");
+            if(out1) out1.style.display = "none";
+            if(out2) out2.style.display = "none";
+        }
+    });
+</script>

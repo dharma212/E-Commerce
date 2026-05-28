@@ -16,7 +16,13 @@
     </ul>
     <ul class="navbar-nav navbar-nav-right">
         <li class="nav-item dropdown d-none d-lg-block">
-        <a class="nav-link btn btn-success create-new-button" id="createbuttonDropdown" data-toggle="dropdown" aria-expanded="false" href="#">+ Create New Project</a>
+<button
+    onclick="openDashboardLoginModal()"
+    class="btn btn-primary">
+
+    Admin Login
+
+</button>
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="createbuttonDropdown">
             <h6 class="p-3 mb-0">Projects</h6>
             <div class="dropdown-divider"></div>
@@ -150,41 +156,100 @@
         </div>
         </li>
         <li class="nav-item dropdown">
-        <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
-            <div class="navbar-profile">
-            {% comment %} <img class="img-xs rounded-circle" src="{% static 'assets/images/faces/face15.jpg' %}" alt=""> {% endcomment %}
-            <p class="mb-0 d-none d-sm-block navbar-profile-name">Henry Klein</p>
+
+    <a class="nav-link"
+       id="profileDropdown"
+       href="#"
+       data-toggle="dropdown">
+
+        <div class="navbar-profile">
+
+            <!-- PROFILE IMAGE -->
+
+            <img
+                class="img-xs rounded-circle"
+                src="{% static 'dashboard/images/faces/admin.jpg' %}"
+                alt="profile"
+            >
+
+            <!-- USERNAME -->
+
+            <p class="mb-0 d-none d-sm-block navbar-profile-name">
+
+                {% if request.user.is_authenticated %}
+
+                    {{ request.user.username }}
+
+                {% else %}
+
+                    Admin
+
+                {% endif %}
+
+            </p>
+
             <i class="mdi mdi-menu-down d-none d-sm-block"></i>
-            </div>
-        </a>
-        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="profileDropdown">
-            <h6 class="p-3 mb-0">Profile</h6>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-                <div class="preview-icon bg-dark rounded-circle">
-                <i class="mdi mdi-settings text-success"></i>
-                </div>
-            </div>
-            <div class="preview-item-content">
-                <p class="preview-subject mb-1">Settings</p>
-            </div>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-                <div class="preview-icon bg-dark rounded-circle">
-                <i class="mdi mdi-logout text-danger"></i>
-                </div>
-            </div>
-            <div class="preview-item-content">
-                <p class="preview-subject mb-1">Log out</p>
-            </div>
-            </a>
-            <div class="dropdown-divider"></div>
-            <p class="p-3 mb-0 text-center">Advanced settings</p>
+
         </div>
-        </li>
+
+    </a>
+
+    <!-- DROPDOWN -->
+
+    <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list">
+
+        <h6 class="p-3 mb-0">
+
+            Profile
+
+        </h6>
+
+        <div class="dropdown-divider"></div>
+
+        <!-- EMAIL -->
+
+        <div class="px-3 py-2 text-light">
+
+            {% if request.user.is_authenticated %}
+
+                {{ request.user.email }}
+
+            {% endif %}
+
+        </div>
+
+        <div class="dropdown-divider"></div>
+
+        <!-- LOGOUT -->
+
+        <a class="dropdown-item preview-item"
+           onclick="dashboardLogout()">
+
+            <div class="preview-thumbnail">
+
+                <div class="preview-icon bg-dark rounded-circle">
+
+                    <i class="mdi mdi-logout text-danger"></i>
+
+                </div>
+
+            </div>
+
+            <div class="preview-item-content">
+
+                <p class="preview-subject mb-1">
+
+                    Logout
+
+                </p>
+
+            </div>
+
+        </a>
+
+    </div>
+
+</li>
     </ul>
     <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
         <span class="mdi mdi-format-line-spacing"></span>

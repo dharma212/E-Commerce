@@ -154,7 +154,7 @@
 </li>
 
     <!-- ORDERS -->
-    <li class="nav-item menu-items {% if request.resolver_match.url_name == 'admin_orders' %}active{% endif %}">
+    <li class="nav-item menu-items {% if request.resolver_match.url_name == 'order_list' %}active{% endif %}">
 
       <a class="nav-link"
          href="{% url 'order_list' %}">
@@ -172,10 +172,10 @@
     </li>
 
     <!-- CUSTOMERS -->
-    <li class="nav-item menu-items {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}">
+    <li class="nav-item menu-items {% if request.resolver_match.url_name == 'user-list' %}active{% endif %}">
 
       <a class="nav-link"
-         href="{% url 'user_list' %}">
+         href="{% url 'user-list' %}">
 
         <span class="menu-icon">
           <i class="mdi mdi-account-multiple"></i>

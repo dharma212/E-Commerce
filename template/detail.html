@@ -87,168 +87,170 @@
 </div>
 
         <!-- PRODUCT INFO -->
-        <div class="col-lg-7 h-auto mb-30">
+    <div class="col-lg-7 h-auto mb-30">
+    <div class="h-100 bg-white p-40 shadow-sm border-radius-10" style="background-color: #ffffff !important;">
+        {% csrf_token %}
 
-            <div class="h-100 bg-light p-30">
-{% csrf_token %}
-                <h3>{{ product.name }}</h3>
+        <!-- Product Name & Share Button -->
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <h2 class="font-weight-bold mb-0" style="color: #212529 !important; font-family: 'Poppins', sans-serif;">{{ product.name }}</h2>
+            <button class="btn btn-light btn-sm rounded-circle shadow-sm text-muted" title="Share Product" style="width: 40px; height: 40px; background-color: #f8f9fa !important;">
+                <i class="fas fa-share-alt" style="color: #6c757d !important;"></i>
+            </button>
+        </div>
 
-                <div class="d-flex mb-3">
+        <!-- Ratings & Reviews -->
+        <div class="d-flex align-items-center mb-3">
+            <div class="text-warning mr-2">
+                <small class="fas fa-star"></small>
+                <small class="fas fa-star"></small>
+                <small class="fas fa-star"></small>
+                <small class="fas fa-star"></small>
+                <small class="far fa-star text-muted"></small>
+            </div>
+            <small class="border-left pl-3" style="color: #6c757d !important; font-weight: 500;">(99 Verified Reviews)</small>
+        </div>
 
-                    <div class="text-primary mr-2">
-                        <small class="fas fa-star"></small>
-                        <small class="fas fa-star"></small>
-                        <small class="fas fa-star"></small>
-                        <small class="fas fa-star"></small>
-                        <small class="far fa-star"></small>
+        <hr class="my-3" style="border-top: 1px solid #eeeeee;">
+
+        <!-- Price Section -->
+        <div class="mb-3">
+            {% if product.mrp > 0 %}
+            <div class="d-flex align-items-baseline flex-wrap">
+                <h2 class="font-weight-bold text-primary mb-0" style="color: #007bff !important;">₹{{ product.final_price }}</h2>
+                <h4 class="ml-3 mb-0" style="color: #adb5bd !important;"><del>₹{{ product.mrp }}</del></h4>
+                <span class="badge badge-soft-success ml-3 px-3 py-2" style="background-color: #e2f6ed !important; color: #155724 !important; font-weight: 600;">
+                    <i class="fa fa-arrow-down mr-1"></i> {{ product.discount_percent }}% OFF
+                </span>
+            </div>
+            {% else %}
+            <h2 class="font-weight-bold text-primary" style="color: #007bff !important;">₹{{ product.price }}</h2>
+            {% endif %}
+            <small class="font-weight-bold mt-1 d-block" style="color: #28a745 !important;">Inclusive of all taxes</small>
+        </div>
+
+        <!-- Stock Urgency Indicator -->
+        {% if product.stock > 0 and product.stock <= 5 %}
+        <div class="mb-3">
+            <small class="text-danger font-weight-bold d-block mb-1">
+                <i class="fas fa-exclamation-triangle mr-1"></i> Hurry up! Only {{ product.stock }} items left in stock.
+            </small>
+            <div class="progress" style="height: 6px; border-radius: 10px; background-color: #f8d7da;">
+                <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar" style="width: 30%"></div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Offers & Coupons Box -->
+        <div class="p-3 mb-4 rounded border shadow-sm" style="background-color: #fcfaff !important; border-color: #d6bbfb !important;">
+            <h6 class="font-weight-bold mb-2" style="color: #4b10a9 !important;"><i class="fas fa-percentage mr-2"></i> Available Offers</h6>
+            <ul class="list-unstyled mb-0 small pl-1">
+                <li class="mb-2" style="color: #495057 !important; line-height: 1.5;">
+                    <i class="fas fa-tag text-purple mr-2" style="color: #6f42c1;"></i> <strong>Bank Offer:</strong> 10% instant discount on Credit Cards.
+                </li>
+                <li style="color: #495057 !important; line-height: 1.5;">
+                    <i class="fas fa-tag text-purple mr-2" style="color: #6f42c1;"></i> <strong>Book_Bazar Special:</strong> Free shipping on orders above ₹499.
+                </li>
+            </ul>
+        </div>
+
+        <!-- Product Features Mini-Grid  -->
+        <div class="row mb-4">
+            <div class="col-6 mb-3">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle p-2 bg-light mr-2 text-primary" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-bookmark" style="font-size: 14px;"></i>
                     </div>
+                    <div>
+                        <small class="d-block text-muted text-uppercase font-weight-bold" style="font-size: 10px;">Category</small>
+                        <span class="font-weight-bold" style="color: #212529 !important; font-size: 14px;">{{ product.category.name }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 mb-3">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle p-2 bg-light mr-2 {% if product.stock > 0 %}text-success{% else %}text-danger{% endif %}" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas {% if product.stock > 0 %}fa-check-circle{% else %}fa-times-circle{% endif %}" style="font-size: 14px;"></i>
+                    </div>
+                    <div>
+                        <small class="d-block text-muted text-uppercase font-weight-bold" style="font-size: 10px;">Availability</small>
+                        <span class="font-weight-bold {% if product.stock > 0 %}text-success{% else %}text-danger{% endif %}" style="font-size: 14px;">
+                            {% if product.stock > 0 %}In Stock ({{ product.stock }}){% else %}Out of Stock{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                    <small class="pt-1">(99 Reviews)</small>
+        <!-- Description Section -->
+        <div class="mb-4 p-3 bg-light rounded" style="border-left: 4px solid #007bff; background-color: #f8f9fa !important;">
+            <small class="d-block text-muted font-weight-bold text-uppercase mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Product Description</small>
+            <p class="mb-0 leading-relaxed" style="color: #333333 !important; font-size: 14px; line-height: 1.6; font-weight: 400;">
+                {{ product.description|truncatewords:50 }}
+            </p>
+        </div>
 
+        <!-- Action Box (Quantity, Buy, Cart) -->
+        <div class="action-wrapper p-3 bg-light rounded shadow-sm mb-4" style="background-color: #f8f9fa !important; border: 1px solid #e9ecef;">
+            <label class="font-weight-bold mb-2" style="color: #212529 !important;">Select Quantity:</label>
+            <div class="d-flex flex-wrap align-items-center">
+                
+                <div class="details-qty-wrapper mr-3 mb-2">
+                    <button class="details-qty-btn btn-minus" {% if cart_quantity|default:1 <= 1 %}disabled{% endif %}>
+                        <i class="fa fa-minus text-dark"></i>
+                    </button>
+                    <input type="text" min="1" max="{{ product.stock }}" data-stock="{{ product.stock }}" class="details-quantity-input text-dark font-weight-bold" value="{{ cart_quantity|default:1 }}" readonly style="background: transparent; color: #000 !important;">
+                    <button class="details-qty-btn btn-plus" {% if cart_quantity >= product.stock %}disabled{% endif %}>
+                        <i class="fa fa-plus text-dark"></i>
+                    </button>
                 </div>
 
-                <!-- PRICE -->
-                <div class="mb-3">
-
-                    {% if product.mrp > 0 %}
-
-                    <h3 class="font-weight-semi-bold">
-
-                        ₹{{ product.final_price }}
-
-                        <small class="text-muted ml-2">
-                            <del>₹{{ product.mrp }}</del>
-                        </small>
-
-                    </h3>
-
-                    <span class="badge badge-success">
-                        {{ product.discount_percent }}% OFF
-                    </span>
-
+                <div class="mb-2 mr-2 flex-grow-1">
+                    {% if in_cart %}
+                    <a href="{% url 'cart' %}" class="btn btn-outline-success btn-block py-2-5 font-weight-bold shadow-sm">
+                        <i class="fa fa-check mr-2"></i> Go To Cart
+                    </a>
                     {% else %}
-
-                    <h3 class="font-weight-semi-bold">
-                        ₹{{ product.price }}
-                    </h3>
-
+                    <button class="btn btn-primary btn-block py-2-5 font-weight-bold add-to-cart shadow-sm" data-id="{{ product.id }}">
+                        <i class="fa fa-shopping-cart mr-2"></i> Add To Cart
+                    </button>
                     {% endif %}
-
                 </div>
 
-                <!-- DESCRIPTION -->
-                <p class="mb-4">
-                    {{ product.description }}
-                </p>
-
-                <!-- CATEGORY -->
-                <div class="mb-2">
-                    <strong>Category :</strong>
-                    {{ product.category.name }}
+                <div class="mb-2 flex-grow-1">
+                    <button class="btn btn-dark btn-block py-2-5 font-weight-bold buy-now shadow-sm" 
+                            data-id="{{ product.id }}"
+                            {% if product.stock <= 0 %}disabled{% endif %}>
+                        <i class="fa fa-bolt mr-2 text-warning"></i> Buy Now
+                    </button>
                 </div>
-
-                <!-- TYPE -->
-                <div class="mb-4">
-                    <strong>Type :</strong>
-                    {{ product.type.name }}
-                </div>
-
-                <!-- STOCK -->
-                <div class="mb-4">
-
-                    {% if product.stock > 0 %}
-
-                    <span class="badge badge-success p-2">
-                        In Stock ({{ product.stock }})
-                    </span>
-
-                    {% else %}
-
-                    <span class="badge badge-danger p-2">
-                        Out Of Stock
-                    </span>
-
-                    {% endif %}
-
-                </div>
-
-                <!-- QUANTITY -->
-<div class="d-flex align-items-center mb-4 pt-2">
-
-    <div class="details-qty-wrapper mr-3">
-
-        <!-- MINUS -->
-        <button class="details-qty-btn btn-minus"
-
-            {% if cart_quantity|default:1 <= 1 %}
-            disabled
-            {% endif %}>
-
-            <i class="fa fa-minus"></i>
-
-        </button>
-
-        <!-- INPUT -->
-        <input type="text"
-
-            min="1"
-
-            max="{{ product.stock }}"
-
-            data-stock="{{ product.stock }}"
-
-            class="details-quantity-input"
-
-            value="{{ cart_quantity|default:1 }}"
-
-            readonly>
-
-        <!-- PLUS -->
-        <button class="details-qty-btn btn-plus"
-
-            {% if cart_quantity >= product.stock %}
-            disabled
-            {% endif %}>
-
-            <i class="fa fa-plus"></i>
-
-        </button>
-
-    </div>
-
-    <!-- CART BUTTON -->
-    {% if in_cart %}
-
-    <a class="btn btn-success px-4 py-2"
-
-        href="{% url 'cart' %}">
-
-        <i class="fa fa-check mr-2"></i>
-
-        Added To Cart
-
-    </a>
-
-    {% else %}
-
-    <button
-        class="btn btn-primary px-4 py-2 add-to-cart"
-        data-id="{{ product.id }}"
-    >
-
-        <i class="fa fa-shopping-cart mr-2"></i>
-
-        Add To Cart
-
-    </button>
-
-    {% endif %}
-
-</div>
 
             </div>
-
         </div>
+
+        <hr class="my-4" style="border-top: 1px solid #eeeeee;">
+
+        <!-- Trust Badges -->
+        <div class="row text-center security-badges">
+            <div class="col-4">
+                <div class="text-primary mb-1"><i class="fas fa-truck fa-lg" style="color: #007bff !important;"></i></div>
+                <h6 class="font-weight-bold small mb-0" style="color: #212529 !important; font-size: 12px;">Fast Delivery</h6>
+                <small class="text-muted d-block" style="font-size: 11px;">Ships within 24 hours</small>
+            </div>
+            <div class="col-4 border-left border-right">
+                <div class="text-primary mb-1"><i class="fas fa-shield-alt fa-lg" style="color: #007bff !important;"></i></div>
+                <h6 class="font-weight-bold small mb-0" style="color: #212529 !important; font-size: 12px;">Secure Payment</h6>
+                <small class="text-muted d-block" style="font-size: 11px;">100% Safe Checkout</small>
+            </div>
+            <div class="col-4">
+                <div class="text-primary mb-1"><i class="fas fa-undo fa-lg" style="color: #007bff !important;"></i></div>
+                <h6 class="font-weight-bold small mb-0" style="color: #212529 !important; font-size: 12px;">Easy Returns</h6>
+                <small class="text-muted d-block" style="font-size: 11px;">7 Days Return Policy</small>
+            </div>
+        </div>
+        
+    </div>
+</div>
 
     </div>
 </div>
@@ -389,4 +391,59 @@
     </div>
 
 </div>
+
+<script>
+$(document).ready(function() {
+    // Quantity Plus/Minus Logic
+    $('.btn-plus').on('click', function() {
+        let input = $('.details-quantity-input');
+        let currentVal = parseInt(input.val());
+        let maxStock = parseInt(input.data('stock'));
+        if (currentVal < maxStock) {
+            input.val(currentVal + 1);
+            $('.btn-minus').prop('disabled', false);
+        }
+        if (parseInt(input.val()) >= maxStock) $(this).prop('disabled', true);
+    });
+
+    $('.btn-minus').on('click', function() {
+        let input = $('.details-quantity-input');
+        let currentVal = parseInt(input.val());
+        if (currentVal > 1) {
+            input.val(currentVal - 1);
+            $('.btn-plus').prop('disabled', false);
+        }
+        if (parseInt(input.val()) <= 1) $(this).prop('disabled', true);
+    });
+
+    // BUY NOW Button Logic
+    $('.buy-now').on('click', function() {
+        let productId = $(this).data('id');
+        let qty = $('.details-quantity-input').val();
+
+        let checkoutUrl = "{% url 'checkout' %}?buy_now=" + productId + "&qty=" + qty;
+        window.location.href = checkoutUrl;
+    });
+
+    $('.add-to-cart').on('click', function() {
+        let productId = $(this).data('id');
+        let qty = $('.details-quantity-input').val() || 1;
+        let csrfToken = $('input[name=csrfmiddlewaretoken]').val();
+
+        $.ajax({
+            url: "/add-to-cart/", 
+            method: "POST",
+            data: {
+                'product_id': productId,
+                'quantity': qty,
+                'csrfmiddlewaretoken': csrfToken
+            },
+            success: function(response) {
+                alert("Product added to cart!");
+                location.reload(); 
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

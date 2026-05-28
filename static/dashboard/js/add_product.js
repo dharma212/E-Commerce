@@ -1,26 +1,48 @@
 // ================= GLOBAL =================
 let selectedImages = [];
+let isEditMode = false;
+let editProductId = null;
 
 // ================= TOAST =================
 function getToastContainer() {
-    let container = document.getElementById("globalToastContainer");
+
+    let container =
+        document.getElementById("globalToastContainer");
 
     if (!container) {
-        container = document.createElement("div");
+
+        container =
+            document.createElement("div");
+
         container.id = "globalToastContainer";
+
         container.style.position = "fixed";
         container.style.top = "20px";
         container.style.right = "20px";
         container.style.zIndex = "999999";
+
         document.body.appendChild(container);
     }
+
     return container;
 }
 
-function showToast(message, type = "success", duration = 3000) {
-    const container = getToastContainer();
+function showToast(
+    message,
+    type = "success",
+    duration = 3000
+) {
 
-    const toast = document.createElement("div");
+    const container =
+        getToastContainer();
+
+    if(!container){
+        return;
+    }
+
+    const toast =
+        document.createElement("div");
+
     toast.style.minWidth = "260px";
     toast.style.marginBottom = "10px";
     toast.style.padding = "14px 16px";
@@ -30,424 +52,1371 @@ function showToast(message, type = "success", duration = 3000) {
     toast.style.display = "flex";
     toast.style.alignItems = "center";
     toast.style.gap = "10px";
-    toast.style.boxShadow = "0 8px 20px rgba(0,0,0,0.2)";
+    toast.style.boxShadow =
+        "0 8px 20px rgba(0,0,0,0.2)";
     toast.style.opacity = "0";
-    toast.style.transform = "translateX(100%)";
-    toast.style.transition = "all 0.4s ease";
+    toast.style.transform =
+        "translateX(100%)";
+    toast.style.transition =
+        "all 0.4s ease";
 
-    let icon = `<i class="bi bi-check-circle-fill"></i>`;
-    if (type === "error") icon = `<i class="bi bi-x-circle-fill"></i>`;
-    if (type === "warning") icon = `<i class="bi bi-exclamation-triangle-fill"></i>`;
+    let icon =
+        `<i class="bi bi-check-circle-fill"></i>`;
 
-    if (type === "success") toast.style.background = "#4CAF50";
-    else if (type === "error") toast.style.background = "#e74c3c";
-    else if (type === "warning") toast.style.background = "#f39c12";
-    else toast.style.background = "#333";
+    if(type === "error"){
 
-    toast.innerHTML = `${icon} <span>${message}</span>`;
+        icon =
+            `<i class="bi bi-x-circle-fill"></i>`;
+    }
+
+    if(type === "warning"){
+
+        icon =
+            `<i class="bi bi-exclamation-triangle-fill"></i>`;
+    }
+
+    if(type === "success"){
+
+        toast.style.background = "#4CAF50";
+
+    }else if(type === "error"){
+
+        toast.style.background = "#e74c3c";
+
+    }else if(type === "warning"){
+
+        toast.style.background = "#f39c12";
+
+    }else{
+
+        toast.style.background = "#333";
+    }
+
+    toast.innerHTML =
+        `${icon} <span>${message}</span>`;
+
     container.appendChild(toast);
 
     requestAnimationFrame(() => {
+
         toast.style.opacity = "1";
-        toast.style.transform = "translateX(0)";
+        toast.style.transform =
+            "translateX(0)";
     });
 
     setTimeout(() => {
+
         toast.style.opacity = "0";
-        toast.style.transform = "translateX(100%)";
-        setTimeout(() => toast.remove(), 400);
+
+        toast.style.transform =
+            "translateX(100%)";
+
+        setTimeout(() => {
+
+            toast.remove();
+
+        }, 400);
+
     }, duration);
 }
 
 // ================= CSRF =================
 function getCSRFToken() {
+
     let name = "csrftoken=";
-    let cookies = document.cookie.split(";");
+
+    let cookies =
+        document.cookie.split(";");
 
     for (let i = 0; i < cookies.length; i++) {
-        let c = cookies[i].trim();
+
+        let c =
+            cookies[i].trim();
+
         if (c.startsWith(name)) {
-            return c.substring(name.length, c.length);
+
+            return c.substring(
+                name.length,
+                c.length
+            );
         }
     }
+
     return "";
 }
 
-// ================= ERROR HANDLING =================
+// ================= ERROR =================
 function clearErrors() {
-    document.querySelectorAll(".error-text").forEach(el => el.innerText = "");
-    document.querySelectorAll(".form-control").forEach(el => el.classList.remove("input-error"));
+
+    document.querySelectorAll(".error-text")
+    .forEach(el => {
+
+        el.innerText = "";
+    });
+
+    document.querySelectorAll(".form-control")
+    .forEach(el => {
+
+        el.classList.remove("input-error");
+    });
 }
 
 function showError(inputId, message) {
-    let errorEl = document.getElementById(`error-${inputId}`);
-    if (errorEl) errorEl.innerText = message;
 
-    let inputEl = document.getElementById(inputId);
-    if (inputEl) inputEl.classList.add("input-error");
+    let errorEl =
+        document.getElementById(
+            `error-${inputId}`
+        );
+
+    if (errorEl) {
+
+        errorEl.innerText = message;
+    }
+
+    let inputEl =
+        document.getElementById(inputId);
+
+    if (inputEl) {
+
+        inputEl.classList.add("input-error");
+    }
 }
 
-// ================= NEW: DISCOUNT CALC =================
-function calculateDiscount() {
-    let mrp = parseFloat(document.getElementById('mrp')?.value) || 0;
-    let discount = parseFloat(document.getElementById('discount')?.value) || 0;
+// ================= SEARCH =================
+function setupSearch(
+    inputId,
+    resultId,
+    hiddenId
+) {
 
-    if (discount > mrp) {
-        showToast("Discount cannot be greater than MRP", "error");
-        document.getElementById('discount').value = "";
+    const input =
+        document.getElementById(inputId);
+
+    const resultBox =
+        document.getElementById(resultId);
+
+    const hiddenInput =
+        document.getElementById(hiddenId);
+
+    if(
+        !input ||
+        !resultBox ||
+        !hiddenInput
+    ){
         return;
     }
 
-    let finalPrice = mrp - discount;
-    let percent = mrp ? ((discount / mrp) * 100).toFixed(2) : 0;
+    // ================= FOCUS =================
+    input.addEventListener("focus", function(){
 
-    document.getElementById('final_price').value = finalPrice;
-    document.getElementById('discount_percent').value = percent + "%";
-}
+        resultBox.style.display = "block";
 
-// ================= PAGE LOAD =================
-document.addEventListener("DOMContentLoaded", function () {
+        const items =
+            resultBox.querySelectorAll(".search-item");
 
-    const fileInput = document.getElementById("imageInput");
-    const uploadBox = document.querySelector(".image-upload-box");
+        items.forEach(item => {
 
-    // NEW: discount listeners
-    document.getElementById('mrp')?.addEventListener('input', calculateDiscount);
-    document.getElementById('discount')?.addEventListener('input', calculateDiscount);
-
-    // ================= CATEGORY =================
-fetch('/api/categories/')
-.then(res => {
-
-    if(!res.ok){
-        throw new Error("API Error");
-    }
-
-    return res.json();
-
-})
-.then(data => {
-
-
-    let cat = document.getElementById('category');
-
-    if(!cat){
-        console.log("Category select box not found");
-        return;
-    }
-
-    cat.innerHTML = '<option value="">Select Category</option>';
-
-    data.forEach(item => {
-
-        cat.innerHTML += `
-            <option value="${item.id}">
-                ${item.name}
-            </option>
-        `;
+            item.style.display = "block";
+        });
 
     });
 
-})
-.catch((error) => {
+    // ================= SEARCH =================
+    input.addEventListener("input", function(){
 
-    console.log(error);
+        const value =
+            this.value.toLowerCase().trim();
 
-    showToast("Failed to load category", "error");
+        const items =
+            resultBox.querySelectorAll(".search-item");
 
-});
+        hiddenInput.value = "";
 
-    // ================= TYPE =================
-    const categorySelect = document.getElementById('category');
+        resultBox.style.display = "block";
 
-    if(categorySelect){
+        items.forEach(item => {
 
-        categorySelect.addEventListener('change', function () {
+            const name =
+                (item.dataset.name || "")
+                .toLowerCase();
 
-            let id = this.value;
+            if(name.includes(value)){
 
-            if (!id) return;
+                item.style.display = "block";
 
-            fetch(`/api/types/${id}/`)
-            .then(res => res.json())
-            .then(data => {
+            }else{
 
-                let type = document.getElementById('type');
+                item.style.display = "none";
+            }
 
-                if(!type) return;
+        });
 
-                type.innerHTML = '<option value="">Select Type</option>';
+    });
 
-                data.forEach(item => {
-                    type.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-                });
+    // ================= CLICK =================
+    resultBox.addEventListener("click", function(e){
+
+        const item =
+            e.target.closest(".search-item");
+
+        // ================= SELECT =================
+        if(item){
+
+            input.value =
+                item.innerText.trim();
+
+            hiddenInput.value =
+                item.dataset.id;
+
+            resultBox.style.display = "none";
+
+            // CATEGORY => LOAD TYPE
+            if(hiddenId === "category"){
+
+                const typeField =
+                    document.getElementById("type");
+
+                const typeInput =
+                    document.getElementById("typeInput");
+
+                if(typeField){
+                    typeField.value = "";
+                }
+
+                if(typeInput){
+                    typeInput.value = "";
+                }
+
+                loadTypes(item.dataset.id);
+            }
+
+            return;
+        }
+
+        // ================= ADD NEW =================
+        const addBtn =
+            e.target.closest(".search-add-more");
+
+        if(addBtn){
+
+            const type =
+                addBtn.dataset.type;
+
+            const value =
+                input.value.trim();
+
+            if(!value){
+
+                showToast(
+                    `Please enter ${type} name`,
+                    "warning"
+                );
+
+                return;
+            }
+
+            let bodyData = {
+                name: value
+            };
+
+            // TYPE NEED CATEGORY
+            if(type === "type"){
+
+                const categoryId =
+                    document.getElementById("category")?.value;
+
+                if(!categoryId){
+
+                    showToast(
+                        "Please select category first",
+                        "warning"
+                    );
+
+                    return;
+                }
+
+                bodyData.category_id =
+                    categoryId;
+            }
+
+            fetch(`/api/add-${type}/`, {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json",
+
+                    "X-CSRFToken":
+                        getCSRFToken()
+                },
+
+                body:
+                    JSON.stringify(bodyData)
 
             })
-            .catch(() => showToast("Failed to load types", "error"));
 
-        });
+            .then(res => res.json())
 
-    }
+            .then(data => {
 
-    // ================= HANDLE FILES =================
-    function handleFiles(files) {
+                if(data.error){
 
-        if (selectedImages.length + files.length > 5) {
-            showToast("Max 5 images allowed", "warning");
+                    showToast(
+                        data.error,
+                        "error"
+                    );
+
+                    return;
+                }
+
+                const div =
+                    document.createElement("div");
+
+                div.className =
+                    "search-item";
+
+                div.setAttribute(
+                    "data-id",
+                    data.id
+                );
+
+                div.setAttribute(
+                    "data-name",
+                    data.name.toLowerCase()
+                );
+
+                div.innerText =
+                    data.name;
+
+                resultBox.insertBefore(
+                    div,
+                    addBtn
+                );
+
+                input.value =
+                    data.name;
+
+                hiddenInput.value =
+                    data.id;
+
+                resultBox.style.display =
+                    "none";
+
+                showToast(
+                    `${type} added successfully`,
+                    "success"
+                );
+
+            })
+
+            .catch(() => {
+
+                showToast(
+                    `Failed to add ${type}`,
+                    "error"
+                );
+
+            });
+
+        }
+
+    });
+
+    // ================= OUTSIDE CLICK =================
+    document.addEventListener("click", function(e){
+
+        if(
+            !resultBox.contains(e.target)
+            &&
+            e.target !== input
+        ){
+
+            resultBox.style.display = "none";
+        }
+
+    });
+
+}
+
+// ================= LOAD CATEGORY =================
+function loadCategories(){
+
+    fetch('/api/categories/')
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        const resultBox =
+            document.getElementById(
+                "categoryResult"
+            );
+
+        if(!resultBox){
             return;
         }
 
-        for (let i = 0; i < files.length; i++) {
-            if (!files[i].type.startsWith("image/")) {
-                showToast("Only images allowed", "error");
-                continue;
-            }
-            selectedImages.push(files[i]);
-        }
+        resultBox.innerHTML = "";
 
-        renderImages();
-        showToast("Images added successfully");
-    }
+        data.forEach(item => {
 
-    if(uploadBox && fileInput){
+            resultBox.innerHTML += `
 
-        uploadBox.addEventListener("click", () => fileInput.click());
+                <div class="search-item"
+                     data-id="${item.id}"
+                     data-name="${item.name.toLowerCase()}">
 
-    }
+                    ${item.name}
 
-    fileInput.addEventListener("change", function (e) {
-        handleFiles(e.target.files);
-        this.value = "";
-    });
+                </div>
 
-    uploadBox.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        uploadBox.classList.add("dragover");
-    });
-
-    uploadBox.addEventListener("dragleave", () => {
-        uploadBox.classList.remove("dragover");
-    });
-
-    uploadBox.addEventListener("drop", (e) => {
-        e.preventDefault();
-        uploadBox.classList.remove("dragover");
-        handleFiles(e.dataTransfer.files);
-    });
-
-    document.querySelectorAll(".form-control").forEach(input => {
-        input.addEventListener("input", () => {
-            input.classList.remove("input-error");
-            let error = document.getElementById(`error-${input.id}`);
-            if (error) error.innerText = "";
+            `;
         });
+
+        resultBox.innerHTML += `
+
+            <div class="search-add-more"
+                 data-type="category">
+
+                + Add New Category
+
+            </div>
+
+        `;
+
+    })
+
+    .catch(() => {
+
+        showToast(
+            "Failed to load categories",
+            "error"
+        );
+
     });
 
-    // ================= SUBMIT =================
-    const submitBtn = document.getElementById("submitBtn");
+}
 
-    if(submitBtn){
+// ================= LOAD TYPES =================
+function loadTypes(categoryId){
 
-        submitBtn.addEventListener("click", function(e){
+    if(!categoryId){
+        return;
+    }
 
-        e.preventDefault();
-        clearErrors();
+    fetch(`/api/types/${categoryId}/`)
 
-        let name = document.getElementById('name').value.trim();
-        let category = document.getElementById('category').value;
-        let type = document.getElementById('type').value;
-        let color = document.getElementById('color').value;
-        let size = document.getElementById('size').value;
-        let stock = document.getElementById('stock').value;
-        let description = document.getElementById('description').value;
-        let imageInput = document.getElementById('imageInput').value;
+    .then(res => res.json())
 
-        // NEW
-        let mrp = document.getElementById('mrp')?.value;
-        let discount = document.getElementById('discount')?.value;
+    .then(data => {
 
-        let isValid = true;
+        const typeResult =
+            document.getElementById(
+                "typeResult"
+            );
 
-        if (!name) {
-            showError("name", "Product name is required");
-            isValid = false;
-        }
-
-        if (!category) {
-            showError("category", "Please select category");
-            isValid = false;
-        }
-
-        if (!type) {
-            showError("type", "Please select type");
-            isValid = false;
-        }
-        if (!color) {
-            showError("color", "Please select color");
-            isValid = false;
-        }
-
-        if (!size) {
-            showError("size", "Please select size");
-            isValid = false;
-        }
-
-        // NEW VALIDATION
-        if (!mrp) {
-            showError("mrp", "MRP is required");
-            isValid = false;
-        }
-
-        if (discount === "") {
-            showError("discount", "Discount is required");
-            isValid = false;
-        }
-
-        if (!stock) {
-            showError("stock", "Stock is required");
-            isValid = false;
-        }
-
-        if (!description) {
-            showError("description", "Description is required");
-            isValid = false;
-        }
-
-        if (selectedImages.length === 0) {
-            showToast("Please upload at least 1 image", "warning");
-            isValid = false;
-        }
-
-        if (selectedImages.length === 0) {
-            showToast("Please upload at least 1 image", "warning");
-            isValid = false;
-        }
-
-        if (!isValid) {
-            showToast("Please fix errors before submitting", "warning");
+        if(!typeResult){
             return;
         }
 
-        let formData = new FormData();
-        formData.append('name', name);
-        formData.append('category', category);
-        formData.append('type', type);
-        formData.append('color', color);
-        formData.append('size', size);
-        formData.append('stock', stock);
-        formData.append('description', description);
+        typeResult.innerHTML = "";
 
-        // NEW
-        formData.append('mrp', mrp);
-        formData.append('discount', discount);
+        data.forEach(item => {
 
-        selectedImages.forEach(file => {
-            formData.append('images', file);
+            typeResult.innerHTML += `
+
+                <div class="search-item"
+                     data-id="${item.id}"
+                     data-name="${item.name.toLowerCase()}">
+
+                    ${item.name}
+
+                </div>
+
+            `;
         });
 
-        showToast("Uploading product...", "warning");
+        typeResult.innerHTML += `
 
-        fetch('/api/add-product/', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCSRFToken()
-            },
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            showToast("Product added successfully 🎉", "success");
+            <div class="search-add-more"
+                 data-type="type">
 
-            document.getElementById("productForm").reset();
-            selectedImages = [];
-            renderImages();
-        })
-        .catch(() => {
-            showToast("Something went wrong!", "error");
-        });
+                + Add New Type
+
+            </div>
+
+        `;
+
+    })
+
+    .catch(() => {
+
+        showToast(
+            "Failed to load types",
+            "error"
+        );
+
     });
-    }
-});
 
+}
+
+// ================= DISCOUNT =================
+function calculateDiscount() {
+
+    let mrp =
+        parseFloat(
+            document.getElementById('mrp')?.value
+        ) || 0;
+
+    let discount =
+        parseFloat(
+            document.getElementById('discount')?.value
+        ) || 0;
+
+    if (discount > mrp) {
+
+        showToast(
+            "Discount cannot be greater than MRP",
+            "error"
+        );
+
+        const discountField =
+            document.getElementById('discount');
+
+        if(discountField){
+            discountField.value = "";
+        }
+
+        return;
+    }
+
+    let finalPrice =
+        mrp - discount;
+
+    let percent =
+        mrp
+        ? ((discount / mrp) * 100).toFixed(2)
+        : 0;
+
+    const finalPriceField =
+        document.getElementById('final_price');
+
+    const percentField =
+        document.getElementById('discount_percent');
+
+    if(finalPriceField){
+
+        finalPriceField.value =
+            finalPrice;
+    }
+
+    if(percentField){
+
+        percentField.value =
+            percent + "%";
+    }
+}
 
 // ================= RENDER IMAGES =================
 function renderImages(){
-    let container = document.getElementById("previewContainer");
+
+    let container =
+        document.getElementById(
+            "previewContainer"
+        );
+
+    if(!container){
+        return;
+    }
+
     container.innerHTML = "";
 
     selectedImages.forEach((file, index) => {
-        let div = document.createElement("div");
+
+        let div =
+            document.createElement("div");
+
         div.className = "img-box";
+
         div.draggable = true;
 
-        let img = document.createElement("img");
-        img.src = URL.createObjectURL(file);
+        let img =
+            document.createElement("img");
+
+        if(file.isOld){
+
+            img.src = file.preview;
+
+        }else{
+
+            img.src =
+                URL.createObjectURL(file);
+        }
 
         if(index === 0){
-            let badge = document.createElement("div");
-            badge.className = "main-badge";
-            badge.innerText = "Main Image";
+
+            let badge =
+                document.createElement("div");
+
+            badge.className =
+                "main-badge";
+
+            badge.innerText =
+                "Main Image";
+
             div.appendChild(badge);
         }
 
-        let actions = document.createElement("div");
-        actions.className = "img-actions";
+        let actions =
+            document.createElement("div");
 
-        let del = document.createElement("button");
-        del.innerHTML = `<i class="bi bi-trash"></i>`;
-        del.className = "delete-btn";
+        actions.className =
+            "img-actions";
+
+        let del =
+            document.createElement("button");
+
+        del.innerHTML =
+            `<i class="bi bi-trash"></i>`;
+
+        del.className =
+            "delete-btn";
+
         del.onclick = () => {
+
             selectedImages.splice(index, 1);
+
             renderImages();
-            showToast("Image removed", "error");
+
+            showToast(
+                "Image removed",
+                "error"
+            );
         };
 
-        let edit = document.createElement("button");
-        edit.innerHTML = `<i class="bi bi-pencil"></i>`;
-        edit.className = "edit-btn";
-        edit.onclick = () => editImage(index);
+        let edit =
+            document.createElement("button");
+
+        edit.innerHTML =
+            `<i class="bi bi-pencil"></i>`;
+
+        edit.className =
+            "edit-btn";
+
+        edit.onclick =
+            () => editImage(index);
 
         actions.appendChild(edit);
+
         actions.appendChild(del);
 
         div.appendChild(img);
+
         div.appendChild(actions);
 
-        div.addEventListener("dragstart", (e) => {
-            e.dataTransfer.setData("index", index);
+        div.addEventListener(
+            "dragstart",
+            (e) => {
+
+            e.dataTransfer.setData(
+                "index",
+                index
+            );
+
         });
 
-        div.addEventListener("dragover", (e) => e.preventDefault());
+        div.addEventListener(
+            "dragover",
+            (e) => e.preventDefault()
+        );
 
-        div.addEventListener("drop", (e) => {
+        div.addEventListener(
+            "drop",
+            (e) => {
+
             e.preventDefault();
-            let from = e.dataTransfer.getData("index");
+
+            let from =
+                e.dataTransfer.getData("index");
+
             let to = index;
 
-            let item = selectedImages.splice(from, 1)[0];
-            selectedImages.splice(to, 0, item);
+            let item =
+                selectedImages.splice(from, 1)[0];
+
+            selectedImages.splice(
+                to,
+                0,
+                item
+            );
 
             renderImages();
-            showToast("Image reordered");
+
+            showToast(
+                "Image reordered"
+            );
+
         });
 
         container.appendChild(div);
+
     });
+
 }
 
 // ================= EDIT IMAGE =================
 function editImage(index){
-    let input = document.createElement("input");
+
+    let input =
+        document.createElement("input");
+
     input.type = "file";
 
+    input.accept = "image/*";
+
     input.onchange = function(e){
-        let file = e.target.files[0];
+
+        let file =
+            e.target.files[0];
+
         if(file){
-            selectedImages[index] = file;
+
+            selectedImages[index] =
+                file;
+
             renderImages();
-            showToast("Image updated");
+
+            showToast(
+                "Image updated"
+            );
         }
+
     };
 
     input.click();
+
 }
+
+// ================= LOAD EDIT PRODUCT =================
+function loadEditProduct(id){
+
+    fetch(`/api/add-product/?id=${id}`)
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        console.log(data);
+
+        // ================= BASIC =================
+        document.getElementById("name").value =
+            data.name || "";
+
+        document.getElementById("mrp").value =
+            data.mrp || "";
+
+        document.getElementById("discount").value =
+            data.discount || "";
+
+        document.getElementById("stock").value =
+            data.stock || "";
+
+        document.getElementById("description").value =
+            data.description || "";
+
+        // ================= CATEGORY =================
+        document.getElementById("category").value =
+            data.category || "";
+
+        document.getElementById("categoryInput").value =
+            data.category_name || "";
+
+        // ================= COLOR =================
+        document.getElementById("color").value =
+            data.color || "";
+
+        document.getElementById("colorInput").value =
+            data.color_name || "";
+
+        // ================= SIZE =================
+        document.getElementById("size").value =
+            data.size || "";
+
+        document.getElementById("sizeInput").value =
+            data.size_name || "";
+
+        // ================= TYPE =================
+        loadTypes(data.category);
+
+        setTimeout(() => {
+
+            document.getElementById("type").value =
+                data.type || "";
+
+            document.getElementById("typeInput").value =
+                data.type_name || "";
+
+        }, 500);
+
+        // ================= CALCULATE =================
+        calculateDiscount();
+
+        // ================= IMAGES =================
+        selectedImages = [];
+
+        if(data.images){
+
+            data.images.forEach(img => {
+
+                selectedImages.push({
+
+                    preview: img.image,
+                    isOld: true
+
+                });
+
+            });
+
+        }
+
+        renderImages();
+
+    })
+
+    .catch((error) => {
+
+        console.log(error);
+
+        showToast(
+            "Failed to load product",
+            "error"
+        );
+
+    });
+
+}
+
+// ================= PAGE LOAD =================
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+    // ================= SEARCH INIT =================
+    setupSearch(
+        "categoryInput",
+        "categoryResult",
+        "category"
+    );
+
+    setupSearch(
+        "typeInput",
+        "typeResult",
+        "type"
+    );
+
+    setupSearch(
+        "colorInput",
+        "colorResult",
+        "color"
+    );
+
+    setupSearch(
+        "sizeInput",
+        "sizeResult",
+        "size"
+    );
+
+    loadCategories();
+
+    // ================= EDIT MODE =================
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    editProductId =
+        params.get("edit");
+
+    if(editProductId){
+
+        isEditMode = true;
+
+        const heading =
+            document.querySelector("h3");
+
+        if(heading){
+
+            heading.innerText =
+                "Edit Product";
+        }
+
+        const submitBtnText =
+            document.getElementById(
+                "submitBtn"
+            );
+
+        if(submitBtnText){
+
+            submitBtnText.innerText =
+                "Update Product";
+        }
+
+        loadEditProduct(editProductId);
+    }
+
+    const fileInput =
+        document.getElementById("imageInput");
+
+    const uploadBox =
+        document.querySelector(
+            ".image-upload-box"
+        );
+
+    // ================= DISCOUNT =================
+    document.getElementById('mrp')
+    ?.addEventListener(
+        'input',
+        calculateDiscount
+    );
+
+    document.getElementById('discount')
+    ?.addEventListener(
+        'input',
+        calculateDiscount
+    );
+
+    // ================= HANDLE FILES =================
+    function handleFiles(files) {
+
+        if(
+            selectedImages.length +
+            files.length > 5
+        ){
+
+            showToast(
+                "Max 5 images allowed",
+                "warning"
+            );
+
+            return;
+        }
+
+        for(let i = 0; i < files.length; i++){
+
+            if(
+                !files[i].type.startsWith("image/")
+            ){
+
+                showToast(
+                    "Only images allowed",
+                    "error"
+                );
+
+                continue;
+            }
+
+            selectedImages.push(files[i]);
+        }
+
+        renderImages();
+
+        showToast(
+            "Images added successfully"
+        );
+    }
+
+    // ================= FILE CLICK =================
+    if(uploadBox && fileInput){
+
+        uploadBox.addEventListener(
+            "click",
+            () => fileInput.click()
+        );
+    }
+
+    // ================= FILE CHANGE =================
+    if(fileInput){
+
+        fileInput.addEventListener(
+            "change",
+            function (e) {
+
+            handleFiles(e.target.files);
+
+            this.value = "";
+
+        });
+
+    }
+
+    // ================= DRAG DROP =================
+    if(uploadBox){
+
+        uploadBox.addEventListener(
+            "dragover",
+            (e) => {
+
+            e.preventDefault();
+
+            uploadBox.classList.add(
+                "dragover"
+            );
+
+        });
+
+        uploadBox.addEventListener(
+            "dragleave",
+            () => {
+
+            uploadBox.classList.remove(
+                "dragover"
+            );
+
+        });
+
+        uploadBox.addEventListener(
+            "drop",
+            (e) => {
+
+            e.preventDefault();
+
+            uploadBox.classList.remove(
+                "dragover"
+            );
+
+            handleFiles(
+                e.dataTransfer.files
+            );
+
+        });
+
+    }
+
+    // ================= INPUT ERROR REMOVE =================
+    const formControls =
+        document.querySelectorAll(
+            ".form-control"
+        );
+
+    formControls.forEach(input => {
+
+        input.addEventListener(
+            "input",
+            () => {
+
+            input.classList.remove(
+                "input-error"
+            );
+
+            let error =
+                document.getElementById(
+                    `error-${input.id}`
+                );
+
+            if(error){
+
+                error.innerText = "";
+            }
+
+        });
+
+    });
+
+    // ================= SUBMIT =================
+    const submitBtn =
+        document.getElementById(
+            "submitBtn"
+        );
+
+    if(submitBtn){
+
+        submitBtn.addEventListener(
+            "click",
+            function(e){
+
+            e.preventDefault();
+
+            clearErrors();
+
+            let name =
+                document.getElementById('name')
+                ?.value.trim();
+
+            let category =
+                document.getElementById('category')
+                ?.value;
+
+            let type =
+                document.getElementById('type')
+                ?.value;
+
+            let color =
+                document.getElementById('color')
+                ?.value;
+
+            let size =
+                document.getElementById('size')
+                ?.value;
+
+            let stock =
+                document.getElementById('stock')
+                ?.value;
+
+            let description =
+                document.getElementById('description')
+                ?.value;
+
+            let mrp =
+                document.getElementById('mrp')
+                ?.value;
+
+            let discount =
+                document.getElementById('discount')
+                ?.value;
+
+            let isValid = true;
+
+            if (!name) {
+
+                showError(
+                    "name",
+                    "Product name is required"
+                );
+
+                isValid = false;
+            }
+
+            if (!category) {
+
+                showError(
+                    "category",
+                    "Please select category"
+                );
+
+                isValid = false;
+            }
+
+            if (!type) {
+
+                showError(
+                    "type",
+                    "Please select type"
+                );
+
+                isValid = false;
+            }
+
+            if (!color) {
+
+                showError(
+                    "color",
+                    "Please select color"
+                );
+
+                isValid = false;
+            }
+
+            if (!size) {
+
+                showError(
+                    "size",
+                    "Please select size"
+                );
+
+                isValid = false;
+            }
+
+            if (!mrp) {
+
+                showError(
+                    "mrp",
+                    "MRP is required"
+                );
+
+                isValid = false;
+            }
+
+            if (discount === "") {
+
+                showError(
+                    "discount",
+                    "Discount is required"
+                );
+
+                isValid = false;
+            }
+
+            if (!stock) {
+
+                showError(
+                    "stock",
+                    "Stock is required"
+                );
+
+                isValid = false;
+            }
+
+            if (!description) {
+
+                showError(
+                    "description",
+                    "Description is required"
+                );
+
+                isValid = false;
+            }
+
+            // ================= IMAGE VALIDATION =================
+            if (
+                !isEditMode &&
+                selectedImages.length === 0
+            ) {
+
+                showToast(
+                    "Please upload at least 1 image",
+                    "warning"
+                );
+
+                isValid = false;
+            }
+
+            if (!isValid) {
+
+                showToast(
+                    "Please fix errors before submitting",
+                    "warning"
+                );
+
+                return;
+            }
+
+            let formData =
+                new FormData();
+
+            formData.append('name', name);
+            formData.append('category', category);
+            formData.append('type', type);
+            formData.append('color', color);
+            formData.append('size', size);
+            formData.append('stock', stock);
+            formData.append('description', description);
+            formData.append('mrp', mrp);
+            formData.append('discount', discount);
+
+            // ================= EDIT ID =================
+            if(isEditMode){
+
+                formData.append(
+                    "id",
+                    editProductId
+                );
+            }
+
+            selectedImages.forEach(file => {
+
+                if(!file.isOld){
+
+                    formData.append(
+                        'images',
+                        file
+                    );
+                }
+
+            });
+
+            showToast(
+
+                isEditMode
+                ? "Updating product..."
+                : "Uploading product...",
+
+                "warning"
+            );
+
+            fetch('/api/add-product/', {
+
+                method:
+                    isEditMode
+                    ? 'PATCH'
+                    : 'POST',
+
+                headers: {
+
+                    'X-CSRFToken':
+                        getCSRFToken()
+
+                },
+
+                body: formData
+
+            })
+
+            .then(res => res.json())
+
+            .then(data => {
+
+                if(data.success === false){
+
+                    showToast(
+                        data.message ||
+                        "Something went wrong",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                showToast(
+
+                    isEditMode
+                    ? "Product updated successfully 🎉"
+                    : "Product added successfully 🎉",
+
+                    "success"
+                );
+
+                if(isEditMode){
+
+                    setTimeout(() => {
+
+                        window.location.href =
+                            "/dashboard/product-list/";
+
+                    }, 1200);
+
+                    return;
+                }
+
+                const form =
+                    document.getElementById(
+                        "productForm"
+                    );
+
+                if(form){
+                    form.reset();
+                }
+
+                selectedImages = [];
+
+                renderImages();
+
+            })
+
+            .catch((error) => {
+
+                console.log(error);
+
+                showToast(
+                    "Something went wrong!",
+                    "error"
+                );
+
+            });
+
+        });
+
+    }
+
+});

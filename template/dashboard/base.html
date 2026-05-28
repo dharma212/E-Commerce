@@ -29,6 +29,545 @@
             </div>
           </div>
     </div>
+<!-- =========================================
+DASHBOARD LOGIN MODAL
+========================================= -->
+
+<div id="dashboardLoginModal" class="login-modal">
+
+    <div class="login-box">
+
+        <!-- CLOSE BUTTON -->
+        <button
+            class="login-close"
+            onclick="closeDashboardLoginModal()">
+
+            <i class="fa fa-times"></i>
+
+        </button>
+
+        <!-- LOGO -->
+        <div class="login-logo">
+
+            <i class="fa fa-user-shield"></i>
+
+        </div>
+
+        <!-- TITLE -->
+        <h3 class="login-title">
+
+            Dashboard Login
+
+        </h3>
+
+        <p class="login-subtitle">
+
+            Login to access admin dashboard
+
+        </p>
+
+        <!-- USERNAME -->
+        <div class="login-input-group">
+
+            <i class="fa fa-user"></i>
+
+            <input
+                type="text"
+                id="dashboard_username"
+                class="login-input"
+                placeholder="Enter Username"
+            >
+
+        </div>
+
+        <div
+            class="login-error"
+            id="dashboard-username-error">
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="login-input-group">
+
+            <i class="fa fa-lock"></i>
+
+            <input
+                type="password"
+                id="dashboard_password"
+                class="login-input"
+                placeholder="Enter Password"
+            >
+
+        </div>
+
+        <div
+            class="login-error"
+            id="dashboard-password-error">
+        </div>
+
+        <!-- LOGIN BUTTON -->
+        <button
+            class="login-btn"
+            onclick="dashboardLogin()">
+
+            Login Dashboard
+
+        </button>
+
+        <!-- MESSAGE -->
+        <div id="dashboard-login-message"></div>
+
+    </div>
+
+</div>
+
+<!-- =========================================
+CSS
+========================================= -->
+
+<style>
+
+/* =========================================
+MODAL
+========================================= */
+
+.login-modal{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.75);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:999999;
+    backdrop-filter:blur(5px);
+}
+
+/* =========================================
+BOX
+========================================= */
+
+.login-box{
+    width:420px;
+    background:#fff;
+    border-radius:24px;
+    padding:35px;
+    position:relative;
+    overflow:hidden;
+    animation:popupAnimation .4s ease;
+}
+
+/* =========================================
+ANIMATION
+========================================= */
+
+@keyframes popupAnimation{
+
+    from{
+        opacity:0;
+        transform:scale(.7);
+    }
+
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+
+}
+
+/* =========================================
+CLOSE BUTTON
+========================================= */
+
+.login-close{
+    position:absolute;
+    top:15px;
+    right:15px;
+    width:38px;
+    height:38px;
+    border:none;
+    border-radius:50%;
+    background:#f1f5f9;
+    cursor:pointer;
+    transition:.3s;
+    font-size:16px;
+}
+
+.login-close:hover{
+    background:#ef4444;
+    color:#fff;
+    transform:rotate(90deg);
+}
+
+/* =========================================
+LOGO
+========================================= */
+
+.login-logo{
+    width:95px;
+    height:95px;
+    background:#eef2ff;
+    border-radius:50%;
+    margin:auto;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:42px;
+    color:#4f46e5;
+    margin-bottom:20px;
+}
+
+/* =========================================
+TITLE
+========================================= */
+
+.login-title{
+    text-align:center;
+    font-size:28px;
+    font-weight:700;
+    margin-bottom:10px;
+    color:#111827;
+}
+
+.login-subtitle{
+    text-align:center;
+    color:#64748b;
+    margin-bottom:30px;
+    font-size:15px;
+}
+
+/* =========================================
+INPUT GROUP
+========================================= */
+
+.login-input-group{
+    position:relative;
+    margin-bottom:20px;
+}
+
+.login-input-group i{
+    position:absolute;
+    top:18px;
+    left:15px;
+    color:#64748b;
+}
+
+/* =========================================
+INPUT
+========================================= */
+
+.login-input{
+    width:100%;
+    height:55px;
+    border:1px solid #dbe2ea;
+    border-radius:14px;
+    padding-left:45px;
+    outline:none;
+    transition:.3s;
+    font-size:15px;
+}
+
+.login-input:focus{
+    border-color:#4f46e5;
+    box-shadow:0 0 0 4px rgba(79,70,229,.12);
+}
+
+/* =========================================
+BUTTON
+========================================= */
+
+.login-btn{
+    width:100%;
+    height:55px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(
+        135deg,
+        #4f46e5,
+        #7c3aed
+    );
+    color:#fff;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.login-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 20px rgba(79,70,229,.25);
+}
+
+/* =========================================
+ERROR
+========================================= */
+
+.login-error{
+    color:#ef4444;
+    font-size:13px;
+    margin-top:-10px;
+    margin-bottom:12px;
+}
+
+/* =========================================
+MESSAGE
+========================================= */
+
+#dashboard-login-message{
+    margin-top:18px;
+    text-align:center;
+    font-size:14px;
+    font-weight:500;
+}
+
+</style>
+
+<!-- =========================================
+JAVASCRIPT
+========================================= -->
+
+<script>
+
+/* =========================================
+OPEN MODAL
+========================================= */
+
+function openDashboardLoginModal(){
+
+    document.getElementById(
+        "dashboardLoginModal"
+    ).style.display = "flex";
+
+}
+
+/* =========================================
+CLOSE MODAL
+========================================= */
+
+function closeDashboardLoginModal(){
+
+    document.getElementById(
+        "dashboardLoginModal"
+    ).style.display = "none";
+
+}
+
+/* =========================================
+AUTO SHOW AFTER 5s
+ONLY IF NOT LOGGED IN
+========================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+
+    function(){
+
+        let isAuthenticated =
+            "{{ request.user.is_authenticated }}";
+
+        if(isAuthenticated != "True"){
+
+            setTimeout(()=>{
+
+                openDashboardLoginModal();
+
+            },5000);
+
+        }
+
+    }
+);
+
+/* =========================================
+LOGIN API
+========================================= */
+
+async function dashboardLogin(){
+
+    let username =
+        document.getElementById(
+            "dashboard_username"
+        ).value.trim();
+
+    let password =
+        document.getElementById(
+            "dashboard_password"
+        ).value.trim();
+
+    // CLEAR ERRORS
+
+    document.getElementById(
+        "dashboard-username-error"
+    ).innerHTML = "";
+
+    document.getElementById(
+        "dashboard-password-error"
+    ).innerHTML = "";
+
+    document.getElementById(
+        "dashboard-login-message"
+    ).innerHTML = "";
+
+    // VALIDATION
+
+    if(username == ""){
+
+        document.getElementById(
+            "dashboard-username-error"
+        ).innerHTML =
+        "Username is required";
+
+        return;
+
+    }
+
+    if(password == ""){
+
+        document.getElementById(
+            "dashboard-password-error"
+        ).innerHTML =
+        "Password is required";
+
+        return;
+
+    }
+
+    // LOGIN BUTTON LOADING
+
+    let loginBtn =
+        document.querySelector(".login-btn");
+
+    loginBtn.innerHTML =
+        "Please Wait...";
+
+    loginBtn.disabled = true;
+
+    // API CALL
+
+    try{
+
+        let response = await fetch(
+
+            "/api/dashboard-login/",
+
+            {
+
+                method:"POST",
+
+                headers:{
+
+                    "Content-Type":"application/json",
+
+                    "X-CSRFToken":
+                    "{{ csrf_token }}"
+
+                },
+
+                body:JSON.stringify({
+
+                    username:username,
+                    password:password
+
+                })
+
+            }
+
+        );
+
+        let data = await response.json();
+
+        // SUCCESS
+
+        if(data.status == "success"){
+
+            document.getElementById(
+                "dashboard-login-message"
+            ).innerHTML =
+
+            `<p style="color:#22c55e;">
+                ${data.message}
+            </p>`;
+
+            setTimeout(()=>{
+
+                window.location.reload();
+
+            },1000);
+
+        }
+
+        // ERROR
+
+        else{
+
+            document.getElementById(
+                "dashboard-login-message"
+            ).innerHTML =
+
+            `<p style="color:#ef4444;">
+                ${data.message}
+            </p>`;
+
+        }
+
+    }
+
+    catch(error){
+
+        document.getElementById(
+            "dashboard-login-message"
+        ).innerHTML =
+
+        `<p style="color:#ef4444;">
+            Something went wrong
+        </p>`;
+
+    }
+
+    // BUTTON RESET
+
+    loginBtn.innerHTML =
+        "Login Dashboard";
+
+    loginBtn.disabled = false;
+
+}
+
+/* =========================================
+LOGOUT
+========================================= */
+
+async function dashboardLogout(){
+
+    let response = await fetch(
+
+        "/api/dashboard-logout/",
+
+        {
+
+            method:"POST",
+
+            headers:{
+                "X-CSRFToken":
+                "{{ csrf_token }}"
+            }
+
+        }
+
+    );
+
+    let data = await response.json();
+
+    if(data.status == "success"){
+
+        location.reload();
+
+    }
+
+}
+
+</script>
     <script src="{% static 'dashboard/vendors/js/vendor.bundle.base.js' %}"></script>
     <script src="{% static 'dashboard/vendors/chart.js/Chart.min.js' %}"></script>
     <script src="{% static 'dashboard/vendors/progressbar.js/progressbar.min.js' %}"></script>
