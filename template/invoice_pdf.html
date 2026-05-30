@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #333;
+            line-height: 1.4;
+        }
+        /* Layout Tables */
+        .w-100 { width: 100%; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        
+        /* Brand Section */
+        .header-table td { vertical-align: top; }
+        .brand-name { font-size: 24px; font-weight: bold; color: #1e293b; }
+        .invoice-label { font-size: 28px; font-weight: bold; color: #2563eb; }
+        
+        /* Info Boxes */
+        .info-section {
+            margin: 20px 0;
+            border-top: 2px solid #e2e8f0;
+            border-bottom: 2px solid #e2e8f0;
+            padding: 15px 0;
+        }
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* Items Table - The Main Part */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .items-table th {
+            background-color: #1e293b;
+            color: #ffffff;
+            padding: 10px;
+            font-size: 13px;
+            border: 1px solid #1e293b;
+        }
+        .items-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13px;
+        }
+        .item-name { font-weight: bold; color: #1e293b; }
+
+        /* Total Section */
+        .total-table {
+            width: 250px;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .total-table td {
+            padding: 8px 5px;
+            font-size: 14px;
+        }
+        .grand-total-row {
+            background-color: #2563eb;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 11px;
+            color: #64748b;
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <table class="w-100 header-table">
+        <tr>
+            <td>
+                <div class="brand-name">ABC STORE</div>
+                <div style="font-size: 12px; color: #64748b;">
+                    123, Business Hub, SG Highway,<br>
+                    Ahmedabad, Gujarat - 380001<br>
+                    GSTIN: 24AAAAA0000A1Z5
+                </div>
+            </td>
+            <td class="text-right">
+                <div class="invoice-label">INVOICE</div>
+                <div style="font-size: 14px;">
+                    <strong>No:</strong> #INV-{{ order.id }}<br>
+                    <strong>Date:</strong> {{ order.created_at|date:"d M Y" }}<br>
+                    <span style="color: #15803d; font-weight: bold;">Status: PAID</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="info-section">
+        <table class="w-100 header-table">
+            <tr>
+                <td width="50%">
+                    <div class="section-title">Bill To:</div>
+                    <div style="font-size: 14px;">
+                        <strong>{{ order.user.username }}</strong><br>
+                        {{ order.user.email }}<br>
+                        {{ order.address.phone }}
+                    </div>
+                </td>
+                <td width="50%">
+                    <div class="section-title">Shipping Address:</div>
+                    <div style="font-size: 13px;">
+                        {{ order.address.address }},<br>
+                        {{ order.address.city }}, {{ order.address.state }} - {{ order.address.pincode }}<br>
+                        <strong>Payment:</strong> {{ order.payment_method }}
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th align="left">Product Description</th>
+                <th width="80">Qty</th>
+                <th width="100" align="right">Price</th>
+                <th width="100" align="right">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in invoice_items %}
+            <tr>
+                <td>
+                    <div class="item-name">{{ item.product }}</div>
+                    <div style="font-size: 11px; color: #64748b;">SKU: {{ item.id }}</div>
+                </td>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td align="right">₹{{ item.price }}</td>
+                <td align="right">₹{{ item.total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="w-100">
+    <tr>
+        <td width="60%"></td>
+        <td width="40%" align="right">
+            <table class="total-table w-100">
+                <tr>
+                    <td>Subtotal</td>
+                    <td align="right">₹{{ subtotal }}</td>
+                </tr>
+                <tr>
+                    <td>Shipping Charges</td>
+                    <td align="right">₹{{ shipping_charge }}</td>
+                </tr>
+                <tr>
+                    <td>Tax (GST 18%)</td>
+                    <td align="right" style="font-size: 11px; color: #64748b;">Included</td>
+                </tr>
+                <tr class="grand-total-row">
+                    <td style="padding: 10px;">Grand Total</td>
+                    <td align="right" style="padding: 10px;">₹{{ grand_total }}</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+    <div class="footer">
+        <div style="font-size: 14px; font-weight: bold; color: #1e293b; margin-bottom: 5px;">
+            Thank you for shopping with ABC STORE! ❤️
+        </div>
+        <p>For support, contact us at support@abcxyz.com</p>
+        <p style="margin-top: 10px;">This is a computer-generated invoice and does not require a physical signature.</p>
+    </div>
+
+</body>
+</html>

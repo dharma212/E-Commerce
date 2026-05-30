@@ -31,11 +31,18 @@ class CartView(LoginRequiredMixin, TemplateView):
         shipping = 100 if subtotal > 0 else 0
 
         grand_total = subtotal + shipping
+        has_items = cart_items.exists()
+        has_out_of_stock = CartItem.objects.filter(
+            cart=cart,
+            product__stock__lte=0
+        ).exists()
 
         context["cart_items"] = cart_items
         context["subtotal"] = subtotal
         context["shipping"] = shipping
         context["grand_total"] = grand_total
+        context["has_items"] = has_items
+        context["has_out_of_stock"] = has_out_of_stock
 
         return context
 

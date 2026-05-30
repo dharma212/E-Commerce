@@ -181,7 +181,7 @@
 }
 
 .edit-btn:hover{
-    background:#e0a800;
+    box-shadow:0 8px 18px rgba(37,99,235,0.35);
 }
 
 .delete-btn{
@@ -238,7 +238,88 @@
     }
 
 }
+/* =========================
+ACTION WRAPPER
+========================= */
 
+.action-btn-wrapper{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+/* =========================
+COMMON BUTTON
+========================= */
+
+.custom-action-btn{
+    border:none;
+    outline:none;
+    text-decoration:none !important;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    height:44px;
+    padding:0 18px;
+    border-radius:12px;
+    font-size:14px;
+    font-weight:600;
+    transition:0.3s;
+    color:#fff !important;
+    cursor:pointer;
+    box-shadow:0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* =========================
+EDIT BUTTON
+========================= */
+
+.edit-btn{
+    background:linear-gradient(135deg,#2563eb,#3b82f6);
+}
+
+.edit-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 18px rgba(37,99,235,0.35);
+}
+
+/* =========================
+DELETE BUTTON
+========================= */
+
+.delete-btn{
+    background:linear-gradient(135deg,#dc2626,#ef4444);
+}
+
+.delete-btn:hover{
+    transform:translateY(-2px);
+    background:linear-gradient(135deg,#dc2626,#ef4444);
+}
+
+/* =========================
+ICON
+========================= */
+
+.custom-action-btn i{
+    font-size:14px;
+}
+
+/* =========================
+MOBILE
+========================= */
+
+@media(max-width:768px){
+
+    .custom-action-btn{
+        min-width:95px;
+        height:40px;
+        font-size:13px;
+        padding:0 14px;
+    }
+
+}
 </style>
 
 <div class="user-page">
@@ -419,35 +500,34 @@
 
                     <td>
 
-    <div class="d-inline-flex align-items-center gap-2">
+    <div class="action-btn-wrapper">
 
-        <!-- EDIT -->
+    <!-- EDIT BUTTON -->
 
-        <a href="{% url 'user_edit' user.id %}"
-           class="btn btn-primary btn-sm">
+    <a href="{% url 'user_edit' user.id %}"
+       class="custom-action-btn edit-btn">
 
-            <i class="fa fa-pen"></i>
+        <i class="fa fa-pen"></i>
+    </a>
 
-        </a>
+    <!-- DELETE BUTTON -->
 
-        <!-- DELETE -->
+    <form action="{% url 'user_delete' user.id %}"
+          method="POST"
+          class="delete-form m-0">
 
-        <form action="{% url 'user_delete' user.id %}"
-      method="POST"
-      class="delete-form d-inline">
+        {% csrf_token %}
 
-    {% csrf_token %}
+        <button type="submit"
+                class="custom-action-btn delete-btn">
 
-    <button type="submit"
-            class="btn btn-danger btn-sm">
+            <i class="fa fa-trash"></i>
 
-        <i class="fa fa-trash"></i>
+        </button>
 
-    </button>
+    </form>
 
-</form>
-
-    </div>
+</div>
 
 </td>
 
@@ -545,5 +625,4 @@ $(document).ready(function(){
 });
 
 </script>
-
 {% endblock extra_js %}

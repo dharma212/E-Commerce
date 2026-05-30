@@ -498,14 +498,19 @@ class IndexView(TemplateView):
 
         context['categories'] = Category.objects.all()
 
-        context['products'] = Product.objects.all().prefetch_related(
+        context['products'] = Product.objects.filter(
+            is_featured=False
+        ).prefetch_related(
             "images"
         )
 
         # =========================
         # DEFAULTS
         # =========================
-
+        featured_products = Product.objects.filter(
+            is_featured=True
+        ).order_by("-id")[:8]
+        
         wishlist_product_ids = []
 
         wishlist_count = 0
@@ -572,6 +577,8 @@ class IndexView(TemplateView):
         context["cart_product_ids"] = cart_product_ids
 
         context["cart_count"] = cart_count
+        
+        context["featured_products"] = featured_products
 
         return context
     

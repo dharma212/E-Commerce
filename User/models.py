@@ -91,19 +91,10 @@ class Product(models.Model):
 
     mrp = models.IntegerField(default=0)
 
-    color = models.ForeignKey(
-        Color,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
-    size = models.ForeignKey(
-        Size,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
+    colors = models.ManyToManyField(Color)
+    sizes = models.ManyToManyField(Size)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_featured = models.BooleanField(default=False)
 
     def final_price(self):
 

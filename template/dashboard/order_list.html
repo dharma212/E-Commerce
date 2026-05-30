@@ -384,6 +384,7 @@
                     <th>Status</th>
                     <th>Date</th>
                     <th>Action</th>
+                    <th>Invoice</th>
                 </tr>
             </thead>
 
@@ -589,6 +590,18 @@ function loadOrders(){
 
                     </td>
 
+                    <td>
+
+    <a href="/invoice/${order.id}/"
+       class="icon-btn view-btn"
+       title="Download Invoice"
+       download>
+
+        <i class="fa-solid fa-file-invoice"></i>
+
+    </a>
+
+</td>
                 </tr>
 
             `;

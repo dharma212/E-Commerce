@@ -1103,13 +1103,18 @@ RIGHT SIDE SUMMARY CARD REPLACE FULL
 
     <div class="action-group">
 
-        <a href="#"
-           class="action-btn primary-btn">
+           {% if order.status == "Delivered" %}
 
-            <i class="fa fa-file-invoice"></i>
-            Download Invoice
+<a href="{% url 'invoice' order.id %}"
+   class="action-btn-checkout btn-checkout-secondary">
 
-        </a>
+    <i class="fa fa-file-invoice-dollar"></i>
+
+    Download Invoice
+
+</a>
+
+{% endif %}
 
         <a href="#"
            class="action-btn secondary-btn">

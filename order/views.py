@@ -75,9 +75,22 @@ class checkoutview(LoginRequiredMixin, TemplateView):
                 status="Pending",
                 payment_method=payment_method 
             )
+            # CHECK STOCK
+            if product.stock < qty:
+                messages.error(request, f"Only {product.stock} items available in stock.")
+                return redirect("checkout")
+
+            # CREATE ORDER ITEM
             OrderItem.objects.create(
-                order=order, product=product, quantity=qty, price=product.final_price()
+                order=order,
+                product=product,
+                quantity=qty,
+                price=product.final_price()
             )
+
+            # MINUS STOCK
+            product.stock -= qty
+            product.save()
         else:
             # --- CART ORDER ---
             cart = Cart.objects.get(user=user)
@@ -97,10 +110,28 @@ class checkoutview(LoginRequiredMixin, TemplateView):
             )
             
             for item in cart_items:
+
+                # CHECK STOCK
+                if item.product.stock < item.quantity:
+
+                    messages.error(
+                        request,
+                        f"Only {item.product.stock} stock available for {item.product.name}"
+                    )
+
+                    return redirect("cart")
+
+                # CREATE ORDER ITEM
                 OrderItem.objects.create(
-                    order=order, product=item.product, 
-                    quantity=item.quantity, price=item.product.final_price()
+                    order=order,
+                    product=item.product,
+                    quantity=item.quantity,
+                    price=item.product.final_price()
                 )
+
+                # MINUS STOCK
+                item.product.stock -= item.quantity
+                item.product.save()
             cart_items.delete()
 
         messages.success(request, "Order placed successfully!")
@@ -146,3 +177,53 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
             })
 
         return super().get(request, *args, **kwargs)
+
+# views.py
+
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render, get_object_or_404
+from datetime import datetime
+
+
+from django.views import View
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+
+class InvoiceView(View):
+    def get(self, request, pk, *args, **kwargs):
+        order = get_object_or_404(Order, id=pk, user=request.user)
+        
+        subtotal = 0.0
+        invoice_items = []
+
+        for item in order.items.all():
+            item_total = float(item.quantity * item.price)
+            subtotal += item_total
+            invoice_items.append({
+                'product': item.product.name,
+                'quantity': item.quantity,
+                'price': item.price,
+                'total': item_total
+            })
+
+        # શિપિંગ ચાર્જ અને ગ્રાન્ડ ટોટલની ગણતરી
+        shipping_charge = 100.0
+        grand_total = subtotal + shipping_charge
+
+        template = get_template('invoice_pdf.html')
+        html = template.render({
+            'order': order,
+            'invoice_items': invoice_items,
+            'subtotal': subtotal,
+            'shipping_charge': shipping_charge,
+            'grand_total': grand_total
+        })
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="Invoice-{order.id}.pdf"'
+        
+        pisa.CreatePDF(html, dest=response)
+        return response

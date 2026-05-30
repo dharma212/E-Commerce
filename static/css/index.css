@@ -185,3 +185,40 @@ MOBILE
 .product-item:hover{
     transform:translateY(-5px);
 }
+
+/* NORMAL HOVER WORKS PROPERLY */
+.stock-btn{
+    position:relative;
+    transition:0.3s;
+}
+
+/* OUT OF STOCK STYLE */
+.stock-btn.out-of-stock{
+    opacity:0.35;
+    pointer-events:none;
+}
+
+/* IMPORTANT: ALLOW HOVER VISUAL BUT NOT CLICK ISSUE */
+.stock-btn.out-of-stock:hover{
+    opacity:0.6;   /* hover effect visible */
+    transform: scale(1.05);
+}
+
+/* BADGE */
+.stock-badge{
+    position:absolute;
+    top:-5px;
+    right:-5px;
+    background:red;
+    color:#fff;
+    font-size:9px;
+    padding:2px 5px;
+    border-radius:50%;
+    font-weight:700;
+}
+
+/* NORMAL HOVER (Bootstrap style override safe) */
+.stock-btn:hover{
+    transform: scale(1.08);
+    transition:0.2s;
+}

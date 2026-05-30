@@ -181,6 +181,66 @@
                 </div>
             </div>
         </div>
+        <!-- COLORS -->
+{% if product.colors.all %}
+<div class="mb-3">
+
+    <small class="text-muted font-weight-bold d-block mb-2">
+        Available Colors
+    </small>
+
+    <div class="d-flex flex-wrap">
+
+        {% for color in product.colors.all %}
+
+        <span class="color-box mr-2 mb-2"
+              title="{{ color.name }}"
+              style="
+                  width: 28px;
+                  height: 28px;
+                  border-radius: 50%;
+                  border: 2px solid #ddd;
+                  display: inline-block;
+                  background: {{ color.name|lower }};
+                  cursor: pointer;
+              ">
+        </span>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endif %}
+<!-- SIZES -->
+{% if product.sizes.all %}
+<div class="mb-3">
+
+    <small class="text-muted font-weight-bold d-block mb-2">
+        Available Sizes
+    </small>
+
+    <div class="d-flex flex-wrap">
+
+        {% for size in product.sizes.all %}
+
+        <span class="badge badge-outline-dark mr-2 mb-2"
+              style="
+                  padding: 8px 12px;
+                  border: 1px solid #333;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-weight: 600;
+              ">
+            {{ size.name }}
+        </span>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endif %}
 
         <!-- Description Section -->
         <div class="mb-4 p-3 bg-light rounded" style="border-left: 4px solid #007bff; background-color: #f8f9fa !important;">
@@ -443,6 +503,39 @@ $(document).ready(function() {
                 location.reload(); 
             }
         });
+    });
+});
+</script>
+<script>
+let selectedColor = null;
+let selectedSize = null;
+
+// COLOR SELECT
+document.querySelectorAll(".color-box").forEach(el => {
+    el.addEventListener("click", function () {
+
+        document.querySelectorAll(".color-box").forEach(c => {
+            c.style.border = "2px solid #ddd";
+        });
+
+        this.style.border = "2px solid #000";
+        selectedColor = this.title;
+    });
+});
+
+// SIZE SELECT
+document.querySelectorAll(".badge").forEach(el => {
+    el.addEventListener("click", function () {
+
+        document.querySelectorAll(".badge").forEach(s => {
+            s.style.background = "transparent";
+            s.style.color = "#000";
+        });
+
+        this.style.background = "#000";
+        this.style.color = "#fff";
+
+        selectedSize = this.innerText.trim();
     });
 });
 </script>

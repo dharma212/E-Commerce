@@ -20,5 +20,10 @@ urlpatterns = [
         OrderDetailView.as_view(),
         name='order_details'
     ),
+    path(
+    'invoice/<int:pk>/',
+    InvoiceView.as_view(),
+    name='invoice'
+)
     
 ]

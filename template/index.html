@@ -155,229 +155,296 @@
     <!-- Categories End -->
 
 
-    <!-- Products Start -->
-    <div class="container-fluid pt-5 pb-3">
-        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Featured Products</span></h2>
-        <div class="row px-xl-5">
-            <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-                <div class="product-item bg-light mb-4">
-                    <div class="product-img position-relative overflow-hidden">
-                        <img class="img-fluid w-100" src="{% static 'img/product-1.jpg' %}" alt="">
-                        <div class="product-action">
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                        </div>
+    <!-- =========================
+FEATURED PRODUCTS START
+========================= -->
+
+<div class="container-fluid pt-5 pb-3">
+
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
+
+        <span class="bg-secondary pr-3">
+
+            Featured Products
+
+        </span>
+
+    </h2>
+
+    <div class="row px-xl-5">
+
+        {% if featured_products %}
+
+        {% for product in featured_products %}
+
+        <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+
+            <div class="product-item bg-light mb-4">
+
+                <!-- IMAGE -->
+                <div class="product-img position-relative overflow-hidden">
+
+                    <!-- PRODUCT IMAGE -->
+                    <a href="{% url 'product_detail' product.id %}">
+
+                        {% if product.images.first %}
+
+                        <img class="img-fluid w-100"
+                             src="{{ product.images.first.image.url }}"
+                             alt="{{ product.name }}">
+
+                        {% else %}
+
+                        <img class="img-fluid w-100"
+                             src="{% static 'img/default.jpg' %}"
+                             alt="">
+
+                        {% endif %}
+
+                    </a>
+
+                    <!-- FEATURED BADGE -->
+                    <div style="
+                        position:absolute;
+                        top:10px;
+                        left:10px;
+                        background:#ff9800;
+                        color:#fff;
+                        padding:5px 10px;
+                        font-size:11px;
+                        border-radius:5px;
+                        font-weight:700;
+                        z-index:5;
+                    ">
+
+                        Featured
+
                     </div>
-                    <div class="text-center py-4">
-                        <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                        <div class="d-flex align-items-center justify-content-center mt-2">
-                            <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-center mb-1">
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small>(99)</small>
-                        </div>
+
+                    <!-- DISCOUNT BADGE -->
+                    {% if product.discount > 0 %}
+
+                    <div style="
+                        position:absolute;
+                        top:10px;
+                        right:10px;
+                        background:#28a745;
+                        color:#fff;
+                        padding:4px 8px;
+                        font-size:12px;
+                        border-radius:5px;
+                        font-weight:600;
+                        z-index:5;
+                    ">
+
+                        {{ product.discount_percent }}% OFF
+
                     </div>
+
+                    {% endif %}
+
+                    <!-- OUT OF STOCK -->
+                    {% if product.stock <= 0 %}
+
+                    <div style="
+                        position:absolute;
+                        inset:0;
+                        background:rgba(0,0,0,0.6);
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        z-index:4;
+                    ">
+
+                        <span style="
+                            background:red;
+                            color:#fff;
+                            padding:10px 18px;
+                            border-radius:6px;
+                            font-weight:700;
+                            font-size:15px;
+                        ">
+
+                            OUT OF STOCK
+
+                        </span>
+
+                    </div>
+
+                    {% endif %}
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="product-action">
+
+                        <!-- ADD TO CART -->
+                        <a class="btn btn-outline-dark btn-square add-to-cart
+
+                        {% if product.id in cart_product_ids %}
+                        active-cart-btn
+                        {% endif %}
+
+                        {% if product.stock <= 0 %}
+                        out-of-stock-btn
+                        {% endif %}
+
+                        "
+                        href="javascript:void(0)"
+                        data-id="{{ product.id }}">
+
+                            <i class="fa fa-shopping-cart"></i>
+
+                        </a>
+
+                        <!-- WISHLIST -->
+                        <a class="btn btn-outline-dark btn-square wishlist-btn
+
+                        {% if product.id in wishlist_product_ids %}
+                        active
+                        {% endif %}
+
+                        "
+                        data-product-id="{{ product.id }}">
+
+                            <i class="
+                            {% if product.id in wishlist_product_ids %}
+                            fas
+                            {% else %}
+                            far
+                            {% endif %}
+                            fa-heart"></i>
+
+                        </a>
+
+                        <!-- COMPARE -->
+                        <a class="btn btn-outline-dark btn-square" href="">
+
+                            <i class="fa fa-sync-alt"></i>
+
+                        </a>
+
+                        <!-- DETAIL -->
+                        <a class="btn btn-outline-dark btn-square"
+                           href="{% url 'product_detail' product.id %}">
+
+                            <i class="fa fa-search"></i>
+
+                        </a>
+
+                    </div>
+
                 </div>
-            </div>
-            <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-                <div class="product-item bg-light mb-4">
-                    <div class="product-img position-relative overflow-hidden">
-                        <img class="img-fluid w-100" src="{% static 'img/product-2.jpg' %}" alt="">
-                        <div class="product-action">
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                        </div>
+
+                <!-- CONTENT -->
+                <div class="text-center py-4">
+
+                    <!-- PRODUCT NAME -->
+                    <a class="h6 text-decoration-none product-name"
+                       href="{% url 'product_detail' product.id %}">
+
+                        {{ product.name|truncatechars:45 }}
+
+                    </a>
+
+                    <!-- PRICE -->
+                    <div class="d-flex align-items-center justify-content-center mt-2">
+
+                        <!-- FINAL PRICE -->
+                        <h5>
+
+                            ₹{{ product.final_price }}
+
+                        </h5>
+
+                        <!-- MRP -->
+                        {% if product.discount > 0 %}
+
+                        <h6 class="text-muted ml-2">
+
+                            <del>
+
+                                ₹{{ product.mrp }}
+
+                            </del>
+
+                        </h6>
+
+                        {% endif %}
+
                     </div>
-                    <div class="text-center py-4">
-                        <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                        <div class="d-flex align-items-center justify-content-center mt-2">
-                            <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-center mb-1">
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star-half-alt text-primary mr-1"></small>
-                            <small>(99)</small>
-                        </div>
+
+                    <!-- STOCK STATUS -->
+                    <div class="mt-2">
+
+                        {% if product.stock <= 0 %}
+
+                        <span class="badge badge-danger px-3 py-2">
+
+                            Out Of Stock
+
+                        </span>
+
+                        {% elif product.stock <= 3 %}
+
+                        <span class="badge badge-warning px-3 py-2">
+
+                            Few Items Left
+
+                        </span>
+
+                        {% endif %}
+
                     </div>
+
+                    <!-- RATING -->
+                    <div class="d-flex align-items-center justify-content-center mb-1 mt-3">
+
+                        <small class="fa fa-star text-primary mr-1"></small>
+                        <small class="fa fa-star text-primary mr-1"></small>
+                        <small class="fa fa-star text-primary mr-1"></small>
+                        <small class="fa fa-star text-primary mr-1"></small>
+                        <small class="fa fa-star text-primary mr-1"></small>
+
+                        <small>(99)</small>
+
+                    </div>
+
                 </div>
+
             </div>
-            <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-                <div class="product-item bg-light mb-4">
-                    <div class="product-img position-relative overflow-hidden">
-                        <img class="img-fluid w-100" src="{% static 'img/product-3.jpg' %}" alt="">
-                        <div class="product-action">
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                        </div>
-                    </div>
-                    <div class="text-center py-4">
-                        <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                        <div class="d-flex align-items-center justify-content-center mt-2">
-                            <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-center mb-1">
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star-half-alt text-primary mr-1"></small>
-                            <small class="far fa-star text-primary mr-1"></small>
-                            <small>(99)</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-                <div class="product-item bg-light mb-4">
-                    <div class="product-img position-relative overflow-hidden">
-                        <img class="img-fluid w-100" src="{% static 'img/product-4.jpg' %}" alt="">
-                        <div class="product-action">
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                        </div>
-                    </div>
-                    <div class="text-center py-4">
-                        <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                        <div class="d-flex align-items-center justify-content-center mt-2">
-                            <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-center mb-1">
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="far fa-star text-primary mr-1"></small>
-                            <small class="far fa-star text-primary mr-1"></small>
-                            <small>(99)</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-                <div class="product-item bg-light mb-4">
-                    <div class="product-img position-relative overflow-hidden">
-                        <img class="img-fluid w-100" src="{% static 'img/product-5.jpg' %}" alt="">
-                        <div class="product-action">
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                        </div>
-                    </div>
-                    <div class="text-center py-4">
-                        <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                        <div class="d-flex align-items-center justify-content-center mt-2">
-                            <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-center mb-1">
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small>(99)</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-                <div class="product-item bg-light mb-4">
-                    <div class="product-img position-relative overflow-hidden">
-                        <img class="img-fluid w-100" src="{% static 'img/product-6.jpg' %}" alt="">
-                        <div class="product-action">
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                        </div>
-                    </div>
-                    <div class="text-center py-4">
-                        <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                        <div class="d-flex align-items-center justify-content-center mt-2">
-                            <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-center mb-1">
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star-half-alt text-primary mr-1"></small>
-                            <small>(99)</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-                <div class="product-item bg-light mb-4">
-                    <div class="product-img position-relative overflow-hidden">
-                        <img class="img-fluid w-100" src="{% static 'img/product-7.jpg' %}" alt="">
-                        <div class="product-action">
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                        </div>
-                    </div>
-                    <div class="text-center py-4">
-                        <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                        <div class="d-flex align-items-center justify-content-center mt-2">
-                            <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-center mb-1">
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star-half-alt text-primary mr-1"></small>
-                            <small class="far fa-star text-primary mr-1"></small>
-                            <small>(99)</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-                <div class="product-item bg-light mb-4">
-                    <div class="product-img position-relative overflow-hidden">
-                        <img class="img-fluid w-100" src="{% static 'img/product-8.jpg' %}" alt="">
-                        <div class="product-action">
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                        </div>
-                    </div>
-                    <div class="text-center py-4">
-                        <a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
-                        <div class="d-flex align-items-center justify-content-center mt-2">
-                            <h5>$123.00</h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-center mb-1">
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="far fa-star text-primary mr-1"></small>
-                            <small class="far fa-star text-primary mr-1"></small>
-                            <small>(99)</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         </div>
+
+        {% endfor %}
+
+        {% else %}
+
+        <!-- EMPTY -->
+        <div class="col-12">
+
+            <div class="text-center py-5">
+
+                <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png"
+                     width="130">
+
+                <h4 class="mt-4">
+
+                    No Featured Products Available
+
+                </h4>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
     </div>
-    <!-- Products End -->
+
+</div>
+
+<!-- =========================
+FEATURED PRODUCTS END
+========================= -->
 
 
     <!-- Offer Start -->
@@ -462,7 +529,60 @@
             </div>
 
             {% endif %}
+            <!-- STOCK STATUS BADGE -->
 
+            {% if product.stock <= 0 %}
+
+            <div style="
+                position:absolute;
+                top:50px;
+                left:10px;
+                background:#dc3545;
+                color:#fff;
+                padding:5px 10px;
+                font-size:12px;
+                border-radius:5px;
+                font-weight:700;
+                z-index:2;
+            ">
+                Out Of Stock
+            </div>
+
+            {% elif product.stock <= 3 %}
+
+            <div style="
+                position:absolute;
+                top:50px;
+                left:10px;
+                background:#ff5722;
+                color:#fff;
+                padding:5px 10px;
+                font-size:12px;
+                border-radius:5px;
+                font-weight:700;
+                z-index:2;
+                animation: blink 1s infinite;
+            ">
+                Few Items Left
+            </div>
+
+            {% elif product.stock <= 7 %}
+
+            <div style="
+                position:absolute;
+                top:50px;
+                left:10px;
+                background:#ffc107;
+                color:#000;
+                padding:5px 10px;
+                font-size:12px;
+                border-radius:5px;
+                font-weight:700;
+                z-index:2;
+            ">
+                Limited Stock
+            </div>
+            {% endif %}
             <!-- ACTION BUTTONS -->
             <div class="product-action">
 
@@ -470,17 +590,25 @@
                 ADD TO CART BUTTON
                 ========================= -->
 
-                <a class="btn btn-outline-dark btn-square add-to-cart
+                <a class="btn btn-outline-dark btn-square add-to-cart stock-btn
 
-                {% if product.id in cart_product_ids %}
-                active-cart-btn
-                {% endif %}
+                    {% if product.id in cart_product_ids %}
+                    active-cart-btn
+                    {% endif %}
 
-                "
-                href="javascript:void(0)"
-                data-id="{{ product.id }}">
+                    {% if product.stock <= 0 %}
+                    out-of-stock
+                    {% endif %}
 
-                    <i class="fa fa-shopping-cart"></i>
+                    "
+                    href="javascript:void(0)"
+                    data-id="{{ product.id }}">
+
+                        <i class="fa fa-shopping-cart"></i>
+
+                        {% if product.stock <= 0 %}
+                        <span class="stock-badge">!</span>
+                        {% endif %}
 
                 </a>
 
@@ -553,44 +681,7 @@
             </div>
 
             {% endif %}
-            {% comment %} <!-- COLOR & SIZE -->
-            <div class="mt-2 d-flex justify-content-center align-items-center flex-wrap gap-1">
-
-                <!-- COLOR -->
-                {% if product.color %}
-
-                <span style="
-                    background: {{ product.color.name|lower }};
-                    color: white;
-                    padding: 4px 12px;
-                    border-radius: 20px;
-                    font-size: 11px;
-                    font-weight: 600;
-                    margin-right:5px;
-                ">
-                    {{ product.color.name }}
-                </span>
-
-                {% endif %}
-
-                <!-- SIZE -->
-                {% if product.size %}
-
-                <span style="
-                    background:#f1f1f1;
-                    color:#333;
-                    padding:4px 10px;
-                    border-radius:6px;
-                    font-size:11px;
-                    font-weight:600;
-                ">
-                    {{ product.size.name }}
-                </span>
-
-                {% endif %}
-
-            </div> {% endcomment %}
-
+            
             <!-- STATIC RATING -->
             <div class="d-flex align-items-center justify-content-center mb-1">
 

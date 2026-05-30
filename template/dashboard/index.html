@@ -352,159 +352,43 @@
 
     <div class="row">
 
-        <div class="col-xl-3 col-md-6 mb-4">
+    <!-- TOTAL USERS -->
 
-            <div class="stats-card">
+    <div class="col-xl-3 col-md-6 mb-4">
 
-                <div class="stats-flex">
+        <div class="stats-card">
 
-                    <div>
+            <div class="stats-flex">
 
-                        <p class="stats-title">
+                <div>
 
-                            Total Users
+                    <p class="stats-title">
 
-                        </p>
+                        Total Users
 
-                        <h2 class="stats-value">
+                    </p>
 
-                            {{ total_users }}
+                    <h2 class="stats-value">
 
-                        </h2>
+                        {{ total_users }}
 
-                        <span class="stats-growth">
+                    </h2>
 
-                            +12% this month
+                    <span class="stats-growth">
 
-                        </span>
+                        {% if user_growth >= 0 %}
+                            +{{ user_growth }}% this month
+                        {% else %}
+                            {{ user_growth }}% this month
+                        {% endif %}
 
-                    </div>
-
-                    <div class="stats-icon users-bg">
-
-                        <i class="fa fa-users"></i>
-
-                    </div>
+                    </span>
 
                 </div>
 
-            </div>
+                <div class="stats-icon users-bg">
 
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-
-            <div class="stats-card">
-
-                <div class="stats-flex">
-
-                    <div>
-
-                        <p class="stats-title">
-
-                            Orders
-
-                        </p>
-
-                        <h2 class="stats-value">
-
-                            {{ total_orders }}
-
-                        </h2>
-
-                        <span class="stats-growth">
-
-                            +8% this week
-
-                        </span>
-
-                    </div>
-
-                    <div class="stats-icon orders-bg">
-
-                        <i class="fa fa-cart-shopping"></i>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-
-            <div class="stats-card">
-
-                <div class="stats-flex">
-
-                    <div>
-
-                        <p class="stats-title">
-
-                            Products
-
-                        </p>
-
-                        <h2 class="stats-value">
-
-                            {{ total_products }}
-
-                        </h2>
-
-                        <span class="stats-growth">
-
-                            +5 new added
-
-                        </span>
-
-                    </div>
-
-                    <div class="stats-icon products-bg">
-
-                        <i class="fa fa-box"></i>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-
-            <div class="stats-card">
-
-                <div class="stats-flex">
-
-                    <div>
-
-                        <p class="stats-title">
-
-                            Revenue
-
-                        </p>
-
-                        <h2 class="stats-value">
-
-                            ₹{{ total_revenue }}
-
-                        </h2>
-
-                        <span class="stats-growth">
-
-                            +18% growth
-
-                        </span>
-
-                    </div>
-
-                    <div class="stats-icon revenue-bg">
-
-                        <i class="fa fa-indian-rupee-sign"></i>
-
-                    </div>
+                    <i class="fa fa-users"></i>
 
                 </div>
 
@@ -513,6 +397,142 @@
         </div>
 
     </div>
+
+    <!-- TOTAL ORDERS -->
+
+    <div class="col-xl-3 col-md-6 mb-4">
+
+        <div class="stats-card">
+
+            <div class="stats-flex">
+
+                <div>
+
+                    <p class="stats-title">
+
+                        Orders
+
+                    </p>
+
+                    <h2 class="stats-value">
+
+                        {{ total_orders }}
+
+                    </h2>
+
+                    <span class="stats-growth">
+
+                        {% if order_growth >= 0 %}
+                            +{{ order_growth }}% this month
+                        {% else %}
+                            {{ order_growth }}% this month
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+                <div class="stats-icon orders-bg">
+
+                    <i class="fa fa-cart-shopping"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- PRODUCTS -->
+
+    <div class="col-xl-3 col-md-6 mb-4">
+
+        <div class="stats-card">
+
+            <div class="stats-flex">
+
+                <div>
+
+                    <p class="stats-title">
+
+                        Products
+
+                    </p>
+
+                    <h2 class="stats-value">
+
+                        {{ total_products }}
+
+                    </h2>
+
+                    <span class="stats-growth">
+
+                        +{{ new_products }} new added
+
+                    </span>
+
+                </div>
+
+                <div class="stats-icon products-bg">
+
+                    <i class="fa fa-box"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- REVENUE -->
+
+    <div class="col-xl-3 col-md-6 mb-4">
+
+        <div class="stats-card">
+
+            <div class="stats-flex">
+
+                <div>
+
+                    <p class="stats-title">
+
+                        Revenue
+
+                    </p>
+
+                    <h2 class="stats-value">
+
+                        ₹{{ total_revenue }}
+
+                    </h2>
+
+                    <span class="stats-growth">
+
+                        {% if revenue_growth >= 0 %}
+                            +{{ revenue_growth }}% growth
+                        {% else %}
+                            {{ revenue_growth }}% growth
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+                <div class="stats-icon revenue-bg">
+
+                    <i class="fa fa-indian-rupee-sign"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
     <!-- CHARTS -->
 <div class="dashboard-card">

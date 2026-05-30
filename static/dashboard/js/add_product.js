@@ -259,39 +259,65 @@ function setupSearch(
         const item =
             e.target.closest(".search-item");
 
-        // ================= SELECT =================
-        if(item){
+// ================= SELECT =================
+if(item){
 
-            input.value =
-                item.innerText.trim();
+    const selectedName =
+        item.innerText.trim();
 
-            hiddenInput.value =
-                item.dataset.id;
+    const selectedId =
+        item.dataset.id;
 
-            resultBox.style.display = "none";
+    // CURRENT VALUES
+    let currentNames =
+        input.value
+        ? input.value.split(",").map(v => v.trim())
+        : [];
 
-            // CATEGORY => LOAD TYPE
-            if(hiddenId === "category"){
+    let currentIds =
+        hiddenInput.value
+        ? hiddenInput.value.split(",").map(v => v.trim())
+        : [];
 
-                const typeField =
-                    document.getElementById("type");
+    // AVOID DUPLICATE
+    if(!currentIds.includes(selectedId)){
 
-                const typeInput =
-                    document.getElementById("typeInput");
+        currentNames.push(selectedName);
 
-                if(typeField){
-                    typeField.value = "";
-                }
+        currentIds.push(selectedId);
+    }
 
-                if(typeInput){
-                    typeInput.value = "";
-                }
+    // SET VALUES
+    input.value =
+        currentNames.join(", ");
 
-                loadTypes(item.dataset.id);
-            }
+    hiddenInput.value =
+        currentIds.join(",");
 
-            return;
+    resultBox.style.display = "none";
+
+    // CATEGORY => LOAD TYPE
+    if(hiddenId === "category"){
+
+        const typeField =
+            document.getElementById("type");
+
+        const typeInput =
+            document.getElementById("typeInput");
+
+        if(typeField){
+            typeField.value = "";
         }
+
+        if(typeInput){
+            typeInput.value = "";
+        }
+
+        loadTypes(selectedId);
+    }
+
+    return;
+}
 
         // ================= ADD NEW =================
         const addBtn =
@@ -825,7 +851,8 @@ function loadEditProduct(id){
 
         document.getElementById("description").value =
             data.description || "";
-
+        document.getElementById("is_featured").checked =
+            data.is_featured || false;
         // ================= CATEGORY =================
         document.getElementById("category").value =
             data.category || "";
@@ -834,18 +861,26 @@ function loadEditProduct(id){
             data.category_name || "";
 
         // ================= COLOR =================
-        document.getElementById("color").value =
-            data.color || "";
+document.getElementById("color").value =
+    data.colors
+    ? data.colors.join(",")
+    : "";
 
-        document.getElementById("colorInput").value =
-            data.color_name || "";
+document.getElementById("colorInput").value =
+    data.color_names
+    ? data.color_names.join(", ")
+    : "";
 
         // ================= SIZE =================
-        document.getElementById("size").value =
-            data.size || "";
+document.getElementById("size").value =
+    data.sizes
+    ? data.sizes.join(",")
+    : "";
 
-        document.getElementById("sizeInput").value =
-            data.size_name || "";
+document.getElementById("sizeInput").value =
+    data.size_names
+    ? data.size_names.join(", ")
+    : "";
 
         // ================= TYPE =================
         loadTypes(data.category);
@@ -1298,12 +1333,37 @@ document.addEventListener(
             formData.append('name', name);
             formData.append('category', category);
             formData.append('type', type);
-            formData.append('color', color);
-            formData.append('size', size);
+// COLORS
+color.split(",").forEach(id => {
+
+    formData.append(
+        "colors",
+        id.trim()
+    );
+
+});
+
+// SIZES
+size.split(",").forEach(id => {
+
+    formData.append(
+        "sizes",
+        id.trim()
+    );
+
+});
             formData.append('stock', stock);
             formData.append('description', description);
             formData.append('mrp', mrp);
             formData.append('discount', discount);
+            let isFeatured =
+                document.getElementById("is_featured")
+                ?.checked;
+
+            formData.append(
+                "is_featured",
+                isFeatured
+            );
 
             // ================= EDIT ID =================
             if(isEditMode){

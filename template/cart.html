@@ -412,14 +412,8 @@
 
                     </div>
 
-                    {% if cart_items %}
-                        <a href="{% url 'checkout' %}"
-                        class="btn btn-block btn-primary font-weight-bold my-3 py-3">
+                    {% if not has_items %}
 
-                            Proceed To Checkout
-
-                        </a>
-                    {% else %}
                         <button class="btn btn-block btn-secondary font-weight-bold my-3 py-3"
                                 disabled
                                 style="cursor:not-allowed; opacity:0.6;">
@@ -427,6 +421,30 @@
                             Your Cart is Empty
 
                         </button>
+
+                    {% else %}
+
+                        {% if has_out_of_stock %}
+
+                            <button class="btn btn-block btn-warning font-weight-bold my-3 py-3"
+                                    disabled
+                                    style="cursor:not-allowed; opacity:0.7;">
+
+                                Remove Out of Stock Items First
+
+                            </button>
+
+                        {% else %}
+
+                            <a href="{% url 'checkout' %}"
+                            class="btn btn-block btn-primary font-weight-bold my-3 py-3">
+
+                                Proceed To Checkout
+
+                            </a>
+
+                        {% endif %}
+
                     {% endif %}
 
                 </div>
@@ -798,5 +816,5 @@ document.addEventListener(
     true
 );
 </script>
-
+    
 {% endblock %}

@@ -1,0 +1,309 @@
+@media (min-width: 992px) {
+    .nav-item.dropdown.dropright:hover>.dropdown-menu {
+        display: block;
+        top: 0;
+        left: 100%;
+        margin-top: 0;
+    }
+}
+
+.dropdown-item img {
+    border-radius: 3px;
+    border: 1px solid #ddd;
+}
+
+/* ===================================================
+    ULTRA-MODERN REDESIGNED MOBILE HEADER & STICKY STYLES
+    =================================================== */
+@media (max-width: 991.98px) {
+    .mobile-hide-navbar-row {
+        display: none !important;
+    }
+
+    /* Luxury Mobile Header Shell */
+    .mobile-header-wrapper {
+        background: #ffffff;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        width: 100%;
+        z-index: 1040;
+        position: relative;
+        transition: all 0.3s ease-in-out;
+    }
+
+    /* Clean High-End Row Layout - Fixed side gaps */
+    .mobile-top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 15px;
+        /* Adjusted padding to remove large gaps */
+        background: #ffffff;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    /* PERFECT STICKY: Smooth Slide-down animation when active */
+    .mobile-header-wrapper.sticky-active {
+        position: fixed;
+        top: 0;
+        left: 0;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.12);
+        animation: headerSlideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes headerSlideDown {
+        from {
+            transform: translateY(-100%);
+        }
+
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    /* Auto hides search panel inside sticky state */
+    .mobile-header-wrapper.sticky-active .mobile-search-container {
+        display: none !important;
+    }
+
+    /* Premium Brand Transformation in Sticky Mode */
+    .mobile-header-wrapper.sticky-active .mobile-top-bar {
+        padding: 12px 15px;
+        background: #111111;
+        /* Sleek dark bar when sticky */
+    }
+
+    /* Inverts logo colors perfectly inside dark sticky bar */
+    .mobile-header-wrapper.sticky-active .mobile-top-bar .text-dark {
+        color: #ffffff !important;
+    }
+
+    /* Minimalist Curved Search Bar Container - Fixed padding for full width stretch */
+    .mobile-search-container {
+        padding: 0 15px 18px 15px;
+        background: #ffffff;
+    }
+
+    .mobile-search-container .input-group {
+        background: #f1f3f5;
+        border-radius: 30px;
+        /* Modern fully rounded capsule design */
+        padding: 2px 6px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+
+    .mobile-search-container .input-group:focus-within {
+        border-color: #ffd333;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(255, 211, 51, 0.2);
+    }
+
+    .mobile-search-container .form-control {
+        background: transparent !important;
+        border: none !important;
+        height: 40px;
+        font-size: 14px;
+        color: #333;
+        padding-left: 15px;
+    }
+
+    .mobile-search-container .form-control:focus {
+        box-shadow: none !important;
+    }
+
+    .mobile-search-container .input-group-text {
+        background: transparent !important;
+        border: none !important;
+        color: #718096 !important;
+        font-size: 16px;
+        padding-right: 15px;
+    }
+
+    /* Designer Styled Burger Button */
+    .mobile-burger-btn {
+        background: #111111;
+        border: none;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        /* Circular high-end button */
+        color: #ffd333;
+        /* Theme contrast accent */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .mobile-header-wrapper.sticky-active .mobile-burger-btn {
+        background: #ffd333;
+        color: #111111;
+        box-shadow: 0 4px 10px rgba(255, 211, 51, 0.2);
+    }
+
+    .mobile-burger-btn:active {
+        transform: scale(0.9);
+    }
+
+    /* APP-STYLE SIDEBAR DRAWER */
+    .navbar-collapse {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 300px;
+        height: 100vh;
+        background-color: #111111 !important;
+        z-index: 1060;
+        transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        display: block !important;
+        overflow-y: auto;
+        padding: 30px 24px;
+        box-shadow: 10px 0 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .navbar-collapse.show {
+        left: 0 !important;
+    }
+
+    /* DRAWER NAVIGATION LINKS & DROP-DOWNS */
+    .navbar-nav .nav-link {
+        padding: 16px 0 !important;
+        border-bottom: 1px solid #1f1f1f;
+        color: #ffffff !important;
+        font-weight: 500;
+        font-size: 15px;
+        letter-spacing: 0.3px;
+    }
+
+    .navbar-nav .nav-link:hover {
+        color: #ffd333 !important;
+    }
+
+    /* FIX: Full clarity colors inside pages drawer menu */
+    .navbar-nav .dropdown-menu {
+        background-color: #1a1a1a !important;
+        padding-left: 15px;
+        border: none !important;
+        margin: 0 !important;
+    }
+
+    .navbar-nav .dropdown-item {
+        color: #bbbbbb !important;
+        /* Soft light tone for high contrast visibility */
+        padding: 12px 0;
+        font-size: 14px;
+        background: transparent !important;
+        border-bottom: 1px solid #262626;
+    }
+
+    .navbar-nav .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .navbar-nav .dropdown-item:hover {
+        color: #ffd333 !important;
+    }
+
+    .navbar-nav .dropdown-toggle::after {
+        color: #ffd333;
+        float: right;
+        margin-top: 8px;
+    }
+
+    /* ADVANCED GLASS-MORPHISM BACKDROP OVERLAY */
+    .navbar-collapse-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 1050;
+        display: none;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+
+    body.menu-open {
+        overflow: hidden;
+    }
+}
+
+    /* Premium Instant Overlay Search Results */
+    #search-result-box, .custom-search-results {
+        position: absolute;
+        width: 100%;
+        background: white;
+        top: 100%;
+        left: 0;
+        z-index: 9999;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        display: none;
+        margin-top: 5px;
+    }
+
+    .search-product-item {
+        display: flex;
+        align-items: center;
+        padding: 14px 18px;
+        border-bottom: 1px solid #f1f3f5;
+        text-decoration: none;
+        color: #212529;
+        transition: 0.2s;
+        background: white;
+    }
+
+    .search-product-item:hover {
+        background: #f8f9fa;
+        text-decoration: none;
+        color: #212529;
+    }
+
+    .search-product-item img {
+        width: 46px;
+        height: 46px;
+        object-fit: cover;
+        margin-right: 15px;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .search-product-info {
+        flex: 1;
+    }
+
+    .search-product-name {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+
+    .search-product-price {
+        color: #ff4757;
+        font-weight: 700;
+        font-size: 13px;
+    }
+    
+    /* Global Styles Fixes From Old Layout */
+    .mega-category-wrapper { position: relative; width: 100%; }
+    .mega-category-link { background: #fff; padding: 14px 20px; border-bottom: 1px solid #f5f5f5; color: #333; font-weight: 500; transition: 0.3s; display: block; }
+    .mega-category-link:hover { background: #f8f8f8; color: #d19c97; text-decoration: none; }
+    .mega-type-dropdown { position: absolute; top: 0; left: 100%; width: 260px; background: #fff; border: 1px solid #eee; display: none; min-height: 100%; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08); z-index: 999; }
+    .mega-category-wrapper:hover .mega-type-dropdown { display: block; animation: fadeIn 0.25s ease; }
+    .mega-type-wrapper { position: relative; }
+    .mega-type-link { display: block; padding: 14px 20px; color: #333; text-decoration: none; border-bottom: 1px solid #f5f5f5; transition: 0.3s; background: #fff; font-weight: 500; }
+    .mega-type-link:hover { background: #fafafa; color: #d19c97; text-decoration: none; }
+    .mega-product-dropdown { position: absolute; top: 0; left: 100%; width: 340px; background: #fff; border: 1px solid #eee; display: none; min-height: 100%; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08); z-index: 999; }
+    .mega-type-wrapper:hover .mega-product-dropdown { display: block; animation: fadeIn 0.25s ease; }
+    .mega-product-header { padding: 14px 18px; font-size: 16px; font-weight: 700; border-bottom: 1px solid #f1f1f1; background: #fafafa; color: #222; }
+    .mega-product-item { display: block; padding: 12px 18px; text-decoration: none; color: #333; border-bottom: 1px solid #f5f5f5; transition: 0.3s; background: #fff; }
+    .mega-product-item:hover { background: #fafafa; text-decoration: none; padding-left: 24px; }
+    .mega-product-info { flex: 1; overflow: hidden; }
+    .mega-product-name { font-size: 14px; font-weight: 600; color: #222; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mega-view-all { display: block; text-align: center; padding: 12px; background: #ffd333; color: #222; font-weight: 600; text-decoration: none; transition: 0.3s; }
+    .mega-view-all:hover { background: #222; color: #ffd333; text-decoration: none; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }

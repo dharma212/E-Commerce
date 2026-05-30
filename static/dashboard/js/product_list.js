@@ -193,25 +193,32 @@ function loadProducts(){
                 <td>${item.type_name || 'N/A'}</td>
 
                 <td>
-
-                    <span class="color-badge"
-                          style="background:${item.color_name ? item.color_name.toLowerCase() : '#555'}">
-
-                        ${item.color_name || 'N/A'}
-
-                    </span>
-
-                </td>
+    ${
+        item.colors && item.colors.length > 0
+        ?
+        item.colors.map(c => `
+            <span class="color-badge" style="background:${c.name.toLowerCase()}">
+                ${c.name}
+            </span>
+        `).join(' ')
+        :
+        'N/A'
+    }
+</td>
 
                 <td>
-
-                    <span class="size-badge">
-
-                        ${item.size_name || 'N/A'}
-
-                    </span>
-
-                </td>
+    ${
+        item.sizes && item.sizes.length > 0
+        ?
+        item.sizes.map(s => `
+            <span class="size-badge">
+                ${s.name}
+            </span>
+        `).join(' ')
+        :
+        'N/A'
+    }
+</td>
 
                 <td class="price">
 

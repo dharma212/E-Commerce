@@ -18,19 +18,36 @@ class ProductImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'image']
 
 class ProductSerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(source='category.name', read_only=True)
-    type_name = serializers.CharField(source='type.name', read_only=True)
-    images = ProductImageSerializer(many=True, read_only=True)
-    color = serializers.PrimaryKeyRelatedField(
-    queryset=Color.objects.all()
+
+    category_name = serializers.CharField(
+        source='category.name',
+        read_only=True
     )
 
-    size = serializers.PrimaryKeyRelatedField(
-        queryset=Size.objects.all()
+    type_name = serializers.CharField(
+        source='type.name',
+        read_only=True
+    )
+
+    images = ProductImageSerializer(
+        many=True,
+        read_only=True
+    )
+
+    colors = serializers.PrimaryKeyRelatedField(
+        queryset=Color.objects.all(),
+        many=True
+    )
+
+    sizes = serializers.PrimaryKeyRelatedField(
+        queryset=Size.objects.all(),
+        many=True
     )
 
     class Meta:
+
         model = Product
+
         fields = '__all__'
 
 from django.contrib.auth.models import User

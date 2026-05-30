@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from User.models import *
 from User.serializers import ProductSerializer
+import json
 
 class SearchProductView(View):
 
@@ -359,7 +360,6 @@ class ProductDetailView(View):
 
         )
 
-
 class ProductListAPI(APIView):
 
     def get(self, request):
@@ -370,18 +370,14 @@ class ProductListAPI(APIView):
 
         for p in products:
 
-            mrp = float(p.mrp or 0)
-
-            discount = float(p.discount or 0)
-
-            final_price = float(p.mrp) - float(p.discount)
+            final_price = float(p.mrp or 0) - float(p.discount or 0)
 
             discount_percent = 0
 
-            if float(p.mrp) > 0:
+            if float(p.mrp or 0) > 0:
 
                 discount_percent = round(
-                    (float(p.discount) / float(p.mrp)) * 100,
+                    (float(p.discount or 0) / float(p.mrp or 0)) * 100,
                     2
                 )
 
@@ -403,23 +399,38 @@ class ProductListAPI(APIView):
 
                 "description": p.description,
 
-                # IDS
+                # CATEGORY + TYPE
                 "category_id": p.category.id if p.category else "",
 
                 "type_id": p.type.id if p.type else "",
 
-                "color_id": p.color.id if p.color else "",
-
-                "size_id": p.size.id if p.size else "",
-
-                # NAMES
                 "category_name": p.category.name if p.category else "",
 
                 "type_name": p.type.name if p.type else "",
 
-                "color_name": p.color.name if p.color else "",
+                # MULTIPLE COLORS
+                "colors": [
 
-                "size_name": p.size.name if p.size else "",
+                    {
+                        "id": color.id,
+                        "name": color.name
+                    }
+
+                    for color in p.colors.all()
+
+                ],
+
+                # MULTIPLE SIZES
+                "sizes": [
+
+                    {
+                        "id": size.id,
+                        "name": size.name
+                    }
+
+                    for size in p.sizes.all()
+
+                ],
 
                 # IMAGES
                 "images": [
@@ -488,6 +499,7 @@ class ProductUpdateAPI(APIView):
             "message": "Product updated successfully"
         })
 
+
 class ProductCreateAPI(APIView):
 
     parser_classes = [MultiPartParser, FormParser]
@@ -533,6 +545,8 @@ class ProductCreateAPI(APIView):
 
             "description": product.description,
 
+            "is_featured": product.is_featured,
+
             # CATEGORY
             "category": product.category.id if product.category else "",
             "category_name": product.category.name if product.category else "",
@@ -542,13 +556,28 @@ class ProductCreateAPI(APIView):
             "type_name": product.type.name if product.type else "",
 
             # COLOR
-            "color": product.color.id if product.color else "",
-            "color_name": product.color.name if product.color else "",
+            "colors": [
+
+                {
+                    "id": c.id,
+                    "name": c.name
+                }
+
+                for c in product.colors.all()
+
+            ],
 
             # SIZE
-            "size": product.size.id if product.size else "",
-            "size_name": product.size.name if product.size else "",
+            "sizes": [
 
+                {
+                    "id": s.id,
+                    "name": s.name
+                }
+
+                for s in product.sizes.all()
+
+            ],            
             # IMAGES
             "images": [
 
@@ -563,7 +592,6 @@ class ProductCreateAPI(APIView):
 
         })
 
-
     # =========================================
     # ADD PRODUCT
     # =========================================
@@ -575,11 +603,28 @@ class ProductCreateAPI(APIView):
 
             if serializer.is_valid():
 
-                # SAVE PRODUCT
                 product = serializer.save()
 
+                # FEATURED
+                product.is_featured = (
+                    request.data.get("is_featured") == "true"
+                )
+
+                product.save()
+
+                # MULTIPLE COLORS
+                colors = request.data.getlist("colors")
+
+                if colors:
+                    product.colors.set(colors)
+
+                # MULTIPLE SIZES
+                sizes = request.data.getlist("sizes")
+
+                if sizes:
+                    product.sizes.set(sizes)
                 # SAVE IMAGES
-                images = request.FILES.getlist('images')
+                images = request.FILES.getlist("images")
 
                 for img in images:
 
@@ -588,13 +633,12 @@ class ProductCreateAPI(APIView):
                         image=img
                     )
 
-                return Response(
-                    {
-                        "success": True,
-                        "message": "Product added successfully"
-                    },
-                    status=201
-                )
+                return Response({
+
+                    "success": True,
+                    "message": "Product added successfully"
+
+                }, status=201)
 
             return Response(
                 serializer.errors,
@@ -603,11 +647,12 @@ class ProductCreateAPI(APIView):
 
         except Exception as e:
 
-            return Response(
-                {"error": str(e)},
-                status=500
-            )
+            return Response({
 
+                "success": False,
+                "message": str(e)
+
+            }, status=500)
 
     # =========================================
     # UPDATE PRODUCT
@@ -618,59 +663,134 @@ class ProductCreateAPI(APIView):
 
             product_id = request.data.get("id")
 
-            product = Product.objects.get(id=product_id)
+            product = Product.objects.get(
+                id=product_id
+            )
 
         except Product.DoesNotExist:
 
             return Response({
+
                 "success": False,
                 "message": "Product not found"
+
             }, status=404)
 
         try:
 
+            # =====================================
             # UPDATE FIELDS
-            product.name = request.data.get("name")
-            product.mrp = request.data.get("mrp")
-            product.discount = request.data.get("discount")
-            product.stock = request.data.get("stock")
-            product.description = request.data.get("description")
+            # =====================================
 
+            product.name = request.data.get(
+                "name",
+                product.name
+            )
+
+            product.mrp = request.data.get(
+                "mrp",
+                product.mrp
+            )
+
+            product.discount = request.data.get(
+                "discount",
+                product.discount
+            )
+
+            product.stock = request.data.get(
+                "stock",
+                product.stock
+            )
+
+            product.description = request.data.get(
+                "description",
+                product.description
+            )
+
+            # =====================================
+            # FEATURED
+            # =====================================
+
+            product.is_featured = (
+                request.data.get("is_featured") == "true"
+            )
+
+            # =====================================
             # CATEGORY
+            # =====================================
+
             category_id = request.data.get("category")
 
             if category_id:
                 product.category_id = category_id
 
+            # =====================================
             # TYPE
+            # =====================================
+
             type_id = request.data.get("type")
 
             if type_id:
                 product.type_id = type_id
 
-            # COLOR
-            color_id = request.data.get("color")
+            # ================================
+            # COLORS (SAFE FIX)
+            # ================================
 
-            if color_id:
-                product.color_id = color_id
+            color_ids = request.data.getlist("colors")
 
-            # SIZE
-            size_id = request.data.get("size")
+            clean_color_ids = []
 
-            if size_id:
-                product.size_id = size_id
+            for c in color_ids:
+                try:
+                    # case 1: direct id
+                    clean_color_ids.append(int(c))
+                except:
+                    try:
+                        # case 2: object came
+                        obj = json.loads(c)
+                        clean_color_ids.append(int(obj["id"]))
+                    except:
+                        pass
+
+            if clean_color_ids:
+                product.colors.set(clean_color_ids)
+
+            # ================================
+            # SIZES (SAFE FIX)
+            # ================================
+
+            size_ids = request.data.getlist("sizes")
+
+            clean_size_ids = []
+
+            for s in size_ids:
+                try:
+                    clean_size_ids.append(int(s))
+                except:
+                    try:
+                        obj = json.loads(s)
+                        clean_size_ids.append(int(obj["id"]))
+                    except:
+                        pass
+
+            if clean_size_ids:
+                product.sizes.set(clean_size_ids)
 
             product.save()
 
-            # NEW IMAGES
+            # =====================================
+            # UPDATE IMAGES
+            # =====================================
+
             images = request.FILES.getlist("images")
 
             if images:
 
-                # DELETE OLD
+                # DELETE OLD IMAGES
                 product.images.all().delete()
 
-                # ADD NEW
+                # ADD NEW IMAGES
                 for img in images:
 
                     ProductImage.objects.create(

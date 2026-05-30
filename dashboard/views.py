@@ -19,6 +19,12 @@ from dashboard.serializers import OrderSerializer
 # Dashboard View
 # ====================================
 
+from django.views.generic import TemplateView
+from django.contrib.auth.models import User
+from django.db.models import Sum
+from django.utils.timezone import now
+from datetime import timedelta
+
 class Dashboardview(TemplateView):
 
     template_name = "dashboard/index.html"
@@ -38,6 +44,83 @@ class Dashboardview(TemplateView):
         context['total_products'] = Product.objects.count()
 
         # =========================
+        # USER GROWTH
+        # =========================
+
+        current_date = now()
+
+        current_month_users = User.objects.filter(
+            date_joined__month=current_date.month,
+            date_joined__year=current_date.year
+        ).count()
+
+        first_day_current_month = current_date.replace(day=1)
+
+        last_month_date = first_day_current_month - timedelta(days=1)
+
+        last_month_users = User.objects.filter(
+            date_joined__month=last_month_date.month,
+            date_joined__year=last_month_date.year
+        ).count()
+
+        if last_month_users > 0:
+
+            user_growth = round(
+                (
+                    (
+                        current_month_users - last_month_users
+                    ) / last_month_users
+                ) * 100
+            )
+
+        else:
+
+            user_growth = 100 if current_month_users > 0 else 0
+
+        context['user_growth'] = user_growth
+
+        # =========================
+        # ORDER GROWTH
+        # =========================
+
+        current_month_orders = Order.objects.filter(
+            created_at__month=current_date.month,
+            created_at__year=current_date.year
+        ).count()
+
+        last_month_orders = Order.objects.filter(
+            created_at__month=last_month_date.month,
+            created_at__year=last_month_date.year
+        ).count()
+
+        if last_month_orders > 0:
+
+            order_growth = round(
+                (
+                    (
+                        current_month_orders - last_month_orders
+                    ) / last_month_orders
+                ) * 100
+            )
+
+        else:
+
+            order_growth = 100 if current_month_orders > 0 else 0
+
+        context['order_growth'] = order_growth
+
+        # =========================
+        # PRODUCT GROWTH
+        # =========================
+
+        current_month_products = Product.objects.filter(
+            created_at__month=current_date.month,
+            created_at__year=current_date.year
+        ).count()
+
+        context['new_products'] = current_month_products
+
+        # =========================
         # TOTAL REVENUE
         # =========================
 
@@ -48,6 +131,42 @@ class Dashboardview(TemplateView):
         )['total'] or 0
 
         context['total_revenue'] = total_revenue
+
+        # =========================
+        # REVENUE GROWTH
+        # =========================
+
+        current_month_revenue = Order.objects.filter(
+            status="Delivered",
+            created_at__month=current_date.month,
+            created_at__year=current_date.year
+        ).aggregate(
+            total=Sum('total_price')
+        )['total'] or 0
+
+        last_month_revenue = Order.objects.filter(
+            status="Delivered",
+            created_at__month=last_month_date.month,
+            created_at__year=last_month_date.year
+        ).aggregate(
+            total=Sum('total_price')
+        )['total'] or 0
+
+        if last_month_revenue > 0:
+
+            revenue_growth = round(
+                (
+                    (
+                        current_month_revenue - last_month_revenue
+                    ) / last_month_revenue
+                ) * 100
+            )
+
+        else:
+
+            revenue_growth = 100 if current_month_revenue > 0 else 0
+
+        context['revenue_growth'] = revenue_growth
 
         # =========================
         # ORDER STATUS COUNT
@@ -70,9 +189,7 @@ class Dashboardview(TemplateView):
         # =========================
 
         best_selling_products = Product.objects.annotate(
-
             total_sold=Sum('orderitem__quantity')
-
         ).order_by('-total_sold')[:10]
 
         context['best_selling_products'] = best_selling_products
@@ -744,12 +861,16 @@ class AddTypeView(View):
 
             }, status=500)
             
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import DashboardLoginSerializer
 
+
+# =========================
+# DASHBOARD LOGIN API
+# =========================
 
 class DashboardLoginAPIView(APIView):
 
@@ -777,13 +898,32 @@ class DashboardLoginAPIView(APIView):
 
             if user is not None:
 
+                # ONLY ADMIN LOGIN
+
                 if user.is_staff:
 
-                    login(request, user)
+                    # =========================
+                    # IMPORTANT
+                    # DON'T USE login(request,user)
+                    # =========================
+
+                    # CREATE SEPARATE DASHBOARD SESSION
+
+                    request.session[
+                        "dashboard_user_id"
+                    ] = user.id
+
+                    request.session[
+                        "dashboard_username"
+                    ] = user.username
+
+                    request.session[
+                        "dashboard_email"
+                    ] = user.email
 
                     return Response({
 
-                        "status":"success",
+                        "status": "success",
 
                         "message":
                         "Dashboard Login Successful"
@@ -792,7 +932,7 @@ class DashboardLoginAPIView(APIView):
 
                 return Response({
 
-                    "status":"error",
+                    "status": "error",
 
                     "message":
                     "You are not admin"
@@ -801,7 +941,7 @@ class DashboardLoginAPIView(APIView):
 
             return Response({
 
-                "status":"error",
+                "status": "error",
 
                 "message":
                 "Invalid Username or Password"
@@ -810,26 +950,44 @@ class DashboardLoginAPIView(APIView):
 
         return Response({
 
-            "status":"error",
+            "status": "error",
 
-            "errors":serializer.errors
+            "errors": serializer.errors
 
         },
         status=status.HTTP_400_BAD_REQUEST)
-        
-from django.contrib.auth import logout
 
+
+# =========================
+# DASHBOARD LOGOUT API
+# =========================
 
 class DashboardLogoutAPIView(APIView):
 
     def post(self, request):
 
-        logout(request)
+        # REMOVE ONLY DASHBOARD SESSION
+
+        request.session.pop(
+            "dashboard_user_id",
+            None
+        )
+
+        request.session.pop(
+            "dashboard_username",
+            None
+        )
+
+        request.session.pop(
+            "dashboard_email",
+            None
+        )
 
         return Response({
 
-            "status":"success",
+            "status": "success",
 
-            "message":"Logout Successful"
+            "message":
+            "Dashboard Logout Successful"
 
         })

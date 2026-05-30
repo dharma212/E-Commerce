@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <div class="orders-section">
     <div class="orders-wrapper">
         
@@ -183,9 +184,18 @@
                                     <i class="fa fa-eye"></i> Details
 
                                 </a>
-                                <a href="#" class="action-btn-checkout btn-checkout-secondary" title="Download System Document">
-                                    <i class="fa fa-file-invoice-dollar"></i> Invoice
-                                </a>
+                                {% if order.status == "Delivered" %}
+
+<a href="{% url 'invoice' order.id %}"
+   class="action-btn-checkout btn-checkout-secondary">
+
+    <i class="fa fa-file-invoice-dollar"></i>
+
+    Download Invoice
+
+</a>
+
+{% endif %}
 
                                 {% if order.status == "Pending" %}
                                 <a href="#" class="action-btn-checkout btn-checkout-primary">
