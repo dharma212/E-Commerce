@@ -12,176 +12,86 @@
             {% csrf_token %}
       <div class="row g-4">
 
-        <!-- NAME -->
         <div class="col-md-6">
             <label>Product Name</label>
             <input type="text" id="name" class="form-control" placeholder="Enter Product Name">
             <small class="error-text" id="error-name"></small>
         </div>
 
-        <!-- COLOR -->
-<!-- COLOR -->
-<div class="col-md-3 position-relative">
-
-    <label>Color</label>
-
-    <input type="text"
-           id="colorInput"
-           class="form-control"
-           placeholder="Search Color">
-
-    <input type="hidden" id="color">
-
-    <div id="colorResult" class="search-result-box">
-
-        {% for color in colors %}
-
-        <div class="search-item"
-             data-id="{{ color.id }}"
-             data-name="{{ color.name|lower }}">
-
-            {{ color.name }}
-
+        <div class="col-md-3 position-relative">
+            <label>Color</label>
+            <input type="text" id="colorInput" class="form-control" placeholder="Search Color">
+            <input type="hidden" id="color">
+            <div id="colorResult" class="search-result-box">
+                {% for color in colors %}
+                <div class="search-item" data-id="{{ color.id }}" data-name="{{ color.name|lower }}">
+                    {{ color.name }}
+                </div>
+                {% endfor %}
+                <div class="search-add-more" data-type="color">
+                    + Add New Color
+                </div>
+            </div>
+            <small class="error-text" id="error-color"></small>
         </div>
 
-        {% endfor %}
-
-        <!-- ADD NEW -->
-        <div class="search-add-more"
-             data-type="color">
-
-            + Add New Color
-
+        <div class="col-md-3 position-relative">
+            <label>Size</label>
+            <input type="text" id="sizeInput" class="form-control" placeholder="Search Size">
+            <input type="hidden" id="size">
+            <div id="sizeResult" class="search-result-box">
+                {% for size in sizes %}
+                <div class="search-item" data-id="{{ size.id }}" data-name="{{ size.name|lower }}">
+                    {{ size.name }}
+                </div>
+                {% endfor %}
+                <div class="search-add-more" data-type="size">
+                    + Add New Size
+                </div>
+            </div>
+            <small class="error-text" id="error-size"></small>
         </div>
 
-    </div>
-
-    <small class="error-text" id="error-color"></small>
-
-</div>
-
-
-
-<!-- SIZE -->
-<div class="col-md-3 position-relative">
-
-    <label>Size</label>
-
-    <input type="text"
-           id="sizeInput"
-           class="form-control"
-           placeholder="Search Size">
-
-    <input type="hidden" id="size">
-
-    <div id="sizeResult" class="search-result-box">
-
-        {% for size in sizes %}
-
-        <div class="search-item"
-             data-id="{{ size.id }}"
-             data-name="{{ size.name|lower }}">
-
-            {{ size.name }}
-
+        <div class="col-md-3 position-relative">
+            <label>Category</label>
+            <input type="text" id="categoryInput" class="form-control" placeholder="Search Category">
+            <input type="hidden" id="category">
+            <div id="categoryResult" class="search-result-box">
+                <div class="search-add-more" onclick="openAddModal('category')">
+                    + Add More Category
+                </div>
+            </div>
+            <small class="error-text" id="error-category"></small>
         </div>
 
-        {% endfor %}
-
-        <!-- ADD NEW -->
-        <div class="search-add-more"
-             data-type="size">
-
-            + Add New Size
-
+        <div class="col-md-3 position-relative">
+            <label>Type</label>
+            <input type="text" id="typeInput" class="form-control" placeholder="Search Type">
+            <input type="hidden" id="type">
+            <div id="typeResult" class="search-result-box">
+                <div class="search-add-more" onclick="openAddModal('type')">
+                    + Add More Type
+                </div>
+            </div>
+            <small class="error-text" id="error-type"></small>
         </div>
 
-    </div>
-
-    <small class="error-text" id="error-size"></small>
-
-</div>
-
-
-
-<!-- CATEGORY -->
-<div class="col-md-3 position-relative">
-
-    <label>Category</label>
-
-    <input type="text"
-           id="categoryInput"
-           class="form-control"
-           placeholder="Search Category">
-
-    <input type="hidden" id="category">
-
-    <div id="categoryResult" class="search-result-box">
-
-        <!-- JS DATA -->
-
-        <div class="search-add-more"
-             onclick="openAddModal('category')">
-
-            + Add More Category
-
-        </div>
-
-    </div>
-
-    <small class="error-text" id="error-category"></small>
-
-</div>
-
-
-
-<!-- TYPE -->
-<div class="col-md-3 position-relative">
-
-    <label>Type</label>
-
-    <input type="text"
-           id="typeInput"
-           class="form-control"
-           placeholder="Search Type">
-
-    <input type="hidden" id="type">
-
-    <div id="typeResult" class="search-result-box">
-
-        <div class="search-add-more"
-             onclick="openAddModal('type')">
-
-            + Add More Type
-
-        </div>
-
-    </div>
-
-    <small class="error-text" id="error-type"></small>
-
-</div>
-
-        <!-- MRP -->
         <div class="col-md-6">
             <label>MRP (Original Price)</label>
             <input type="number" id="mrp" class="form-control" placeholder="Enter MRP">
             <small class="error-text" id="error-mrp"></small>
         </div>
 
-        <!-- FINAL PRICE -->
         <div class="col-md-6">
             <label>Final Price</label>
             <input type="text" id="final_price" class="form-control" readonly>
         </div>
 
-        <!-- DISCOUNT % -->
         <div class="col-md-6">
             <label>Discount %</label>
             <input type="text" id="discount_percent" class="form-control" readonly>
         </div>
 
-        <!-- STOCK -->
         <div class="col-md-6">
             <label>Stock</label>
             <input type="number" id="stock" class="form-control" placeholder="Enter Stock">
@@ -194,46 +104,62 @@
             <small class="error-text" id="error-discount"></small>
         </div>
 
-        <!-- DESCRIPTION -->
         <div class="col-md-12">
             <label>Description</label>
             <textarea id="description" class="form-control" rows="3" placeholder="Enter Description..........."></textarea>
             <small class="error-text" id="error-description"></small>
         </div>
 
-        <!-- IMAGE SECTION -->
-            <div class="col-md-12">
-            <label>Product Images (Max 5)</label>
+        <div class="row mb-3 mt-3">
+            <div class="col-md-6">
+                <label>Image Color</label>
+                <select id="imageColor" class="form-control">
+                    <option value="">Select Color</option>
+                    {% for color in colors %}
+                    <option value="{{ color.id }}">{{ color.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
+            <div class="col-md-6">
+                <label>Image Size</label>
+                <select id="imageSize" class="form-control">
+                    <option value="">Select Size</option>
+                    {% for size in sizes %}
+                    <option value="{{ size.id }}">{{ size.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <label>Product Images</label>
             <div class="image-upload-box">
                 <input type="file" id="imageInput" multiple>
                 <p>Click or Drag Images Here</p>
             </div>
             <small class="error-text" id="error-imageInput"></small>
-
             <div id="previewContainer" class="image-grid mt-3"></div>
-            </div>
-            <!-- FEATURED PRODUCT -->
-            <div class="col-md-6 d-flex align-items-center">
-                <div class="form-check mt-4">
-                    <input class="form-check-input" type="checkbox" id="is_featured">
-                    <label class="form-check-label fw-bold" for="is_featured">
-                        Featured Product
-                    </label>
-                </div>
-            </div>
-            <!-- BUTTON -->
-            <div class="col-md-12">
-                <button type="button" id="submitBtn" class="btn btn-primary">Add Product</button>
-            </div>
-
         </div>
 
+        <div class="col-md-6 d-flex align-items-center">
+            <div class="form-check mt-4">
+                <input class="form-check-input" type="checkbox" id="is_featured">
+                <label class="form-check-label fw-bold" for="is_featured">
+                    Featured Product
+                </label>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <button type="button" id="submitBtn" class="btn btn-primary">Add Product</button>
+        </div>
+
+      </div>
     </form>
-
   </div>
-
 </div>
+
 <style>
 .search-result-box{
     position: absolute;
@@ -249,17 +175,14 @@
     display: none;
     border-radius: 0 0 8px 8px;
 }
-
 .search-item{
     padding: 10px 15px;
     cursor: pointer;
     border-bottom: 1px solid #f1f1f1;
 }
-
 .search-item:hover{
     background: #f5f5f5;
 }
-
 .search-add-more{
     padding: 12px;
     background: #f8f9fa;
@@ -267,7 +190,6 @@
     font-weight: 600;
     cursor: pointer;
 }
-
 .search-add-more:hover{
     background: #f1f1f1;
 }

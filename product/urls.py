@@ -21,7 +21,7 @@ urlpatterns = [
     ),
 
     path(
-        'product/<int:id>/',
+        'product/<slug:slug>/',
         ProductDetailView.as_view(),
         name='product_detail'
     ),

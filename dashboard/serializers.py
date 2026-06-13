@@ -49,21 +49,14 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
 
-    user_name = serializers.CharField(
-        source='user.username'
-    )
+    user_name = serializers.CharField(source='user.username')
+    address = serializers.CharField(source='address.address', default='')
 
-    address = serializers.CharField(
-        source='address.address',
-        default=''
-    )
-
+    rating = serializers.SerializerMethodField()
     items = serializers.SerializerMethodField()
 
     class Meta:
-
         model = Order
-
         fields = [
             'id',
             'user_name',
@@ -71,15 +64,19 @@ class OrderSerializer(serializers.ModelSerializer):
             'total_price',
             'status',
             'created_at',
+            'rating',
             'items'
         ]
 
-    def get_items(self, obj):
+    def get_rating(self, obj):
+        review = getattr(obj, 'review', None)
+        if review:
+            return review.rating
+        return None
 
-        serializer = OrderItemSerializer(
+    def get_items(self, obj):
+        return OrderItemSerializer(
             obj.items.all(),
             many=True,
             context=self.context
-        )
-
-        return serializer.data
+        ).data

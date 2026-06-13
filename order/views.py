@@ -13,7 +13,8 @@ class checkoutview(LoginRequiredMixin, TemplateView):
         
         buy_now_id = self.request.GET.get('buy_now')
         buy_now_qty = self.request.GET.get('qty')
-
+        buy_now_color = self.request.GET.get('color')
+        buy_now_size = self.request.GET.get('size')
         if buy_now_id:
             product = get_object_or_404(Product, id=buy_now_id)
             qty = int(buy_now_qty) if buy_now_qty else 1
@@ -22,10 +23,14 @@ class checkoutview(LoginRequiredMixin, TemplateView):
             context["cart_items"] = [{
                 'product': product,
                 'quantity': qty,
+                'color': buy_now_color,
+                'size': buy_now_size,
                 'total_price': subtotal
             }]
             context["buy_now_id"] = buy_now_id
             context["buy_now_qty"] = qty
+            context["buy_now_color"] = buy_now_color
+            context["buy_now_size"] = buy_now_size
         else:
             cart, _ = Cart.objects.get_or_create(user=user)
             cart_items = CartItem.objects.filter(cart=cart).select_related("product")
@@ -51,6 +56,8 @@ class checkoutview(LoginRequiredMixin, TemplateView):
         user = request.user
         buy_now_id = request.POST.get("buy_now_id")
         buy_now_qty = request.POST.get("buy_now_qty")
+        buy_now_color = request.POST.get("buy_now_color")
+        buy_now_size = request.POST.get("buy_now_size")
         payment_method = request.POST.get("payment")
         selected_address_id = request.POST.get("selected_address") 
 
@@ -85,7 +92,9 @@ class checkoutview(LoginRequiredMixin, TemplateView):
                 order=order,
                 product=product,
                 quantity=qty,
-                price=product.final_price()
+                price=product.final_price(),
+                color=buy_now_color,
+                size=buy_now_size
             )
 
             # MINUS STOCK
@@ -126,7 +135,9 @@ class checkoutview(LoginRequiredMixin, TemplateView):
                     order=order,
                     product=item.product,
                     quantity=item.quantity,
-                    price=item.product.final_price()
+                    price=item.product.final_price(),
+                    color=item.color,
+                    size=item.size
                 )
 
                 # MINUS STOCK
@@ -158,7 +169,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 class OrderDetailView(LoginRequiredMixin, DetailView):
     model = Order
-    template_name = "order_details.html"
+    template_name = "order_detail.html"
     context_object_name = "order"
 
     def get_object(self):
@@ -227,3 +238,146 @@ class InvoiceView(View):
         
         pisa.CreatePDF(html, dest=response)
         return response
+    
+# views.py
+
+from django.views import View
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
+
+
+
+class AddReviewView(View):
+
+    def post(self, request, pk):
+
+        if not request.user.is_authenticated:
+            return redirect('login')
+
+        order = get_object_or_404(
+            Order,
+            pk=pk,
+            user=request.user
+        )
+
+        # Only Delivered Orders
+        if order.status != "Delivered":
+            messages.error(
+                request,
+                "Review can only be added after delivery."
+            )
+            return redirect('order_details', pk=order.id)
+
+        # Already Reviewed
+        if hasattr(order, 'review'):
+            messages.error(
+                request,
+                "You have already reviewed this order."
+            )
+            return redirect('order_details', pk=order.id)
+
+        rating = request.POST.get('rating')
+        description = request.POST.get('description')
+
+        if not rating:
+            messages.error(
+                request,
+                "Please select rating."
+            )
+            return redirect('order_details', pk=order.id)
+
+        Review.objects.create(
+            order=order,
+            user=request.user,
+            rating=int(rating),
+            description=description
+        )
+
+        messages.success(
+            request,
+            "Review submitted successfully."
+        )
+
+        return redirect('order_details', pk=order.id)
+    
+from django.views import View
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+# views.py
+
+class ReOrderView(LoginRequiredMixin, View):
+
+    def post(self, request, pk):
+        order = get_object_or_404(
+            Order,
+            pk=pk,
+            user=request.user
+        )
+
+        cart, created = Cart.objects.get_or_create(
+            user=request.user
+        )
+
+        # Re-order કરતી વખતે જો જૂનું કાર્ટ ખાલી કરવું હોય તો નીચેની લાઇન અન-કમેન્ટ કરો:
+        # CartItem.objects.filter(cart=cart).delete()
+
+        for item in order.items.all():
+            cart_item = CartItem.objects.filter(
+                cart=cart,
+                product=item.product,
+                color=item.color,
+                size=item.size
+            ).first()
+
+            if cart_item:
+                cart_item.quantity += item.quantity
+                cart_item.save()
+            else:
+                CartItem.objects.create(
+                    cart=cart,
+                    product=item.product,
+                    quantity=item.quantity,
+                    color=item.color,
+                    size=item.size
+                )
+
+        messages.success(
+            request,
+            "Items prepared for re-order."
+        )
+
+        # કાર્ટમાં મોકલવાને બદલે સીધું જ CHECKOUT વ્યુ પર મોકલો!
+        return redirect("checkout") # તમારી url pattern નું નામ 'checkout' હોવું જોઈએ
+
+
+class CancelOrderView(LoginRequiredMixin, View):
+
+    def post(self, request, pk):
+        order = get_object_or_404(
+            Order,
+            pk=pk,
+            user=request.user
+        )
+
+        reason = request.POST.get("cancel_reason")
+        other_reason = request.POST.get("other_reason")
+
+        # જો યુઝરે રેડિયો બટનમાં "Other" સિલેક્ટ કર્યું હોય તો ટેક્સ્ટ બોક્સની વેલ્યુ લો
+        if reason == "Other":
+            reason = other_reason
+
+        order.status = "Cancelled"
+        order.cancel_reason = reason
+        order.save()
+
+        messages.success(
+            request,
+            "Order cancelled successfully."
+        )
+
+        return redirect(
+            "order_details", # તમારા ઓર્ડર ડિટેલના url નેમ મુજબ રાખવું (pk=order.id સાથે)
+            pk=order.id
+        )

@@ -223,23 +223,59 @@ class ShopView(TemplateView):
         return self.render_to_response(context)
 
 
+from django.views import View
+from django.shortcuts import get_object_or_404, render
+from django.db.models import Avg, Count
+
 class ProductDetailView(View):
 
-    def get(self, request, id):
+    def get(self, request, slug):
 
         # =========================
         # PRODUCT
         # =========================
-
         product = get_object_or_404(
             Product,
-            id=id
+            slug=slug
         )
+        
+        reviews = Review.objects.filter(
+            order__items__product=product
+        ).select_related("user").distinct().order_by("-created_at")
+
+        avg_rating = reviews.aggregate(
+            Avg('rating')
+        )['rating__avg'] or 0
+
+        avg_rating = round(avg_rating, 1)
+
+        total_reviews = reviews.count()
+        
+        rating_breakdown = {
+            5: reviews.filter(rating=5).count(),
+            4: reviews.filter(rating=4).count(),
+            3: reviews.filter(rating=3).count(),
+            2: reviews.filter(rating=2).count(),
+            1: reviews.filter(rating=1).count(),
+        }
+
+        # ====================================
+        # PREVIOUS AND NEXT PRODUCT NAVIGATION
+        # ====================================
+        category_products = Product.objects.filter(category=product.category)
+        
+        previous_product = category_products.filter(
+            created_at__lt=product.created_at
+        ).order_by('-created_at').first()
+        
+        next_product = category_products.filter(
+            created_at__gt=product.created_at
+        ).order_by('created_at').first()
 
         # =========================
-        # RELATED PRODUCTS
+        # RELATED PRODUCTS (Fixed Query Path)
         # =========================
-
+        # This isolates related items safely without trying to look up missing 'order' paths
         related_products = Product.objects.filter(
             category=product.category
         ).exclude(
@@ -249,115 +285,89 @@ class ProductDetailView(View):
         # =========================
         # DEFAULT VALUES
         # =========================
-
         in_cart = False
-
         in_wishlist = False
-
         cart_quantity = 1
-
         cart_product_ids = []
-
         wishlist_product_ids = []
 
         # =========================
         # LOGIN USER
         # =========================
-
         if request.user.is_authenticated:
 
             # =========================
             # CART ITEM
             # =========================
-
             cart_item = CartItem.objects.filter(
-
                 cart__user=request.user,
-
                 product=product
-
             ).first()
 
-            # PRODUCT IN CART
             if cart_item:
-
                 in_cart = True
-
                 cart_quantity = cart_item.quantity
 
             # =========================
             # ALL CART PRODUCTS
             # =========================
-
             cart_product_ids = list(
-
                 CartItem.objects.filter(
-
                     cart__user=request.user
-
                 ).values_list(
-
                     "product_id",
-
                     flat=True
-
                 )
-
             )
 
             # =========================
             # WISHLIST PRODUCTS
             # =========================
-
             wishlist_product_ids = list(
-
                 Wishlist.objects.filter(
-
                     user=request.user
-
                 ).values_list(
-
                     "product_id",
-
                     flat=True
-
                 )
-
             )
 
-            # PRODUCT IN WISHLIST
             in_wishlist = product.id in wishlist_product_ids
 
         # =========================
         # CONTEXT
         # =========================
+        color_images = {}
+
+        for img in product.images.all():
+            color = getattr(img.color, "name", "").lower()
+
+            if color not in color_images:
+                color_images[color] = []
+
+            color_images[color].append(img.image.url)
 
         context = {
-
             "product": product,
-
+            "previous_product": previous_product,
+            "next_product": next_product,
             "related_products": related_products,
-
             "in_cart": in_cart,
-
             "in_wishlist": in_wishlist,
-
             "cart_quantity": cart_quantity,
-
             "cart_product_ids": cart_product_ids,
-
-            "wishlist_product_ids": wishlist_product_ids
-
+            "wishlist_product_ids": wishlist_product_ids,
+            "reviews": reviews,
+            "avg_rating": avg_rating,
+            "total_reviews": total_reviews,
+            "rating_breakdown": rating_breakdown,
+            "color_images": color_images
         }
 
         return render(
-
             request,
-
             "detail.html",
-
             context
-
         )
 
 class ProductListAPI(APIView):
@@ -595,63 +605,55 @@ class ProductCreateAPI(APIView):
     # =========================================
     # ADD PRODUCT
     # =========================================
+
     def post(self, request):
-
         try:
-
             serializer = ProductSerializer(data=request.data)
-
             if serializer.is_valid():
-
                 product = serializer.save()
 
                 # FEATURED
-                product.is_featured = (
-                    request.data.get("is_featured") == "true"
-                )
-
+                product.is_featured = (request.data.get("is_featured") == "true")
                 product.save()
 
                 # MULTIPLE COLORS
                 colors = request.data.getlist("colors")
-
                 if colors:
                     product.colors.set(colors)
 
                 # MULTIPLE SIZES
                 sizes = request.data.getlist("sizes")
-
                 if sizes:
                     product.sizes.set(sizes)
-                # SAVE IMAGES
-                images = request.FILES.getlist("images")
 
-                for img in images:
+                images = request.FILES.getlist("images")
+                image_colors = request.data.getlist("image_colors")  
+                image_sizes = request.data.getlist("image_sizes")    
+
+                for index, img in enumerate(images):
+                    img_color_id = image_colors[index] if index < len(image_colors) else None
+                    img_size_id = image_sizes[index] if index < len(image_sizes) else None
+                    if img_color_id == "" or img_color_id == "null": img_color_id = None
+                    if img_size_id == "" or img_size_id == "null": img_size_id = None
 
                     ProductImage.objects.create(
                         product=product,
-                        image=img
+                        image=img,
+                        color_id=img_color_id,  
+                        size_id=img_size_id     
                     )
 
                 return Response({
-
                     "success": True,
                     "message": "Product added successfully"
-
                 }, status=201)
 
-            return Response(
-                serializer.errors,
-                status=400
-            )
+            return Response(serializer.errors, status=400)
 
         except Exception as e:
-
             return Response({
-
                 "success": False,
                 "message": str(e)
-
             }, status=500)
 
     # =========================================
@@ -660,94 +662,54 @@ class ProductCreateAPI(APIView):
     def patch(self, request):
 
         try:
-
             product_id = request.data.get("id")
-
-            product = Product.objects.get(
-                id=product_id
-            )
+            product = Product.objects.get(id=product_id)
 
         except Product.DoesNotExist:
-
             return Response({
-
                 "success": False,
                 "message": "Product not found"
-
             }, status=404)
 
         try:
-
             # =====================================
             # UPDATE FIELDS
             # =====================================
-
-            product.name = request.data.get(
-                "name",
-                product.name
-            )
-
-            product.mrp = request.data.get(
-                "mrp",
-                product.mrp
-            )
-
-            product.discount = request.data.get(
-                "discount",
-                product.discount
-            )
-
-            product.stock = request.data.get(
-                "stock",
-                product.stock
-            )
-
-            product.description = request.data.get(
-                "description",
-                product.description
-            )
+            product.name = request.data.get("name", product.name)
+            product.mrp = request.data.get("mrp", product.mrp)
+            product.discount = request.data.get("discount", product.discount)
+            product.stock = request.data.get("stock", product.stock)
+            product.description = request.data.get("description", product.description)
 
             # =====================================
             # FEATURED
             # =====================================
-
-            product.is_featured = (
-                request.data.get("is_featured") == "true"
-            )
+            product.is_featured = (request.data.get("is_featured") == "true")
 
             # =====================================
             # CATEGORY
             # =====================================
-
             category_id = request.data.get("category")
-
             if category_id:
                 product.category_id = category_id
 
             # =====================================
             # TYPE
             # =====================================
-
             type_id = request.data.get("type")
-
             if type_id:
                 product.type_id = type_id
 
             # ================================
             # COLORS (SAFE FIX)
             # ================================
-
             color_ids = request.data.getlist("colors")
-
             clean_color_ids = []
-
             for c in color_ids:
                 try:
-                    # case 1: direct id
                     clean_color_ids.append(int(c))
                 except:
                     try:
-                        # case 2: object came
                         obj = json.loads(c)
                         clean_color_ids.append(int(obj["id"]))
                     except:
@@ -759,11 +721,8 @@ class ProductCreateAPI(APIView):
             # ================================
             # SIZES (SAFE FIX)
             # ================================
-
             size_ids = request.data.getlist("sizes")
-
             clean_size_ids = []
-
             for s in size_ids:
                 try:
                     clean_size_ids.append(int(s))
@@ -780,38 +739,39 @@ class ProductCreateAPI(APIView):
             product.save()
 
             # =====================================
-            # UPDATE IMAGES
+            # UPDATE IMAGES WITH COLOR & SIZE (FIXED)
             # =====================================
-
             images = request.FILES.getlist("images")
+            
+            image_colors = request.data.getlist("image_colors")  
+            image_sizes = request.data.getlist("image_sizes")    
 
             if images:
-
-                # DELETE OLD IMAGES
                 product.images.all().delete()
 
-                # ADD NEW IMAGES
-                for img in images:
+                for index, img in enumerate(images):
+                    img_color_id = image_colors[index] if index < len(image_colors) else None
+                    img_size_id = image_sizes[index] if index < len(image_sizes) else None
+                    
+                    if img_color_id == "" or img_color_id == "null": img_color_id = None
+                    if img_size_id == "" or img_size_id == "null": img_size_id = None
 
                     ProductImage.objects.create(
                         product=product,
-                        image=img
+                        image=img,
+                        color_id=img_color_id,   
+                        size_id=img_size_id      
                     )
 
             return Response({
-
                 "success": True,
                 "message": "Product updated successfully"
-
             })
 
         except Exception as e:
-
             return Response({
-
                 "success": False,
                 "message": str(e)
-
             }, status=500)
 
 class detailview(TemplateView):
@@ -902,7 +862,7 @@ class BuyNowAPI(View):
         product_id = request.POST.get("product_id")
         quantity = int(request.POST.get("quantity", 1))
 
-        product = get_object_or_404(Product, id=product_id)
+        product = get_object_or_404(Product, slug=product_id)
 
         cart, created = Cart.objects.get_or_create(user=request.user)
 

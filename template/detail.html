@@ -9,7 +9,7 @@
             <nav class="breadcrumb bg-light mb-30">
                 <a class="breadcrumb-item text-dark" href="/">Home</a>
                 <a class="breadcrumb-item text-dark" href="/shop/">Shop</a>
-                <span class="breadcrumb-item active">{{ product.name }}</span>
+                <span class="breadcrumb-item active">{{ product.name |truncatechars:40 }}</span>
             </nav>
         </div>
     </div>
@@ -19,524 +19,549 @@
 <div class="container-fluid pb-5">
     <div class="row px-xl-5">
 
-<!-- PRODUCT IMAGES -->
-<div class="col-lg-5 mb-30">
+        <!-- PRODUCT IMAGES -->
+        <div class="col-lg-5 mb-30">
+            <div class="bg-light p-3 image-gallery-box sticky-product-gallery">
 
-    <div class="bg-light p-3 image-gallery-box">
+                <!-- BIG IMAGE BOX -->
+                <div class="main-image-box">
+                    <!-- PREVIOUS BUTTON -->
+                    <button class="gallery-btn prev-btn" onclick="previousImage()">
+                        <i class="fa fa-angle-left"></i>
+                    </button>
 
-        <!-- BIG IMAGE BOX -->
-        <div class="main-image-box">
+                    <!-- BIG IMAGE -->
+                    {% if product.images.first %}
+                    <img id="mainProductImage"
+                         src="{{ product.images.first.image.url }}"
+                         class="main-product-image"
+                         alt="{{ product.name }}">
+                    {% else %}
+                    <img id="mainProductImage"
+                         src="{% static 'img/no-image.png' %}"
+                         class="main-product-image">
+                    {% endif %}
 
-            <!-- PREVIOUS BUTTON -->
-            <button class="gallery-btn prev-btn" onclick="previousImage()">
-                <i class="fa fa-angle-left"></i>
-            </button>
+                    <!-- NEXT BUTTON -->
+                    <button class="gallery-btn next-btn" onclick="nextImage()">
+                        <i class="fa fa-angle-right"></i>
+                    </button>
+                </div>
 
-            <!-- BIG IMAGE -->
-            {% if product.images.first %}
+                <!-- SMALL IMAGES -->
+                <!-- SMALL IMAGES CONTAINER WITH SCROLL ONLY BUTTONS -->
+<div class="small-images-container mt-3">
+    <button class="thumb-nav-btn prev-thumb-btn" type="button" onclick="scrollThumbnails('left')">
+        <i class="fa fa-angle-left"></i>
+    </button>
 
-            <img id="mainProductImage"
-                 src="{{ product.images.first.image.url }}"
-                 class="main-product-image"
+    <!-- THUMBNAIL SCROLL TRACK -->
+    <div class="thumbnail-scroll-track" id="thumbScrollTrack">
+        {% with first_color=product.colors.first.name %}
+        {% for image in product.images.all %}
+        <div class="small-image-wrapper thumb-wrapper" 
+             data-thumb-color="{{ image.color.name|lower }}"
+             style="{% if image.color.name != first_color %}display: none;{% endif %}">
+            
+            <img src="{{ image.image.url }}"
+                 class="small-product-image {% if forloop.first %}active-thumb{% endif %}"
+                 data-color="{{ image.color.name|lower }}"
+                 onclick="changeMainImage(this)"
                  alt="{{ product.name }}">
-
-            {% else %}
-
-            <img id="mainProductImage"
-                 src="{% static 'img/no-image.png' %}"
-                 class="main-product-image">
-
-            {% endif %}
-
-            <!-- NEXT BUTTON -->
-            <button class="gallery-btn next-btn" onclick="nextImage()">
-                <i class="fa fa-angle-right"></i>
-            </button>
-
         </div>
-
-        <!-- SMALL IMAGES -->
-        <div class="small-images-container mt-3">
-
-            {% for image in product.images.all %}
-
-            <div class="small-image-wrapper">
-
-                <img src="{{ image.image.url }}"
-                     class="small-product-image {% if forloop.first %}active-thumb{% endif %}"
-                     onclick="changeMainImage(this, {{ forloop.counter0 }})"
-                     alt="{{ product.name }}">
-
-            </div>
-
-            {% empty %}
-
-            <div class="small-image-wrapper">
-
-                <img src="{% static 'img/no-image.png' %}"
-                     class="small-product-image active-thumb">
-
-            </div>
-
-            {% endfor %}
-
-        </div>
-
+        {% endfor %}
+        {% endwith %}
     </div>
 
+    <button class="thumb-nav-btn next-thumb-btn" type="button" onclick="scrollThumbnails('right')">
+        <i class="fa fa-angle-right"></i>
+    </button>
 </div>
+
+                <div class="image-action-buttons mt-3">
+                    <div class="row mx-n1">
+                        <div class="col-6 px-1">
+                            {% if in_cart %}
+                            <a href="{% url 'cart' %}" class="btn btn-success btn-block py-3 font-weight-bold">
+                                <i class="fa fa-check mr-2"></i> Go To Cart
+                            </a>
+                            {% else %}
+                            <button class="btn btn-primary btn-block py-3 font-weight-bold add-to-cart" data-id="{{ product.id }}">
+                                <i class="fa fa-shopping-cart mr-2"></i> Add To Cart
+                            </button>
+                            {% endif %}
+                        </div>
+                        <div class="col-6 px-1">
+                            <button class="btn btn-dark btn-block py-3 font-weight-bold buy-now"
+                                    data-id="{{ product.id }}"
+                                    {% if product.stock <= 0 %}disabled{% endif %}>
+                                <i class="fa fa-bolt text-warning mr-2"></i> Buy Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- PRODUCT INFO -->
-    <div class="col-lg-7 h-auto mb-30">
-    <div class="h-100 bg-white p-40 shadow-sm border-radius-10" style="background-color: #ffffff !important;">
-        {% csrf_token %}
+        <div class="col-lg-7 h-auto mb-30">
+            <div class="h-100 bg-white p-40 shadow-sm border-radius-10" style="background-color: #ffffff !important;">
+                {% csrf_token %}
 
-        <!-- Product Name & Share Button -->
-        <div class="d-flex justify-content-between align-items-start mb-2">
-            <h2 class="font-weight-bold mb-0" style="color: #212529 !important; font-family: 'Poppins', sans-serif;">{{ product.name }}</h2>
-            <button class="btn btn-light btn-sm rounded-circle shadow-sm text-muted" title="Share Product" style="width: 40px; height: 40px; background-color: #f8f9fa !important;">
-                <i class="fas fa-share-alt" style="color: #6c757d !important;"></i>
-            </button>
-        </div>
+                <!-- Product Name & Share Button -->
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h2 class="font-weight-bold mb-0"
+                        style="color: #212529 !important; font-size: 20px;">
 
-        <!-- Ratings & Reviews -->
-        <div class="d-flex align-items-center mb-3">
-            <div class="text-warning mr-2">
-                <small class="fas fa-star"></small>
-                <small class="fas fa-star"></small>
-                <small class="fas fa-star"></small>
-                <small class="fas fa-star"></small>
-                <small class="far fa-star text-muted"></small>
-            </div>
-            <small class="border-left pl-3" style="color: #6c757d !important; font-weight: 500;">(99 Verified Reviews)</small>
-        </div>
+                        {% if product.name|length > 90 %}
+                            <span class="short-name">
+                                {{ product.name|slice:":90" }}...
+                            </span>
 
-        <hr class="my-3" style="border-top: 1px solid #eeeeee;">
+                            <span class="full-name" style="display:none;">
+                                {{ product.name }}
+                            </span>
 
-        <!-- Price Section -->
-        <div class="mb-3">
-            {% if product.mrp > 0 %}
-            <div class="d-flex align-items-baseline flex-wrap">
-                <h2 class="font-weight-bold text-primary mb-0" style="color: #007bff !important;">₹{{ product.final_price }}</h2>
-                <h4 class="ml-3 mb-0" style="color: #adb5bd !important;"><del>₹{{ product.mrp }}</del></h4>
-                <span class="badge badge-soft-success ml-3 px-3 py-2" style="background-color: #e2f6ed !important; color: #155724 !important; font-weight: 600;">
-                    <i class="fa fa-arrow-down mr-1"></i> {{ product.discount_percent }}% OFF
-                </span>
-            </div>
-            {% else %}
-            <h2 class="font-weight-bold text-primary" style="color: #007bff !important;">₹{{ product.price }}</h2>
-            {% endif %}
-            <small class="font-weight-bold mt-1 d-block" style="color: #28a745 !important;">Inclusive of all taxes</small>
-        </div>
+                            <a href="javascript:void(0)"
+                            class="view-more-name text-primary font-weight-bold"
+                            style="font-size:14px;">
+                                View More
+                            </a>
+                        {% else %}
+                            {{ product.name }}
+                        {% endif %}
 
-        <!-- Stock Urgency Indicator -->
-        {% if product.stock > 0 and product.stock <= 5 %}
-        <div class="mb-3">
-            <small class="text-danger font-weight-bold d-block mb-1">
-                <i class="fas fa-exclamation-triangle mr-1"></i> Hurry up! Only {{ product.stock }} items left in stock.
-            </small>
-            <div class="progress" style="height: 6px; border-radius: 10px; background-color: #f8d7da;">
-                <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar" style="width: 30%"></div>
-            </div>
-        </div>
-        {% endif %}
+                    </h2>
+                    <div class="custom-nav-group mr-2" role="group" aria-label="Product Navigation">
+                        {% if previous_product %}
+                        <a href="{% url 'product_detail' previous_product.slug %}" 
+                        class="btn custom-nav-circle-btn" 
+                        title="Previous: {{ previous_product.name | truncatechars:30 }}">
+                            <i class="fa fa-angle-left"></i>
+                        </a>
+                        {% else %}
+                        <button class="btn custom-nav-circle-btn" disabled>
+                            <i class="fa fa-angle-left"></i>
+                        </button>
+                        {% endif %}
 
-        <!-- Offers & Coupons Box -->
-        <div class="p-3 mb-4 rounded border shadow-sm" style="background-color: #fcfaff !important; border-color: #d6bbfb !important;">
-            <h6 class="font-weight-bold mb-2" style="color: #4b10a9 !important;"><i class="fas fa-percentage mr-2"></i> Available Offers</h6>
-            <ul class="list-unstyled mb-0 small pl-1">
-                <li class="mb-2" style="color: #495057 !important; line-height: 1.5;">
-                    <i class="fas fa-tag text-purple mr-2" style="color: #6f42c1;"></i> <strong>Bank Offer:</strong> 10% instant discount on Credit Cards.
-                </li>
-                <li style="color: #495057 !important; line-height: 1.5;">
-                    <i class="fas fa-tag text-purple mr-2" style="color: #6f42c1;"></i> <strong>Book_Bazar Special:</strong> Free shipping on orders above ₹499.
-                </li>
-            </ul>
-        </div>
-
-        <!-- Product Features Mini-Grid  -->
-        <div class="row mb-4">
-            <div class="col-6 mb-3">
-                <div class="d-flex align-items-center">
-                    <div class="rounded-circle p-2 bg-light mr-2 text-primary" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-bookmark" style="font-size: 14px;"></i>
-                    </div>
-                    <div>
-                        <small class="d-block text-muted text-uppercase font-weight-bold" style="font-size: 10px;">Category</small>
-                        <span class="font-weight-bold" style="color: #212529 !important; font-size: 14px;">{{ product.category.name }}</span>
+                        {% if next_product %}
+                        <a href="{% url 'product_detail' next_product.slug %}" 
+                        class="btn custom-nav-circle-btn ml-1" 
+                        title="Next: {{ next_product.name | truncatechars:30 }}">
+                            <i class="fa fa-angle-right"></i>
+                        </a>
+                        {% else %}
+                        <button class="btn custom-nav-circle-btn ml-1" disabled>
+                            <i class="fa fa-angle-right"></i>
+                        </button>
+                        {% endif %}
                     </div>
                 </div>
-            </div>
-            <div class="col-6 mb-3">
-                <div class="d-flex align-items-center">
-                    <div class="rounded-circle p-2 bg-light mr-2 {% if product.stock > 0 %}text-success{% else %}text-danger{% endif %}" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas {% if product.stock > 0 %}fa-check-circle{% else %}fa-times-circle{% endif %}" style="font-size: 14px;"></i>
+
+                <!-- Ratings & Reviews Container -->
+                <div class="rating-popover-container d-inline-block position-relative">
+                    <small class="border-left pl-3" id="openRatingPopup" style="color: #e47911 !important; font-weight: 600; cursor:pointer; font-size: 14px;">
+                        ★ {{ avg_rating }} <span style="color: #565959; font-weight: 500;">({{ total_reviews }} reviews) <i class="fas fa-info-circle" style="color: #e47911 !important;"></i></span>
+                    </small>
+
+                    <!-- SMALL RATING POPOVER -->
+                    <div id="ratingModal" class="rating-popover-box">
+                        <div class="rating-summary-box">
+                            <!-- MAIN SUMMARY VIEW -->
+                            <div id="summary-view">
+                                <div class="rating-header-top d-flex justify-content-between align-items-center mb-2">
+                                    <span class="overall-rating-text font-weight-bold" style="color: #e47911; font-size: 16px;">★ {{ avg_rating }} out of 5</span>
+                                    <span class="rating-close-btn" style="cursor: pointer; font-size: 20px; font-weight: bold; color: #565959;">&times;</span>
+                                </div>
+                                <p class="rating-count-text text-muted small mb-3">Based on {{ total_reviews }} Verified Buyers</p>
+
+                                <!-- Progress Bars -->
+                                <div class="rating-progress-wrapper mb-3">
+                                    <div class="rating-row mb-1 d-flex align-items-center">
+                                        <span class="small" style="width: 40px; color: #565959;">5 star</span>
+                                        <div class="progress flex-grow-1 mx-2" style="height: 12px; background-color: #f1f1f1; border-radius: 4px;">
+                                            <div class="progress-bar" style="width:{% widthratio rating_breakdown.5 total_reviews 100 %}% !important; background-color: #ff8f00 !important; border-radius: 4px;"></div>
+                                        </div>
+                                        <span class="small text-right text-muted" style="width: 35px;">{% widthratio rating_breakdown.5 total_reviews 100 %}%</span>
+                                    </div>
+                                    <div class="rating-row mb-1 d-flex align-items-center">
+                                        <span class="small" style="width: 40px; color: #565959;">4 star</span>
+                                        <div class="progress flex-grow-1 mx-2" style="height: 12px; background-color: #f1f1f1; border-radius: 4px;">
+                                            <div class="progress-bar" style="width:{% widthratio rating_breakdown.4 total_reviews 100 %}% !important; background-color: #ff8f00 !important; border-radius: 4px;"></div>
+                                        </div>
+                                        <span class="small text-right text-muted" style="width: 35px;">{% widthratio rating_breakdown.4 total_reviews 100 %}%</span>
+                                    </div>
+                                    <div class="rating-row mb-1 d-flex align-items-center">
+                                        <span class="small" style="width: 40px; color: #565959;">3 star</span>
+                                        <div class="progress flex-grow-1 mx-2" style="height: 12px; background-color: #f1f1f1; border-radius: 4px;">
+                                            <div class="progress-bar" style="width:{% widthratio rating_breakdown.3 total_reviews 100 %}% !important; background-color: #ff8f00 !important; border-radius: 4px;"></div>
+                                        </div>
+                                        <span class="small text-right text-muted" style="width: 35px;">{% widthratio rating_breakdown.3 total_reviews 100 %}%</span>
+                                    </div>
+                                    <div class="rating-row mb-1 d-flex align-items-center">
+                                        <span class="small" style="width: 40px; color: #565959;">2 star</span>
+                                        <div class="progress flex-grow-1 mx-2" style="height: 12px; background-color: #f1f1f1; border-radius: 4px;">
+                                            <div class="progress-bar" style="width:{% widthratio rating_breakdown.2 total_reviews 100 %}% !important; background-color: #ff8f00 !important; border-radius: 4px;"></div>
+                                        </div>
+                                        <span class="small text-right text-muted" style="width: 35px;">{% widthratio rating_breakdown.2 total_reviews 100 %}%</span>
+                                    </div>
+                                    <div class="rating-row mb-1 d-flex align-items-center">
+                                        <span class="small" style="width: 40px; color: #565959;">1 star</span>
+                                        <div class="progress flex-grow-1 mx-2" style="height: 12px; background-color: #f1f1f1; border-radius: 4px;">
+                                            <div class="progress-bar" style="width:{% widthratio rating_breakdown.1 total_reviews 100 %}% !important; background-color: #ff8f00 !important; border-radius: 4px;"></div>
+                                        </div>
+                                        <span class="small text-right text-muted" style="width: 35px;">{% widthratio rating_breakdown.1 total_reviews 100 %}%</span>
+                                    </div>
+                                </div>
+                                <hr class="my-2">
+                                <div class="text-center">
+                                    <button type="button" id="show-popover-reviews" class="btn btn-link p-0 small font-weight-bold" style="text-decoration: none; color: #007185;">See customer reviews ></button>
+                                </div>
+                            </div>
+
+                            <!-- INNER REVIEWS LIST -->
+                            <div id="popover-reviews-list" style="display: none;">
+                                <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                    <button type="button" id="back-to-summary" class="btn btn-sm btn-light py-0 px-2" style="font-size: 12px; border: 1px solid #ddd;">
+                                        <i class="fa fa-angle-left mr-1"></i> Back
+                                    </button>
+                                    <span class="small font-weight-bold" style="color: #111;">Customer Reviews</span>
+                                    <span class="rating-close-btn" style="cursor: pointer; font-size: 20px; font-weight: bold; color: #565959;">&times;</span>
+                                </div>
+                                <div class="popover-scroll-area" style="max-height: 260px; overflow-y: auto; padding-right: 5px;">
+                                    {% for review in reviews %}
+                                    <div class="mb-3 pb-3 border-bottom" style="border-bottom: 1px dashed #eee !important;">
+                                        <div class="d-flex align-items-center mb-1">
+                                            <strong class="mr-2" style="font-size: 13px; color: #111;">{{ review.user.username }}</strong>
+                                            <span class="badge px-2 py-1" style="background-color: #e47911 !important; color: #fff !important; font-size: 10px; border-radius: 3px;">
+                                                {{ review.rating }} ★
+                                            </span>
+                                        </div>
+                                        <p class="mb-0 text-muted" style="font-size: 13px; line-height: 1.4; color: #333 !important; word-break: break-word;">
+                                            {{ review.description }}
+                                        </p>
+                                    </div>
+                                    {% empty %}
+                                    <p class="text-muted text-center small my-3">No reviews yet. Be the first to review this product!</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <small class="d-block text-muted text-uppercase font-weight-bold" style="font-size: 10px;">Availability</small>
-                        <span class="font-weight-bold {% if product.stock > 0 %}text-success{% else %}text-danger{% endif %}" style="font-size: 14px;">
-                            {% if product.stock > 0 %}In Stock ({{ product.stock }}){% else %}Out of Stock{% endif %}
+                </div>
+                <hr class="my-3" style="border-top: 1px solid #eeeeee;">
+
+                <!-- Price Section -->
+                <div class="mb-3">
+                    {% if product.mrp > 0 %}
+                    <div class="d-flex align-items-baseline flex-wrap">
+                        <h2 class="font-weight-bold text-primary mb-0" style="color: #007bff !important;">₹{{ product.final_price }}</h2>
+                        <h4 class="ml-3 mb-0" style="color: #adb5bd !important;"><del>₹{{ product.mrp }}</del></h4>
+                        <span class="badge badge-soft-success ml-3 px-3 py-2" style="background-color: #e2f6ed !important; color: #155724 !important; font-weight: 600;">
+                            <i class="fa fa-arrow-down mr-1"></i> {{ product.discount_percent }}% OFF
                         </span>
                     </div>
-                </div>
-            </div>
-        </div>
-        <!-- COLORS -->
-{% if product.colors.all %}
-<div class="mb-3">
-
-    <small class="text-muted font-weight-bold d-block mb-2">
-        Available Colors
-    </small>
-
-    <div class="d-flex flex-wrap">
-
-        {% for color in product.colors.all %}
-
-        <span class="color-box mr-2 mb-2"
-              title="{{ color.name }}"
-              style="
-                  width: 28px;
-                  height: 28px;
-                  border-radius: 50%;
-                  border: 2px solid #ddd;
-                  display: inline-block;
-                  background: {{ color.name|lower }};
-                  cursor: pointer;
-              ">
-        </span>
-
-        {% endfor %}
-
-    </div>
-
-</div>
-{% endif %}
-<!-- SIZES -->
-{% if product.sizes.all %}
-<div class="mb-3">
-
-    <small class="text-muted font-weight-bold d-block mb-2">
-        Available Sizes
-    </small>
-
-    <div class="d-flex flex-wrap">
-
-        {% for size in product.sizes.all %}
-
-        <span class="badge badge-outline-dark mr-2 mb-2"
-              style="
-                  padding: 8px 12px;
-                  border: 1px solid #333;
-                  border-radius: 6px;
-                  cursor: pointer;
-                  font-weight: 600;
-              ">
-            {{ size.name }}
-        </span>
-
-        {% endfor %}
-
-    </div>
-
-</div>
-{% endif %}
-
-        <!-- Description Section -->
-        <div class="mb-4 p-3 bg-light rounded" style="border-left: 4px solid #007bff; background-color: #f8f9fa !important;">
-            <small class="d-block text-muted font-weight-bold text-uppercase mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Product Description</small>
-            <p class="mb-0 leading-relaxed" style="color: #333333 !important; font-size: 14px; line-height: 1.6; font-weight: 400;">
-                {{ product.description|truncatewords:50 }}
-            </p>
-        </div>
-
-        <!-- Action Box (Quantity, Buy, Cart) -->
-        <div class="action-wrapper p-3 bg-light rounded shadow-sm mb-4" style="background-color: #f8f9fa !important; border: 1px solid #e9ecef;">
-            <label class="font-weight-bold mb-2" style="color: #212529 !important;">Select Quantity:</label>
-            <div class="d-flex flex-wrap align-items-center">
-                
-                <div class="details-qty-wrapper mr-3 mb-2">
-                    <button class="details-qty-btn btn-minus" {% if cart_quantity|default:1 <= 1 %}disabled{% endif %}>
-                        <i class="fa fa-minus text-dark"></i>
-                    </button>
-                    <input type="text" min="1" max="{{ product.stock }}" data-stock="{{ product.stock }}" class="details-quantity-input text-dark font-weight-bold" value="{{ cart_quantity|default:1 }}" readonly style="background: transparent; color: #000 !important;">
-                    <button class="details-qty-btn btn-plus" {% if cart_quantity >= product.stock %}disabled{% endif %}>
-                        <i class="fa fa-plus text-dark"></i>
-                    </button>
-                </div>
-
-                <div class="mb-2 mr-2 flex-grow-1">
-                    {% if in_cart %}
-                    <a href="{% url 'cart' %}" class="btn btn-outline-success btn-block py-2-5 font-weight-bold shadow-sm">
-                        <i class="fa fa-check mr-2"></i> Go To Cart
-                    </a>
                     {% else %}
-                    <button class="btn btn-primary btn-block py-2-5 font-weight-bold add-to-cart shadow-sm" data-id="{{ product.id }}">
-                        <i class="fa fa-shopping-cart mr-2"></i> Add To Cart
-                    </button>
+                    <h2 class="font-weight-bold text-primary" style="color: #007bff !important;">₹{{ product.price }}</h2>
                     {% endif %}
+                    <small class="font-weight-bold mt-1 d-block" style="color: #28a745 !important;">Inclusive of all taxes</small>
                 </div>
 
-                <div class="mb-2 flex-grow-1">
-                    <button class="btn btn-dark btn-block py-2-5 font-weight-bold buy-now shadow-sm" 
-                            data-id="{{ product.id }}"
-                            {% if product.stock <= 0 %}disabled{% endif %}>
-                        <i class="fa fa-bolt mr-2 text-warning"></i> Buy Now
-                    </button>
+                <!-- Stock Urgency Indicator -->
+                {% if product.stock > 0 and product.stock <= 5 %}
+                <div class="mb-3">
+                    <small class="text-danger font-weight-bold d-block mb-1">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> Hurry up! Only {{ product.stock }} items left in stock.
+                    </small>
+                    <div class="progress" style="height: 6px; border-radius: 10px; background-color: #f8d7da;">
+                        <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar" style="width: 30%"></div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Offers & Coupons Box -->
+                <div class="p-3 mb-4 rounded border shadow-sm" style="background-color: #fcfaff !important; border-color: #d6bbfb !important;">
+                    <h6 class="font-weight-bold mb-2" style="color: #4b10a9 !important;"><i class="fas fa-percentage mr-2"></i> Available Offers</h6>
+                    <ul class="list-unstyled mb-0 small pl-1">
+                        <li class="mb-2" style="color: #495057 !important; line-height: 1.5;">
+                            <i class="fas fa-tag text-purple mr-2" style="color: #6f42c1;"></i> <strong>Bank Offer:</strong> 10% instant discount on Credit Cards.
+                        </li>
+                        <li style="color: #495057 !important; line-height: 1.5;">
+                            <i class="fas fa-tag text-purple mr-2" style="color: #6f42c1;"></i> <strong>Book_Bazar Special:</strong> Free shipping on orders above ₹499.
+                        </li>
+                    </ul>
                 </div>
 
+                <!-- Product Features Mini-Grid  -->
+                <div class="row mb-4">
+                    <div class="col-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle p-2 bg-light mr-2 text-primary" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-bookmark" style="font-size: 14px;"></i>
+                            </div>
+                            <div>
+                                <small class="d-block text-muted text-uppercase font-weight-bold" style="font-size: 10px;">Category</small>
+                                <span class="font-weight-bold" style="color: #212529 !important; font-size: 14px;">{{ product.category.name }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle p-2 bg-light mr-2 {% if product.stock > 0 %}text-success{% else %}text-danger{% endif %}" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas {% if product.stock > 0 %}fa-check-circle{% else %}fa-times-circle{% endif %}" style="font-size: 14px;"></i>
+                            </div>
+                            <div>
+                                <small class="d-block text-muted text-uppercase font-weight-bold" style="font-size: 10px;">Availability</small>
+                                <span class="font-weight-bold {% if product.stock > 0 %}text-success{% else %}text-danger{% endif %}" style="font-size: 14px;">
+                                    {% if product.stock > 0 %}In Stock ({{ product.stock }}){% else %}Out of Stock{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLORS -->
+                {% if product.colors.all %}
+                <div class="mb-3">
+                    <small class="text-muted font-weight-bold d-block mb-2">Available Colors</small>
+                    <div class="d-flex flex-wrap">
+                        {% for color in product.colors.all %}
+                            {% for img in product.images.all %}
+                                {% if img.color.id == color.id %}
+                                    {% ifchanged img.color.id %}
+                                    <div class="color-box mr-2 mb-2"
+                                        data-color="{{ color.name }}"
+                                        title="{{ color.name }}"
+                                        style="
+                                            position: relative;
+                                            width: 60px;
+                                            height: 60px;
+                                            border: 2px solid #ddd;
+                                            border-radius: 6px;
+                                            overflow: hidden;
+                                            cursor: pointer;
+                                        ">
+                                        <img src="{{ img.image.url }}" alt="{{ color.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                        <small style="
+                                            position: absolute; 
+                                            bottom: 0; 
+                                            left: 0; 
+                                            right: 0; 
+                                            background: rgba(0,0,0,0.6); 
+                                            color: #fff; 
+                                            font-size: 9px; 
+                                            text-align: center; 
+                                            white-space: nowrap; 
+                                            overflow: hidden; 
+                                            text-overflow: ellipsis;
+                                            padding: 1px 0;
+                                        ">{{ color.name }}</small>
+                                    </div>
+                                    {% endifchanged %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- SIZES -->
+                {% if product.sizes.all %}
+                <div class="mb-3">
+                    <small class="text-muted font-weight-bold d-block mb-2">Available Sizes</small>
+                    <div class="d-flex flex-wrap">
+                        {% for size in product.sizes.all %}
+                        <span class="badge badge-outline-dark mr-2 mb-2 size-badge"
+                              data-size="{{ size.name }}"
+                              style="
+                                  padding: 8px 12px;
+                                  border: 1px solid #333;
+                                  border-radius: 6px;
+                                  cursor: pointer;
+                                  font-weight: 600;
+                              ">
+                            {{ size.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Description Section -->
+                <div class="mb-4 p-3 bg-light rounded" style="border-left: 4px solid #007bff; background-color: #f8f9fa !important;">
+                    <small class="d-block text-muted font-weight-bold text-uppercase mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Product Description</small>
+                    <p class="mb-0 leading-relaxed" style="color: #333333 !important; font-size: 14px; line-height: 1.6; font-weight: 400;">
+                        {{ product.description|truncatewords:50 }}
+                    </p>
+                </div>
+
+                <!-- Action Box (Quantity, Buy, Cart) -->
+                <div class="action-wrapper p-3 bg-light rounded shadow-sm mb-4" style="background-color: #f8f9fa !important; border: 1px solid #e9ecef;">
+                    <label class="font-weight-bold mb-2" style="color: #212529 !important;">Select Quantity:</label>
+                    <div class="d-flex flex-wrap align-items-center">
+                        <div class="details-qty-wrapper mr-3 mb-2">
+                            <button class="details-qty-btn btn-minus" {% if cart_quantity|default:1 <= 1 %}disabled{% endif %}>
+                                <i class="fa fa-minus text-dark"></i>
+                            </button>
+                            <input type="text" min="1" max="{{ product.stock }}" data-stock="{{ product.stock }}" class="details-quantity-input text-dark font-weight-bold" value="{{ cart_quantity|default:1 }}" readonly style="background: transparent; color: #000 !important;">
+                            <button class="details-qty-btn btn-plus" {% if cart_quantity >= product.stock %}disabled{% endif %}>
+                                <i class="fa fa-plus text-dark"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4" style="border-top: 1px solid #eeeeee;">
+
+                <!-- Trust Badges -->
+                <div class="row text-center security-badges">
+                    <div class="col-4">
+                        <div class="text-primary mb-1"><i class="fas fa-truck fa-lg" style="color: #007bff !important;"></i></div>
+                        <h6 class="font-weight-bold small mb-0" style="color: #212529 !important; font-size: 12px;">Fast Delivery</h6>
+                        <small class="text-muted d-block" style="font-size: 11px;">Ships within 24 hours</small>
+                    </div>
+                    <div class="col-4 border-left border-right">
+                        <div class="text-primary mb-1"><i class="fas fa-shield-alt fa-lg" style="color: #007bff !important;"></i></div>
+                        <h6 class="font-weight-bold small mb-0" style="color: #212529 !important; font-size: 12px;">Secure Payment</h6>
+                        <small class="text-muted d-block" style="font-size: 11px;">100% Safe Checkout</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-primary mb-1"><i class="fas fa-undo fa-lg" style="color: #007bff !important;"></i></div>
+                        <h6 class="font-weight-bold small mb-0" style="color: #212529 !important; font-size: 12px;">Easy Returns</h6>
+                        <small class="text-muted d-block" style="font-size: 11px;">7 Days Return Policy</small>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <hr class="my-4" style="border-top: 1px solid #eeeeee;">
-
-        <!-- Trust Badges -->
-        <div class="row text-center security-badges">
-            <div class="col-4">
-                <div class="text-primary mb-1"><i class="fas fa-truck fa-lg" style="color: #007bff !important;"></i></div>
-                <h6 class="font-weight-bold small mb-0" style="color: #212529 !important; font-size: 12px;">Fast Delivery</h6>
-                <small class="text-muted d-block" style="font-size: 11px;">Ships within 24 hours</small>
-            </div>
-            <div class="col-4 border-left border-right">
-                <div class="text-primary mb-1"><i class="fas fa-shield-alt fa-lg" style="color: #007bff !important;"></i></div>
-                <h6 class="font-weight-bold small mb-0" style="color: #212529 !important; font-size: 12px;">Secure Payment</h6>
-                <small class="text-muted d-block" style="font-size: 11px;">100% Safe Checkout</small>
-            </div>
-            <div class="col-4">
-                <div class="text-primary mb-1"><i class="fas fa-undo fa-lg" style="color: #007bff !important;"></i></div>
-                <h6 class="font-weight-bold small mb-0" style="color: #212529 !important; font-size: 12px;">Easy Returns</h6>
-                <small class="text-muted d-block" style="font-size: 11px;">7 Days Return Policy</small>
-            </div>
-        </div>
-        
-    </div>
-</div>
 
     </div>
 </div>
 
 <!-- RELATED PRODUCTS -->
 <div class="container-fluid py-5">
-
     <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
-
-        <span class="bg-secondary pr-3">
-            Related Products
-        </span>
-
+        <span class="bg-secondary pr-3">Related Products</span>
     </h2>
-
     <div class="row px-xl-5">
-
         {% for item in related_products %}
-
         <div class="col-lg-3 col-md-4 col-sm-6 pb-4">
-
             <div class="product-item bg-light mb-4">
-
                 <!-- IMAGE -->
                 <div class="product-img position-relative overflow-hidden">
-
                     {% if item.images.first %}
-
                     <img class="img-fluid w-100" src="{{ item.images.first.image.url }}">
-
                     {% else %}
-
-                    <img class="img-fluid w-100"
-                         src="{% static 'img/no-image.png' %}">
-
+                    <img class="img-fluid w-100" src="{% static 'img/no-image.png' %}">
                     {% endif %}
-
                     <div class="product-action">
-
-    <!-- CART -->
-    <a
-        href="javascript:void(0)"
-        class="btn btn-square add-to-cart
-
-        {% if item.id in cart_product_ids %}
-            btn-warning active-cart-btn
-        {% else %}
-            btn-outline-dark
-        {% endif %}
-        "
-
-        data-id="{{ item.id }}"
-    >
-
-        <i class="fa fa-shopping-cart"></i>
-
-    </a>
-
-
-
-    <!-- WISHLIST -->
-    <a
-        href="javascript:void(0)"
-        class="btn btn-square wishlist-btn
-
-        {% if item.id in wishlist_product_ids %}
-            btn-danger active
-        {% else %}
-            btn-outline-dark
-        {% endif %}
-        "
-
-        data-product-id="{{ item.id }}"
-    >
-
-        <i class="{% if item.id in wishlist_product_ids %}fas{% else %}far{% endif %} fa-heart"></i>
-
-    </a>
-
-
-
-    <!-- DETAIL -->
-    <a
-        class="btn btn-outline-dark btn-square"
-        href="{% url 'product_detail' item.id %}"
-    >
-
-        <i class="fa fa-eye"></i>
-
-    </a>
-
-</div>
-
+                        <!-- CART -->
+                        <a href="javascript:void(0)" class="btn btn-square add-to-cart {% if item.id in cart_product_ids %}btn-warning active-cart-btn{% else %}btn-outline-dark{% endif %}" data-id="{{ item.id }}">
+                            <i class="fa fa-shopping-cart"></i>
+                        </a>
+                        <!-- WISHLIST -->
+                        <a href="javascript:void(0)" class="btn btn-square wishlist-btn {% if item.id in wishlist_product_ids %}btn-danger active{% else %}btn-outline-dark{% endif %}" data-product-id="{{ item.id }}">
+                            <i class="{% if item.id in wishlist_product_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+                        </a>
+                        <!-- DETAIL -->
+                        <a class="btn btn-outline-dark btn-square" href="{% url 'product_detail' item.slug %}">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                    </div>
                 </div>
-
                 <!-- INFO -->
                 <div class="text-center py-4">
-
-                    <a class="h6 text-decoration-none text-truncate"
-                       href="{% url 'product_detail' item.id %}">
-
-                        {{ item.name }}
-
-                    </a>
-
+                    <a class="h6 text-decoration-none product-name" href="{% url 'product_detail' item.slug %}">{{ item.name |truncatechars:50 }}</a>
                     <div class="d-flex align-items-center justify-content-center mt-2">
-
                         <h5>₹{{ item.final_price }}</h5>
-
                         {% if item.mrp > 0 %}
-
-                        <h6 class="text-muted ml-2">
-                            <del>₹{{ item.mrp }}</del>
-                        </h6>
-
+                        <h6 class="text-muted ml-2"><del>₹{{ item.mrp }}</del></h6>
                         {% endif %}
-
                     </div>
-
                     <div class="d-flex align-items-center justify-content-center mb-1">
-
                         <small class="fa fa-star text-primary mr-1"></small>
                         <small class="fa fa-star text-primary mr-1"></small>
                         <small class="fa fa-star text-primary mr-1"></small>
                         <small class="fa fa-star text-primary mr-1"></small>
                         <small class="fa fa-star text-primary mr-1"></small>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
         {% endfor %}
-
     </div>
-
 </div>
 
-<script>
-$(document).ready(function() {
-    // Quantity Plus/Minus Logic
-    $('.btn-plus').on('click', function() {
-        let input = $('.details-quantity-input');
-        let currentVal = parseInt(input.val());
-        let maxStock = parseInt(input.data('stock'));
-        if (currentVal < maxStock) {
-            input.val(currentVal + 1);
-            $('.btn-minus').prop('disabled', false);
-        }
-        if (parseInt(input.val()) >= maxStock) $(this).prop('disabled', true);
-    });
+<!-- PREMIUM PRODUCT VARIANT POPUP MODAL -->
+<div id="variantModal" class="variant-modal">
+    <div class="variant-modal-content border-0 shadow-lg animate-popup">
+        <span class="close-variant">&times;</span>
+        
+        <!-- POPUP HEADER (PRODUCT MINI INFO) -->
+        <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+            <div class="popup-img-container mr-3">
+                {% if product.images.first %}
+                <img id="popupProductImage" src="{{ product.images.first.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                <img id="popupProductImage" src="{% static 'img/no-image.png' %}">
+                {% endif %}
+            </div>
+            <div>
+                <h6 class="font-weight-bold text-dark mb-1 pr-3" style="line-height: 1.4; font-size: 15px;">{{ product.name }}</h6>
+                <div class="d-flex align-items-baseline">
+                    <h5 class="font-weight-bold text-primary mb-0" style="font-size: 16px;">₹{{ product.final_price }}</h5>
+                    {% if product.mrp > 0 %}
+                    <small class="text-muted ml-2"><del>₹{{ product.mrp }}</del></small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
 
-    $('.btn-minus').on('click', function() {
-        let input = $('.details-quantity-input');
-        let currentVal = parseInt(input.val());
-        if (currentVal > 1) {
-            input.val(currentVal - 1);
-            $('.btn-plus').prop('disabled', false);
-        }
-        if (parseInt(input.val()) <= 1) $(this).prop('disabled', true);
-    });
+        <!-- COLORS SECTION -->
+        {% if product.colors.all %}
+        <div class="mb-4">
+            <label class="font-weight-bold d-block text-muted small text-uppercase mb-2" style="letter-spacing: 0.5px;">Select Color</label>
+            <div class="d-flex flex-wrap">
+                {% for color in product.colors.all %}
+                    {% for img in product.images.all %}
+                        {% if img.color.id == color.id %}
+                            {% ifchanged img.color.id %}
+                            <div class="popup-color-box mr-2 mb-2"
+                                 data-color="{{ color.name }}"
+                                 data-img-url="{{ img.image.url }}"
+                                 title="{{ color.name }}">
+                                <img src="{{ img.image.url }}" alt="{{ color.name }}">
+                                <small>{{ color.name }}</small>
+                            </div>
+                            {% endifchanged %}
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
 
-    // BUY NOW Button Logic
-    $('.buy-now').on('click', function() {
-        let productId = $(this).data('id');
-        let qty = $('.details-quantity-input').val();
+        <!-- SIZES SECTION -->
+        {% if product.sizes.all %}
+        <div class="mb-4">
+            <label class="font-weight-bold d-block text-muted small text-uppercase mb-2" style="letter-spacing: 0.5px;">Select Size</label>
+            <div class="d-flex flex-wrap">
+                {% for size in product.sizes.all %}
+                <!-- અહીં data-size ની સાથે-સાથે આપણે ટેક્સ્ટ પણ પાસ કરીએ છીએ -->
+                <span class="popup-size-box mr-2 mb-2 font-weight-bold" data-size="{{ size.name }}">
+                    {{ size.name }}
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
 
-        let checkoutUrl = "{% url 'checkout' %}?buy_now=" + productId + "&qty=" + qty;
-        window.location.href = checkoutUrl;
-    });
-
-    $('.add-to-cart').on('click', function() {
-        let productId = $(this).data('id');
-        let qty = $('.details-quantity-input').val() || 1;
-        let csrfToken = $('input[name=csrfmiddlewaretoken]').val();
-
-        $.ajax({
-            url: "/add-to-cart/", 
-            method: "POST",
-            data: {
-                'product_id': productId,
-                'quantity': qty,
-                'csrfmiddlewaretoken': csrfToken
-            },
-            success: function(response) {
-                alert("Product added to cart!");
-                location.reload(); 
-            }
-        });
-    });
-});
-</script>
-<script>
-let selectedColor = null;
-let selectedSize = null;
-
-// COLOR SELECT
-document.querySelectorAll(".color-box").forEach(el => {
-    el.addEventListener("click", function () {
-
-        document.querySelectorAll(".color-box").forEach(c => {
-            c.style.border = "2px solid #ddd";
-        });
-
-        this.style.border = "2px solid #000";
-        selectedColor = this.title;
-    });
-});
-
-// SIZE SELECT
-document.querySelectorAll(".badge").forEach(el => {
-    el.addEventListener("click", function () {
-
-        document.querySelectorAll(".badge").forEach(s => {
-            s.style.background = "transparent";
-            s.style.color = "#000";
-        });
-
-        this.style.background = "#000";
-        this.style.color = "#fff";
-
-        selectedSize = this.innerText.trim();
-    });
-});
-</script>
+        <!-- ACTION BUTTON -->
+        <div class="mt-4">
+            <button id="continueVariantBtn" class="btn btn-primary btn-block py-3 font-weight-bold shadow-sm continue-btn" disabled>
+                Confirm & Proceed
+            </button>
+        </div>
+    </div>
+</div>
 {% endblock %}

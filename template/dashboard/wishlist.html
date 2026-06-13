@@ -15,7 +15,7 @@
 #wishlistTable tbody tr:nth-child(even) { background:#f9fafb; }
 .product-box { display:flex; align-items:center; gap:12px; }
 .product-img { width:55px; height:55px; border-radius:8px; object-fit:cover; border:1px solid #ddd; }
-.status-badge { background:#dcfce7; color:#166534; padding:6px 12px; border-radius:30px; font-size:12px; font-weight:600; }
+.status-badge { background:green; color:#166534; padding:6px 12px; border-radius:30px; font-size:12px; font-weight:600; }
 .dataTables_filter { margin-bottom:15px; }
 .dataTables_filter input { border:1px solid #ddd !important; border-radius:8px !important; padding:8px 12px !important; outline:none !important; }
 .dataTables_length select { border:1px solid #ddd !important; border-radius:8px !important; padding:5px !important; }
@@ -63,7 +63,7 @@
                                 <span>{{ item.product.name|truncatechars:40 }}</span>
                             </div>
                         </td>
-                        <td>₹{{ item.product.price }}</td>
+                        <td>₹{{ item.product.final_price }}</td>
                         <td>{{ item.created_at|date:"d M Y" }}</td>
                         <td>
                             <span class="status-badge">Wishlisted</span>

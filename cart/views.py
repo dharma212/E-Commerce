@@ -76,14 +76,17 @@ class AddToCartView(LoginRequiredMixin, View):
 
             data = json.loads(request.body)
 
-            quantity = int(
-                data.get("quantity", 1)
-            )
+            quantity = int(data.get("quantity", 1))
+
+            color = data.get("color", "")
+
+            size = data.get("size", "")
 
         except:
 
             quantity = 1
-
+            color = ""
+            size = ""
         # =========================
         # STOCK LIMIT
         # =========================
@@ -100,7 +103,9 @@ class AddToCartView(LoginRequiredMixin, View):
 
         cart_item = CartItem.objects.filter(
             cart=cart,
-            product=product
+            product=product,
+            color=color,
+            size=size
         ).first()
 
         # =========================
@@ -133,7 +138,9 @@ class AddToCartView(LoginRequiredMixin, View):
 
             product=product,
 
-            quantity=quantity
+            quantity=quantity,
+            color=color,
+            size=size
 
         )
 

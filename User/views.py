@@ -502,7 +502,7 @@ class IndexView(TemplateView):
             is_featured=False
         ).prefetch_related(
             "images"
-        )
+        ).all()
 
         # =========================
         # DEFAULTS

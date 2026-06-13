@@ -122,7 +122,7 @@
 </div>
 
 {% endif %}
-{% comment %} <!-- =======================================
+ <!-- =======================================
 MOBILE BOTTOM NAVBAR
 ======================================= -->
 
@@ -213,7 +213,7 @@ MOBILE BOTTOM NAVBAR
     <!-- ORDERS -->
     {% if request.user.is_authenticated %}
 
-<a href="#"
+<a href="{% url 'my_orders' %}"
    class="mobile-nav-item {% if 'orders' in request.path %}active{% endif %}">
 
         <i class="fas fa-box"></i>
@@ -276,412 +276,154 @@ MOBILE BOTTOM NAVBAR
 
 </div>
 <style>
-
-    .mobile-nav-item{
-
-    font-size: 10px;
-
-}
-
-.mobile-nav-item i{
-
-    font-size: 18px;
-
-}
-body{
-
-    padding-bottom: 75px;
-
-}
-
 /* =========================
 MOBILE BOTTOM NAVBAR
 ========================= */
 
 .mobile-bottom-navbar{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:72px;
 
-    position: fixed;
+    background:#ffffff;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
 
-    bottom: 0;
+    box-shadow:0 -5px 20px rgba(0,0,0,.08);
 
-    left: 0;
+    z-index:99999;
 
-    width: 100%;
+    border-top:1px solid #f1f1f1;
 
-    height: 65px;
-
-    background: #fff;
-
-    display: flex;
-
-    justify-content: space-around;
-
-    align-items: center;
-
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-
-    z-index: 99999;
-
-    border-top-left-radius: 15px;
-
-    border-top-right-radius: 15px;
-
+    padding-bottom:env(safe-area-inset-bottom);
 }
 
 .mobile-nav-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
 
-    display: flex;
+    text-decoration:none;
 
-    flex-direction: column;
+    color:#777;
+    font-size:11px;
+    font-weight:600;
 
-    align-items: center;
+    position:relative;
 
-    justify-content: center;
+    width:100%;
+    height:100%;
 
-    text-decoration: none;
-
-    color: #555;
-
-    font-size: 12px;
-
-    font-weight: 500;
-
-    position: relative;
-
-    width: 100%;
-
-    height: 100%;
-
-    transition: 0.3s;
-
+    transition:.25s ease;
 }
 
 .mobile-nav-item i{
-
-    font-size: 20px;
-
-    margin-bottom: 4px;
-
+    font-size:21px;
+    margin-bottom:4px;
+    transition:.25s ease;
 }
+
+.mobile-nav-item span{
+    font-size:11px;
+    line-height:1;
+}
+
+/* Hover */
 
 .mobile-nav-item:hover{
-
-    color: #FFD333;
-
-    text-decoration: none;
-
+    color:#FFD333;
+    text-decoration:none;
 }
+
+/* Active */
 
 .mobile-nav-item.active{
-
-    color: #FFD333;
-
-}
-
-.mobile-count{
-
-    position: absolute;
-
-    top: -5px;
-
-    right: -10px;
-
-    background: red;
-
-    color: white;
-
-    border-radius: 50%;
-
-    min-width: 18px;
-
-    height: 18px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    font-size: 10px;
-
-    font-weight: bold;
-
-}
-
-/* DESKTOP HIDE */
-@media(min-width:992px){
-
-    .mobile-bottom-navbar{
-
-        display: none;
-
-    }
-
-}
-
-</style> {% endcomment %}
-<!-- =======================================
- MOBILE NAVBAR
-======================================= -->
-<div class="mobile-bottom-navbar d-lg-none" id="mobileNavbar">
-    <!-- HOME -->
-    <a href="{% url 'index' %}"
-       class="mobile-nav-item {% if request.path == '/' %}active{% endif %}">
-        <i class="fas fa-home"></i>
-        <span>Home</span>
-    </a>
-    <!-- CATEGORY -->
-    <a href="javascript:void(0)"
-       onclick="toggleCategoryMenu()"
-       class="mobile-nav-item">
-        <i class="fas fa-th-large"></i>
-        <span>Category</span>
-    </a>
-
-    <!-- FLOATING CART -->
-    {% if request.user.is_authenticated %}
-    <a href="{% url 'cart' %}"
-       class="floating-cart-btn">
-        <i class="fas fa-shopping-cart"></i>
-        <small class="floating-cart-count">
-            {{ cart_count|default:0 }}
-        </small>
-    </a>
-    {% else %}
-    <a href="javascript:void(0)"
-       onclick="openLoginModal()"
-       class="floating-cart-btn">
-        <i class="fas fa-shopping-cart"></i>
-    </a>
-    {% endif %}
-
-    <!-- ORDERS -->
-    <a href="#"
-       class="mobile-nav-item">
-        <i class="fas fa-box"></i>
-        <span>Orders</span>
-    </a>
-
-    <!-- PROFILE / LOGIN -->
-    {% if request.user.is_authenticated %}
-    <a href="{% url 'profile' %}"
-       class="mobile-nav-item {% if 'profile' in request.path %}active{% endif %}">
-        <i class="fas fa-user"></i>
-        <span>Profile</span>
-    </a>
-    {% else %}
-    <a href="javascript:void(0)"
-       onclick="openLoginModal()"
-       class="mobile-nav-item">
-        <i class="fas fa-sign-in-alt"></i>
-        <span>Login</span>
-    </a>
-    {% endif %}
-</div>
-
-<!-- CATEGORY POPUP -->
-<div class="mobile-category-menu" id="mobileCategoryMenu">
-    <div class="category-header">
-        <h5>Categories</h5>
-        <button onclick="toggleCategoryMenu()">
-            &times;
-        </button>
-    </div>
-    <a href="#">Fashion</a>
-    <a href="#">Electronics</a>
-    <a href="#">Shoes</a>
-    <a href="#">Mobiles</a>
-    <a href="#">Beauty</a>
-    <a href="#">Accessories</a>
-</div>
-<style>
-/* ===================================
- MOBILE NAVBAR
-=================================== */
-{% comment %} body{
-    padding-bottom: 90px;
-} {% endcomment %}
-
-/* NAVBAR */
-.mobile-bottom-navbar{
-    position: fixed;
-    bottom: 10px;
-    left: 10px;
-    right: 10px;
-    height: 70px;
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(15px);
-    border-radius: 25px;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    z-index: 99999;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    transition: 0.4s;
-}
-
-/* NAV ITEM */
-.mobile-nav-item{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    color: #666;
-    font-size: 11px;
-    font-weight: 600;
-    transition: 0.3s;
-    width: 70px;
-}
-
-.mobile-nav-item i{
-    font-size: 20px;
-    margin-bottom: 4px;
-}
-
-/* ACTIVE */
-.mobile-nav-item.active{
-    color: #FFD333;
-    transform: translateY(-3px);
+    color:#FFD333;
 }
 
 .mobile-nav-item.active i{
-    animation: bounce 0.5s;
+    transform:translateY(-2px);
 }
 
-/* FLOATING CART */
-.floating-cart-btn{
-    width: 65px;
-    height: 65px;
-    background: #FFD333;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    margin-top: -35px;
-    text-decoration: none;
-    color: #000;
-    font-size: 24px;
-    box-shadow: 0 10px 25px rgba(255,211,51,0.5);
+/* Active Top Indicator */
+
+.mobile-nav-item.active::before{
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:26px;
+    height:3px;
+
+    background:#FFD333;
+
+    border-radius:10px;
 }
 
-.floating-cart-count{
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: red;
-    color: white;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
+/* Count Badge */
+
+.mobile-count{
+    position:absolute;
+
+    top:-7px;
+    right:-10px;
+
+    background:#ff3b30;
+    color:#fff;
+
+    border-radius:20px;
+
+    min-width:18px;
+    height:18px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:10px;
+    font-weight:700;
+
+    padding:0 4px;
+
+    border:2px solid #fff;
+
+    box-shadow:0 2px 8px rgba(255,59,48,.35);
 }
 
-/* CATEGORY MENU */
-.mobile-category-menu{
-    position: fixed;
-    bottom: -100%;
-    left: 0;
-    width: 100%;
-    background: white;
-    border-radius: 25px 25px 0 0;
-    padding: 20px;
-    z-index: 999999;
-    transition: 0.4s;
-    box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
+/* Icon Wrapper */
+
+.position-relative{
+    position:relative;
 }
 
-.mobile-category-menu.active{
-    bottom: 0;
+/* Login Logout */
+
+.mobile-nav-item .fa-sign-in-alt,
+.mobile-nav-item .fa-sign-out-alt{
+    font-size:20px;
 }
 
-.category-header{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
+/* Desktop Hide */
 
-.category-header button{
-    border: none;
-    background: none;
-    font-size: 28px;
-}
-
-.mobile-category-menu a{
-    display: block;
-    padding: 14px;
-    text-decoration: none;
-    color: #333;
-    border-bottom: 1px solid #eee;
-    font-weight: 500;
-}
-
-/* ANIMATION */
-@keyframes bounce{
-    0%{
-        transform: scale(0.8);
-    }
-    50%{
-        transform: scale(1.2);
-    }
-    100%{
-        transform: scale(1);
-    }
-}
-
-/* HIDE DESKTOP */
 @media(min-width:992px){
-    .mobile-bottom-navbar,
-    .mobile-category-menu{
-        display: none;
+    .mobile-bottom-navbar{
+        display:none;
     }
 }
-</style>
-<script>
-    // CATEGORY TOGGLE
-function toggleCategoryMenu(){
+</style> 
+<!-- =======================================
+ MOBILE NAVBAR
+======================================= -->
 
-    document.getElementById(
-        "mobileCategoryMenu"
-    ).classList.toggle("active");
-
-}
-
-
-// HIDE NAVBAR ON SCROLL
-let lastScroll = 0;
-
-window.addEventListener("scroll", function(){
-
-    const navbar = document.getElementById(
-        "mobileNavbar"
-    );
-
-    let currentScroll = window.pageYOffset;
-
-    if(currentScroll > lastScroll){
-
-        navbar.style.transform =
-            "translateY(120px)";
-
-    }
-
-    else{
-
-        navbar.style.transform =
-            "translateY(0)";
-
-    }
-
-    lastScroll = currentScroll;
-
-});
-</script>
 {% include "footer.html" %}
 </body>
     <script src="{% static 'js/profile.js' %}"></script>

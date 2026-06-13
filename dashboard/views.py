@@ -991,3 +991,88 @@ class DashboardLogoutAPIView(APIView):
             "Dashboard Logout Successful"
 
         })
+        
+from django.views.generic import ListView
+
+from django.views.generic import TemplateView
+
+class CancelledOrdersTablePage(TemplateView):
+    template_name = "dashboard/cancelled_orders.html"
+        
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+class CancelledOrderListAPI(APIView):
+
+    def get(self, request):
+
+        orders = Order.objects.filter(
+            status__iexact="Cancelled"
+        ).order_by("-id")
+
+        data = []
+
+        for order in orders:
+
+            items = []
+
+            try:
+                for item in order.items.all():
+
+                    items.append({
+                        "product_name": item.product.name if item.product else "",
+                        "quantity": item.quantity
+                    })
+
+            except:
+                pass
+
+            data.append({
+                "id": order.id,
+                "user_name": getattr(order.user, "username", "-"),
+                "total_price": float(getattr(order, "total_price", 0)),
+                "status": order.status,
+                "rating": getattr(order, "rating", None),
+                "created_at": order.created_at,
+                "items": items
+            })
+
+        return Response(data)        
+        
+from django.views.generic import TemplateView
+
+class CancelledOrderCalendarView(TemplateView):
+    template_name = "dashboard/cancelled_order_calendar.html"
+    
+from django.views import View
+from django.http import JsonResponse
+from django.db.models.functions import TruncHour
+from django.db.models import Count
+
+
+
+class CancelledOrderCalendarEvents(View):
+
+    def get(self, request, *args, **kwargs):
+
+        orders = (
+            Order.objects
+            .filter(status__iexact="Cancelled")
+            .annotate(hour=TruncHour("created_at"))
+            .values("hour")
+            .annotate(count=Count("id"))
+            .order_by("hour")
+        )
+
+        events = []
+
+        for order in orders:
+
+            events.append({
+                "title": f"{order['count']} Cancelled Orders",
+                "start": order["hour"].isoformat(),
+                "allDay": False,
+                "color": "#dc3545"
+            })
+
+        return JsonResponse(events, safe=False)

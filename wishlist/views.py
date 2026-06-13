@@ -5,64 +5,56 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from User.models import *
 
+import json
+from django.http import JsonResponse
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.cache import cache
+
 class WishlistAPIView(LoginRequiredMixin, View):
 
     def post(self, request):
 
-        product_id = request.POST.get("product_id")
+        # ✅ FIX: JSON support
+        try:
+            data = json.loads(request.body)
+            product_id = data.get("product_id")
+        except:
+            product_id = request.POST.get("product_id")
 
         if not product_id:
             return JsonResponse({
                 "status": "error",
                 "message": "Product id required"
-            })
+            }, status=400)
 
         try:
             product = Product.objects.get(id=product_id)
-
         except Product.DoesNotExist:
             return JsonResponse({
                 "status": "error",
                 "message": "Product not found"
-            })
+            }, status=404)
 
         wishlist_item = Wishlist.objects.filter(
             user=request.user,
             product=product
         ).first()
 
-        # REMOVE
         if wishlist_item:
-
             wishlist_item.delete()
+            status_msg = "removed"
+        else:
+            Wishlist.objects.create(
+                user=request.user,
+                product=product
+            )
+            status_msg = "added"
 
-            cache_key = f"wishlist_{request.user.id}"
-            cache.delete(cache_key)
-
-            wishlist_count = Wishlist.objects.filter(
-                user=request.user
-            ).count()
-
-            return JsonResponse({
-                "status": "removed",
-                "wishlist_count": wishlist_count
-            })
-
-        # ADD
-        Wishlist.objects.create(
-            user=request.user,
-            product=product
-        )
-
-        cache_key = f"wishlist_{request.user.id}"
-        cache.delete(cache_key)
-
-        wishlist_count = Wishlist.objects.filter(
-            user=request.user
-        ).count()
+        wishlist_count = Wishlist.objects.filter(user=request.user).count()
 
         return JsonResponse({
-            "status": "added",
+            "status": status_msg,
             "wishlist_count": wishlist_count
         })
 
@@ -144,8 +136,8 @@ class WishlistPageView(TemplateView):
 
                     "name": product.name,
 
-                    "price": product.price,
-
+                    "mrp": product.mrp,
+                    
                     "final_price": product.final_price(),
 
                     "discount": product.discount,

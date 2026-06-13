@@ -185,8 +185,11 @@ FEATURED PRODUCTS START
                 <div class="product-img position-relative overflow-hidden">
 
                     <!-- PRODUCT IMAGE -->
+                     {% if product.slug %}
+                    <a href="{% url 'product_detail' product.slug %}">
+                    {% else %}
                     <a href="{% url 'product_detail' product.id %}">
-
+                    {% endif %}
                         {% if product.images.first %}
 
                         <img class="img-fluid w-100"
@@ -277,21 +280,25 @@ FEATURED PRODUCTS START
                     <div class="product-action">
 
                         <!-- ADD TO CART -->
-                        <a class="btn btn-outline-dark btn-square add-to-cart
+                        <a class="btn btn-outline-dark btn-square add-to-cart stock-btn
 
-                        {% if product.id in cart_product_ids %}
-                        active-cart-btn
-                        {% endif %}
+                            {% if product.id in cart_product_ids %}
+                            active-cart-btn
+                            {% endif %}
 
-                        {% if product.stock <= 0 %}
-                        out-of-stock-btn
-                        {% endif %}
+                            {% if product.stock <= 0 %}
+                            out-of-stock
+                            {% endif %}
 
-                        "
-                        href="javascript:void(0)"
-                        data-id="{{ product.id }}">
+                            "
+                            href="javascript:void(0)"
+                            data-id="{{ product.id }}"
+                            data-name="{{ product.name }}"
+                            data-colors="{% for c in product.colors.all %}{{ c.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
+                            data-sizes="{% for s in product.sizes.all %}{{ s.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
+                            data-in-cart="{% if product.id in cart_product_ids %}true{% else %}false{% endif %}">
 
-                            <i class="fa fa-shopping-cart"></i>
+                                <i class="fa fa-shopping-cart"></i>
 
                         </a>
 
@@ -323,12 +330,21 @@ FEATURED PRODUCTS START
                         </a>
 
                         <!-- DETAIL -->
-                        <a class="btn btn-outline-dark btn-square"
-                           href="{% url 'product_detail' product.id %}">
+                        {% if product.slug %}
+
+                         <a class="btn btn-outline-dark btn-square"
+                            href="{% url 'product_detail' product.slug %}">
 
                             <i class="fa fa-search"></i>
-
                         </a>
+                        {% else %}
+
+                         <a class="btn btn-outline-dark btn-square"
+                            href="{% url 'product_detail' product.slug %}">
+
+                            <i class="fa fa-search"></i>
+                        </a>
+                        {% endif %}
 
                     </div>
 
@@ -338,13 +354,21 @@ FEATURED PRODUCTS START
                 <div class="text-center py-4">
 
                     <!-- PRODUCT NAME -->
+                        {% if product.slug %}
+                        <a class="h6 text-decoration-none product-name"
+                        href="{% url 'product_detail' product.slug %}">
+    
+                            {{ product.name|truncatechars:45 }}
+                        </a>
+                        {% else %}
+                        
                     <a class="h6 text-decoration-none product-name"
-                       href="{% url 'product_detail' product.id %}">
+                       href="{% url 'product_detail' product.slug %}">
 
                         {{ product.name|truncatechars:45 }}
 
                     </a>
-
+{% endif %}
                     <!-- PRICE -->
                     <div class="d-flex align-items-center justify-content-center mt-2">
 
@@ -396,16 +420,20 @@ FEATURED PRODUCTS START
                     </div>
 
                     <!-- RATING -->
-                    <div class="d-flex align-items-center justify-content-center mb-1 mt-3">
+                    <div class="d-flex align-items-center justify-content-center mb-1">
 
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= product.average_rating %}
+                                <small class="fa fa-star text-warning mr-1"></small>
+                            {% else %}
+                                <small class="far fa-star text-muted mr-1"></small>
+                            {% endif %}
+                        {% endfor %}
 
-                        <small>(99)</small>
-
+                        <small class="ml-2">
+                            {{ product.average_rating }}/5
+                            ({{ product.total_reviews }})
+                        </small>
                     </div>
 
                 </div>
@@ -493,23 +521,26 @@ FEATURED PRODUCTS END
         <div class="product-img position-relative overflow-hidden">
 
             <!-- PRODUCT IMAGE -->
-            <a href="{% url 'product_detail' product.id %}">
-
-                {% if product.images.first %}
-
-                <img class="img-fluid w-100"
-                     src="{{ product.images.first.image.url }}"
-                     alt="{{ product.name }}">
-
+                {% if product.slug %}
+            <a href="{% url 'product_detail' product.slug %}">
                 {% else %}
-
-                <img class="img-fluid w-100"
-                     src="{% static 'img/default.jpg' %}"
-                     alt="">
-
+            <a href="{% url 'product_detail' product.slug %}">
                 {% endif %}
+    {% if product.images.first %}
 
-            </a>
+    <img class="img-fluid w-100"
+         src="{{ product.images.first.image.url }}"
+         alt="{{ product.name }}">
+
+    {% else %}
+
+    <img class="img-fluid w-100"
+         src="{% static 'img/default.jpg' %}"
+         alt="{{ product.name }}">
+
+    {% endif %}
+
+</a>
 
             <!-- DISCOUNT BADGE -->
             {% if product.discount > 0 %}
@@ -589,28 +620,27 @@ FEATURED PRODUCTS END
                 <!-- =========================
                 ADD TO CART BUTTON
                 ========================= -->
+<a class="btn btn-outline-dark btn-square add-to-cart stock-btn
 
-                <a class="btn btn-outline-dark btn-square add-to-cart stock-btn
+{% if product.id in cart_product_ids %}
+active-cart-btn
+{% endif %}
 
-                    {% if product.id in cart_product_ids %}
-                    active-cart-btn
-                    {% endif %}
+{% if product.stock <= 0 %}
+out-of-stock
+{% endif %}
 
-                    {% if product.stock <= 0 %}
-                    out-of-stock
-                    {% endif %}
+"
+href="javascript:void(0)"
+data-id="{{ product.id }}"
+data-name="{{ product.name }}"
+data-colors="{% for c in product.colors.all %}{{ c.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
+data-sizes="{% for s in product.sizes.all %}{{ s.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
+data-in-cart="{% if product.id in cart_product_ids %}true{% else %}false{% endif %}">
 
-                    "
-                    href="javascript:void(0)"
-                    data-id="{{ product.id }}">
+    <i class="fa fa-shopping-cart"></i>
 
-                        <i class="fa fa-shopping-cart"></i>
-
-                        {% if product.stock <= 0 %}
-                        <span class="stock-badge">!</span>
-                        {% endif %}
-
-                </a>
+</a>
 
                 <!-- WISHLIST BUTTON -->
                 <a class="btn btn-outline-dark btn-square wishlist-btn {% if product.id in wishlist_product_ids %}active{% endif %}"
@@ -623,13 +653,20 @@ FEATURED PRODUCTS END
                 </a>
 
                 <!-- DETAIL PAGE -->
+                 {% if product.slug %}
                 <a class="btn btn-outline-dark btn-square"
-                   href="{% url 'product_detail' product.id %}">
+                   href="{% url 'product_detail' product.slug %}">
 
                     <i class="fa fa-search"></i>
 
                 </a>
+                {% else %}
+                <a class="btn btn-outline-dark btn-square"
+                   href="{% url 'product_detail' product.slug %}">
 
+                    <i class="fa fa-search"></i>
+                </a>
+                {% endif %}
             </div>
 
         </div>
@@ -638,12 +675,21 @@ FEATURED PRODUCTS END
         <div class="text-center py-4">
 
             <!-- PRODUCT NAME -->
-            <a class="h6 text-decoration-none product-name"
-               href="{% url 'product_detail' product.id %}">
+{% if product.slug %}
+    <a class="h6 text-decoration-none product-name"
+       href="{% url 'product_detail' product.slug %}">
 
-                {{ product.name|truncatechars:50 }}
+        {{ product.name|truncatechars:50 }}
 
-            </a>
+    </a>
+{% else %}
+    <a class="h6 text-decoration-none product-name"
+       href="{% url 'product_detail' product.slug %}">
+
+        {{ product.name|truncatechars:50 }}
+
+    </a>
+{% endif %}
 
             <!-- PRICE -->
             <div class="d-flex align-items-center justify-content-center mt-2">
@@ -682,18 +728,22 @@ FEATURED PRODUCTS END
 
             {% endif %}
             
-            <!-- STATIC RATING -->
             <div class="d-flex align-items-center justify-content-center mb-1">
 
-                <small class="fa fa-star text-primary mr-1"></small>
-                <small class="fa fa-star text-primary mr-1"></small>
-                <small class="fa fa-star text-primary mr-1"></small>
-                <small class="fa fa-star text-primary mr-1"></small>
-                <small class="fa fa-star text-primary mr-1"></small>
+    {% for i in "12345" %}
+        {% if forloop.counter <= product.average_rating %}
+            <small class="fa fa-star text-warning mr-1"></small>
+        {% else %}
+            <small class="far fa-star text-muted mr-1"></small>
+        {% endif %}
+    {% endfor %}
 
-                <small>(99)</small>
+    <small class="ml-2">
+        {{ product.average_rating }}/5
+        ({{ product.total_reviews }})
+    </small>
 
-            </div>
+</div>  
 
         </div>
 
@@ -702,18 +752,229 @@ FEATURED PRODUCTS END
 </div>
 
 {% endfor %}
+<!-- COLOR SIZE POPUP -->
+
+<div id="variantPopup" class="variant-popup">
+
+    <div class="variant-box">
+         <!-- Close Button -->
+        <button type="button"
+                class="popup-close"
+                onclick="closeVariantPopup()">
+            &times;
+        </button>
+
+        <h5 id="popupProductName"></h5>
+
+        <h6>Select Color</h6>
+
+        <div id="popupColors"></div>
+
+        <h6 class="mt-3">Select Size</h6>
+
+        <div id="popupSizes"></div>
+
+        <button id="continueBtn"
+                class="btn btn-primary mt-4 w-100">
+
+            Continue
+
+        </button>
+
+    </div>
 
 </div>
 </div>
-<script>
-
-function getCSRFToken() {
-
-    return document.querySelector(
-        '[name=csrfmiddlewaretoken]'
-    ).value;
-
+</div>
+<style>
+    .variant-popup{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.6);
+    z-index:9999;
+    justify-content:center;
+    align-items:center;
 }
 
+.variant-box{
+    background:#fff;
+    width:400px;
+    max-width:95%;
+    padding:25px;
+    border-radius:10px;
+}
+
+.variant-option{
+    display:inline-block;
+    border:1px solid #ddd;
+    padding:8px 14px;
+    margin:4px;
+    cursor:pointer;
+    border-radius:5px;
+}
+
+.variant-option.active{
+    background:#ffd333;
+    border-color:#ffd333;
+}
+.variant-box{
+    background:#fff;
+    width:400px;
+    max-width:95%;
+    padding:25px;
+    border-radius:10px;
+    position:relative;
+}
+
+.popup-close{
+    position:absolute;
+    top:10px;
+    right:10px;
+    width:35px;
+    height:35px;
+    border:none;
+    background:#f1f1f1;
+    border-radius:50%;
+    font-size:24px;
+    line-height:1;
+    cursor:pointer;
+}
+
+.popup-close:hover{
+    background:#ddd;
+}
+</style>
+<script>
+    document.addEventListener("click", function(e){
+
+    const btn =
+        e.target.closest(".add-to-cart");
+
+    if(!btn){
+        return;
+    }
+     if(btn.classList.contains("active-cart-btn")){
+        return; // popup open na karo
+    }
+        e.preventDefault();
+
+
+    const hasColors =
+        btn.dataset.colors &&
+        btn.dataset.colors.trim() !== "";
+
+    const hasSizes =
+        btn.dataset.sizes &&
+        btn.dataset.sizes.trim() !== "";
+
+    if(!hasColors && !hasSizes){
+        return;
+    }
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    popupProductId =
+        btn.dataset.id;
+
+    document.getElementById(
+        "popupProductName"
+    ).innerText =
+        btn.dataset.name;
+
+    const colorsDiv =
+        document.getElementById(
+            "popupColors"
+        );
+
+    const sizesDiv =
+        document.getElementById(
+            "popupSizes"
+        );
+
+    colorsDiv.innerHTML = "";
+    sizesDiv.innerHTML = "";
+
+    (btn.dataset.colors || "")
+    .split(",")
+
+    .forEach(color=>{
+
+        color = color.trim();
+
+        if(color){
+
+            colorsDiv.innerHTML += `
+                <span class="variant-option">
+                    ${color}
+                </span>
+            `;
+
+        }
+
+    });
+
+    (btn.dataset.sizes || "")
+    .split(",")
+
+    .forEach(size=>{
+
+        size = size.trim();
+
+        if(size){
+
+            sizesDiv.innerHTML += `
+                <span class="variant-option">
+                    ${size}
+                </span>
+            `;
+
+        }
+
+    });
+
+    document
+    .getElementById(
+        "variantPopup"
+    )
+    .style.display = "flex";
+
+});
+document.addEventListener("click", function(e){
+
+    if(
+        e.target.classList.contains(
+            "variant-option"
+        )
+    ){
+
+        const parent =
+            e.target.parentElement;
+
+        parent
+        .querySelectorAll(
+            ".variant-option"
+        )
+        .forEach(x=>{
+
+            x.classList.remove(
+                "active"
+            );
+
+        });
+
+        e.target.classList.add(
+            "active"
+        );
+
+    }
+
+});
+</script>
+<script>
+function closeVariantPopup(){
+    document.getElementById("variantPopup").style.display = "none";
+}
 </script>
 {% endblock content %}

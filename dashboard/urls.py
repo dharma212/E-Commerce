@@ -203,5 +203,28 @@ path(
     DashboardLogoutAPIView.as_view(),
     name="dashboard_logout_api"
 ),
+path(
+    "dashboard/cancelled-orders/",
+    CancelledOrdersTablePage.as_view(),
+    name="cancelled_orders_table_page"
+),
+
+path(
+    "api/cancelled-orders/",
+    CancelledOrderListAPI.as_view(),
+    name="cancelled_orders_api"
+),
+
+    path(
+        "cancelled-order-calendar/",
+        CancelledOrderCalendarView.as_view(),
+        name="cancelled_order_calendar"
+    ),
+
+    path(
+        "cancelled-order-events/",
+        CancelledOrderCalendarEvents.as_view(),
+        name="cancelled_order_events"
+    ),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

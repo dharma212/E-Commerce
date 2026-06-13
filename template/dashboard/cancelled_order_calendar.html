@@ -1,0 +1,189 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+
+<div class="card">
+    <div class="card-header">
+        <h4 class="mb-0">Cancelled Orders Calendar</h4>
+    </div>
+
+    <div class="card-body">
+
+        <div class="cancel-order-calendar-wrapper">
+            <div id="cancelOrderScheduler"></div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    let calendarEl = document.getElementById("cancelOrderScheduler");
+
+    let calendar = new FullCalendar.Calendar(calendarEl, {
+
+        initialView: "dayGridMonth",
+
+        height: 700,
+
+        dayMaxEvents: false,
+
+        eventDisplay: "block",
+
+        displayEventTime: false,
+
+        headerToolbar: {
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth"
+        },
+
+        buttonText: {
+            today: "Today",
+            month: "Month",
+            week: "Week",
+            day: "Day",
+            list: "List"
+        },
+
+        events: "{% url 'cancelled_order_events' %}"
+
+    });
+
+    calendar.render();
+
+});
+</script>
+
+<style>
+
+/* ===================================
+   CANCEL ORDER CALENDAR
+=================================== */
+
+.cancel-order-calendar-wrapper{
+    width:100%;
+    background:#fff;
+    padding:15px;
+    border-radius:12px;
+}
+
+/* Title */
+.cancel-order-calendar-wrapper .fc-toolbar-title{
+    font-size:30px !important;
+    font-weight:700 !important;
+    color:#212529 !important;
+}
+
+/* Buttons */
+.cancel-order-calendar-wrapper .fc-button{
+    background:#ffffff !important;
+    border:1px solid #dcdcdc !important;
+    color:#212529 !important;
+    text-transform:capitalize !important;
+    box-shadow:none !important;
+}
+
+.cancel-order-calendar-wrapper .fc-button:hover{
+    background:#dc3545 !important;
+    border-color:#dc3545 !important;
+    color:#ffffff !important;
+}
+
+.cancel-order-calendar-wrapper .fc-button-active{
+    background:#dc3545 !important;
+    border-color:#dc3545 !important;
+    color:#ffffff !important;
+}
+
+.cancel-order-calendar-wrapper .fc-today-button{
+    background:#198754 !important;
+    border-color:#198754 !important;
+    color:#ffffff !important;
+}
+
+/* Events */
+.cancel-order-calendar-wrapper .fc-daygrid-event{
+    display:block !important;
+    white-space:normal !important;
+    background:#dc3545 !important;
+    border:none !important;
+    border-radius:6px !important;
+    padding:4px 8px !important;
+    color:#ffffff !important;
+    font-size:12px !important;
+    font-weight:600 !important;
+}
+
+.cancel-order-calendar-wrapper .fc-event-title{
+    color:#ffffff !important;
+}
+
+.cancel-order-calendar-wrapper .fc-daygrid-event-dot{
+    display:none !important;
+}
+
+.cancel-order-calendar-wrapper .fc-daygrid-dot-event{
+    border:none !important;
+}
+
+/* Header Days */
+.cancel-order-calendar-wrapper .fc-col-header-cell{
+    background:#f8f9fa !important;
+}
+
+.cancel-order-calendar-wrapper .fc-col-header-cell-cushion{
+    color:#212529 !important;
+    text-decoration:none !important;
+    font-weight:600 !important;
+}
+
+/* Date Numbers */
+.cancel-order-calendar-wrapper .fc-daygrid-day-number{
+    color:#212529 !important;
+    text-decoration:none !important;
+    font-weight:500 !important;
+}
+
+/* Today */
+.cancel-order-calendar-wrapper .fc-day-today{
+    background:#fff8e7 !important;
+}
+
+/* Borders */
+.cancel-order-calendar-wrapper .fc-theme-standard td,
+.cancel-order-calendar-wrapper .fc-theme-standard th{
+    border:1px solid #e5e5e5 !important;
+}
+
+/* List View */
+.cancel-order-calendar-wrapper .fc-list-event-title a{
+    color:#212529 !important;
+    text-decoration:none !important;
+}
+
+.cancel-order-calendar-wrapper .fc-list-event-time{
+    color:#212529 !important;
+}
+
+/* Responsive */
+@media(max-width:768px){
+
+    .cancel-order-calendar-wrapper .fc-toolbar{
+        flex-direction:column;
+        gap:10px;
+    }
+
+    .cancel-order-calendar-wrapper .fc-toolbar-title{
+        font-size:22px !important;
+    }
+
+}
+
+</style>
+
+{% endblock %}

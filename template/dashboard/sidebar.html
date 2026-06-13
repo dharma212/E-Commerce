@@ -153,24 +153,69 @@
 
 </li>
 
-    <!-- ORDERS -->
-    <li class="nav-item menu-items {% if request.resolver_match.url_name == 'order_list' %}active{% endif %}">
+   <!-- ORDER MANAGEMENT -->
+<li class="nav-item menu-items {% if request.resolver_match.url_name == 'order_list' or request.resolver_match.url_name == 'cancelled_orders_table_page' or request.resolver_match.url_name == 'cancelled_order_calendar' %}active{% endif %}">
 
-      <a class="nav-link"
-         href="{% url 'order_list' %}">
+  <a class="nav-link"
+     data-toggle="collapse"
+     href="#ordersManagement"
+     aria-expanded="{% if request.resolver_match.url_name == 'order_list' or request.resolver_match.url_name == 'cancelled_orders_table_page' or request.resolver_match.url_name == 'cancelled_order_calendar' %}true{% else %}false{% endif %}">
 
-        <span class="menu-icon">
-          <i class="mdi mdi-receipt"></i>
-        </span>
+    <span class="menu-icon">
+      <i class="mdi mdi-receipt"></i>
+    </span>
 
-        <span class="menu-title">
+    <span class="menu-title">
+      Order Management
+    </span>
+
+    <i class="menu-arrow"></i>
+
+  </a>
+
+  <div class="collapse {% if request.resolver_match.url_name == 'order_list' or request.resolver_match.url_name == 'cancelled_orders_table_page' or request.resolver_match.url_name == 'cancelled_order_calendar' %}show{% endif %}"
+       id="ordersManagement">
+
+    <ul class="nav flex-column sub-menu">
+
+      <li class="nav-item">
+
+        <a class="nav-link {% if request.resolver_match.url_name == 'order_list' %}active{% endif %}"
+           href="{% url 'order_list' %}">
+
           Orders
-        </span>
 
-      </a>
+        </a>
 
-    </li>
+      </li>
 
+      <li class="nav-item">
+
+        <a class="nav-link {% if request.resolver_match.url_name == 'cancelled_orders_table_page' %}active{% endif %}"
+           href="{% url 'cancelled_orders_table_page' %}">
+
+          Cancelled Orders
+
+        </a>
+
+      </li>
+
+      <li class="nav-item">
+
+        <a class="nav-link {% if request.resolver_match.url_name == 'cancelled_order_calendar' %}active{% endif %}"
+           href="{% url 'cancelled_order_calendar' %}">
+
+          Calendar
+
+        </a>
+
+      </li>
+
+    </ul>
+
+  </div>
+
+</li>
     <!-- CUSTOMERS -->
     <li class="nav-item menu-items {% if request.resolver_match.url_name == 'user-list' %}active{% endif %}">
 

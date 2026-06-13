@@ -24,6 +24,22 @@ urlpatterns = [
     'invoice/<int:pk>/',
     InvoiceView.as_view(),
     name='invoice'
-)
-    
+),
+
+path(
+    'add-review/<int:pk>/',
+    AddReviewView.as_view(),
+    name='add_review'
+),
+path(
+    "order/<int:pk>/cancel/",
+    CancelOrderView.as_view(),
+    name="cancel_order"
+),
+
+path(
+    "order/<int:pk>/reorder/",
+    ReOrderView.as_view(),
+    name="reorder_order"
+),   
 ]

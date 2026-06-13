@@ -678,7 +678,7 @@ function renderImages(){
         }else{
 
             img.src =
-                URL.createObjectURL(file);
+                URL.createObjectURL(file.file);
         }
 
         if(index === 0){
@@ -739,7 +739,25 @@ function renderImages(){
         actions.appendChild(del);
 
         div.appendChild(img);
+if(file.color || file.size){
 
+    let info =
+        document.createElement("div");
+
+    info.style.position = "absolute";
+    info.style.bottom = "5px";
+    info.style.left = "5px";
+    info.style.background = "rgba(0,0,0,0.7)";
+    info.style.color = "#fff";
+    info.style.padding = "3px 8px";
+    info.style.fontSize = "11px";
+    info.style.borderRadius = "4px";
+
+    info.innerHTML =
+        `Color: ${file.color}<br>Size: ${file.size}`;
+
+    div.appendChild(info);
+}
         div.appendChild(actions);
 
         div.addEventListener(
@@ -906,11 +924,11 @@ document.getElementById("sizeInput").value =
             data.images.forEach(img => {
 
                 selectedImages.push({
-
-                    preview: img.image,
-                    isOld: true
-
-                });
+    preview: img.image,
+    color: img.color || "",
+    size: img.size || "",
+    isOld: true
+});
 
             });
 
@@ -1022,44 +1040,30 @@ document.addEventListener(
         calculateDiscount
     );
 
-    // ================= HANDLE FILES =================
+// ================= HANDLE FILES (UNLIMITED) =================
     function handleFiles(files) {
+        const color = document.getElementById("imageColor").value;
+        const size = document.getElementById("imageSize").value;
 
-        if(
-            selectedImages.length +
-            files.length > 5
-        ){
-
-            showToast(
-                "Max 5 images allowed",
-                "warning"
-            );
-
+        if(!color || !size){
+            showToast("Please select image color and size first", "warning");
             return;
         }
 
         for(let i = 0; i < files.length; i++){
-
-            if(
-                !files[i].type.startsWith("image/")
-            ){
-
-                showToast(
-                    "Only images allowed",
-                    "error"
-                );
-
+            if(!files[i].type.startsWith("image/")){
+                showToast("Only images allowed", "error");
                 continue;
             }
-
-            selectedImages.push(files[i]);
+            selectedImages.push({
+                file: files[i],
+                color: color,
+                size: size
+            });
         }
 
         renderImages();
-
-        showToast(
-            "Images added successfully"
-        );
+        showToast("Images added successfully");
     }
 
     // ================= FILE CLICK =================
@@ -1367,23 +1371,16 @@ size.split(",").forEach(id => {
 
             // ================= EDIT ID =================
             if(isEditMode){
-
-                formData.append(
-                    "id",
-                    editProductId
-                );
+                formData.append("id", editProductId);
             }
 
-            selectedImages.forEach(file => {
-
-                if(!file.isOld){
-
-                    formData.append(
-                        'images',
-                        file
-                    );
+            selectedImages.forEach(item => {
+                if(!item.isOld){
+                    formData.append("images", item.file);
+                    
+                    formData.append("image_colors", item.color || "");
+                    formData.append("image_sizes", item.size || "");
                 }
-
             });
 
             showToast(

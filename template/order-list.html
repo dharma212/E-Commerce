@@ -1,268 +1,547 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<div class="orders-section">
-    <div class="orders-wrapper">
-        
-        <div class="layout-split-grid">
-            
-            <!-- LEFT CONTROL COLUMN BANNER -->
-            <aside class="checkout-control-card">
-                <div class="panel-header-title">
-                    <h2>My Purchases</h2>
-                    <p>Review real-time status, manage shipping coordinates, and download historical balance invoices.</p>
-                </div>
-                
-                <!-- Search -->
-                <form method="GET" action="">
-                    <div class="interactive-search-form">
-                        <i class="fa fa-search"></i>
-                        <input 
-                            type="text" 
-                            name="q" 
-                            value="{{ request.GET.q|default:'' }}" 
-                            placeholder="Find purchase orders..."
-                        >
-                    </div>
-                </form>
 
-                <!-- Status Filter Options -->
-                <form method="GET" action="">
-                    {% if request.GET.q %}
-                        <input type="hidden" name="q" value="{{ request.GET.q }}">
-                    {% endif %}
-                    <select 
-                        name="status" 
-                        class="custom-select-element" 
-                        onchange="this.form.submit()"
-                    >
-                        <option value="">Filter Status: All</option>
-                        <option value="Pending" {% if request.GET.status == 'Pending' %}selected{% endif %}>Pending</option>
-                        <option value="Delivered" {% if request.GET.status == 'Delivered' %}selected{% endif %}>Delivered</option>
-                        <option value="Cancelled" {% if request.GET.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
-                    </select>
-                </form>
+<style>
+/* ==========================================================================
+   FLIPKART EXACT ORDER LIST STYLE
+   ========================================================================== */
+body {
+    background: #f1f3f6;
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, "Segoe UI", Arial, sans-serif;
+    color: #212121;
+}
 
-                <div class="pane-divider"></div>
-                
-                <!-- Extra Metrics Board Data -->
-                <div class="metric-row">
-                    <span class="metric-label">Total Logs Found</span>
-                    <span class="metric-value">{{ orders|length }}</span>
-                </div>
-                <div class="metric-row">
-                    <span class="metric-label">Current Account Profile</span>
-                    <span class="metric-value" style="color: #0284c7;">{{ request.user.username|capfirst }}</span>
-                </div>
-            </aside>
+.orders-section {
+    padding: 16px 0;
+    min-height: 100vh;
+}
 
-            <!-- RIGHT CONTROL STREAM PANELS -->
-            <main class="orders-stream-container">
-                
-                {% if orders %}
-                    {% for order in orders %}
-                    <div class="slate-order-wrapper-row">
-                        
-                        <!-- Top Strip Header Meta Block -->
-                        <div class="order-strip-header">
-                            <div class="order-headline-meta-grid">
-                                <div class="headline-block">
-                                    <div class="cap">Tracking Reference</div>
-                                    <div class="det order-id-accent">#ORD-{{ order.id }}</div>
-                                </div>
-                                <div class="headline-block">
-                                    <div class="cap">Timestamp Placed</div>
-                                    <div class="det">{{ order.created_at|date:"d M Y" }}</div>
-                                </div>
-                                <div class="headline-block">
-                                    <!-- FIXED: Referencing your exact model variable: order.total_price -->
-                                    <div class="cap">Grand Total</div>
-                                    <div class="det" style="color: #0f172a; font-weight: 800;">₹{{ order.total_price }}</div>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                {% if order.status == "Delivered" %}
-                                    <span class="badge-pill-status st-delivered">Delivered</span>
-                                {% elif order.status == "Cancelled" %}
-                                    <span class="badge-pill-status st-cancelled">Cancelled</span>
-                                {% else %}
-                                    <span class="badge-pill-status st-pending">{{ order.status }}</span>
-                                {% endif %}
-                            </div>
-                        </div>
+.orders-container {
+    max-width: 1248px;
+    margin: 0 auto;
+    padding: 0 16px;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 16px;
+    align-items: start;
+}
 
-                        <div class="order-canvas-body">
+/* ==========================================
+   LEFT SIDEBAR: FILTERS (Desktop Only)
+   ========================================== */
+.fk-filter-sidebar {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.08);
+    border: 1px solid #e0e0e0;
+}
+
+.filter-title-main {
+    font-size: 18px;
+    font-weight: 500;
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    margin: 0;
+}
+
+.filter-section-box {
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.filter-section-box:last-child {
+    border-bottom: none;
+}
+
+.filter-header-sub {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: #212121;
+    margin: 0 0 12px 0;
+    letter-spacing: 0.5px;
+}
+
+.fk-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #212121;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.fk-checkbox-label input {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+/* ==========================================
+   RIGHT CONTENT: ORDERS STREAM
+   ========================================== */
+.orders-stream-box {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Search Bar Component */
+.fk-search-wrapper {
+    display: flex;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.04);
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+.fk-search-input {
+    flex: 1;
+    border: none;
+    padding: 12px 16px;
+    font-size: 14px;
+    outline: none;
+    color: #212121;
+}
+
+.fk-search-btn {
+    background: #2874f0;
+    color: #fff;
+    border: none;
+    padding: 0 24px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fk-search-btn:hover {
+    background: #125ece;
+}
+
+/* Mobile Category Pills */
+.mobile-filter-pills {
+    display: none;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0 12px 0;
+    scrollbar-width: none;
+}
+.mobile-filter-pills::-webkit-scrollbar {
+    display: none;
+}
+
+.pill-item {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    padding: 6px 16px;
+    border-radius: 16px;
+    font-size: 13px;
+    white-space: nowrap;
+    color: #212121;
+    text-decoration: none;
+}
+
+.pill-item.active {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+}
+
+/* Flipkart Order Row Card */
+.fk-order-card {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.05);
+    border: 1px solid #e0e0e0;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: auto 2.5fr 1fr 1.8fr;
+    gap: 24px;
+    align-items: start;
+    text-decoration: none !important;
+    color: unset !important;
+    transition: box-shadow 0.2s ease;
+}
+
+.fk-order-card:hover {
+    box-shadow: 0 4px 12px 0 rgba(0,0,0,.1);
+}
+
+/* Image Matrix Engine */
+.fk-img-container {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    width: 90px;
+}
+
+.single-img-frame {
+    width: 80px;
+    height: 80px;
+    border: 1px solid #f0f0f0;
+    padding: 4px;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.single-img-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Multi-image thumbnail block for layout matching */
+.multi-img-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 40px);
+    gap: 4px;
+    width: 84px;
+}
+
+.thumb-frame {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #f0f0f0;
+    border-radius: 2px;
+    background: #fff;
+    padding: 2px;
+    overflow: hidden;
+}
+
+.thumb-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Content Blocks */
+.fk-detail-col .prod-title {
+    font-size: 14px;
+    font-weight: 400;
+    color: #212121;
+    margin: 0 0 6px 0;
+    line-height: 1.4;
+}
+
+.fk-detail-col .prod-meta {
+    font-size: 12px;
+    color: #878787;
+    margin: 0;
+}
+
+.fk-price-col {
+    font-size: 14px;
+    font-weight: 500;
+    color: #212121;
+    white-space: nowrap;
+}
+
+.fk-status-col {
+    font-size: 14px;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.st-green { background: #26a541; }
+.st-red { background: #e53935; }
+.st-orange { background: #ff9f00; }
+
+.status-text-main {
+    font-weight: 500;
+    color: #212121;
+}
+
+.status-text-sub {
+    font-size: 12px;
+    color: #878787;
+    margin-top: 6px;
+    line-height: 1.4;
+}
+
+.rate-review-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #2874f0;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 12px;
+    text-decoration: none;
+}
+
+/* Mobile Chevron */
+.mobile-chevron {
+    display: none;
+    color: #212121;
+    align-items: center;
+}
+
+/* Minimalist Empty Layout */
+.fk-empty-state {
+    background: #fff;
+    padding: 40px;
+    text-align: center;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN (MOBILE LAYOUT CONTROL)
+   ========================================== */
+@media (max-width: 768px) {
+    .orders-container {
+        grid-template-columns: 1fr;
+        padding: 0 8px;
+    }
+
+    .fk-filter-sidebar {
+        display: none; /* Hide Sidebar on Mobile */
+    }
+
+    .mobile-filter-pills {
+        display: flex; /* Show pills carousel */
+    }
+
+    .fk-search-btn span {
+        display: none; /* Only search icon on mobile */
+    }
     
-                                <div class="nested-item-flex-row" style="cursor: pointer;" onclick="toggleOrderItems('{{ order.id }}')">
-                                    
-                                    <div style="position: relative; width: 85px; height: 85px;">
-                                        {% with first_item=order.items.all|first %}
-                                            {% if first_item.product.images.first %}
-                                                <img class="product-avatar" src="{{ first_item.product.images.first.image.url }}" alt="Product">
-                                            {% else %}
-                                                <img class="product-avatar" src="{% static 'img/no-image.png' %}" alt="No Image">
-                                            {% endif %}
-                                        {% endwith %}
+    .fk-search-btn {
+        padding: 0 16px;
+    }
 
-                                        {% if order.items.count > 1 %}
-                                        <div style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); 
-                                                    background: white; border: 1px solid #ddd; padding: 2px 8px; 
-                                                    border-radius: 4px; font-size: 11px; font-weight: bold; white-space: nowrap;
-                                                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                                            {{ order.items.count|add:"-1" }} More Items
-                                        </div>
-                                        {% endif %}
-                                    </div>
+    /* Flip Card to Full Mobile View */
+    .fk-order-card {
+        grid-template-columns: auto 1fr auto;
+        gap: 12px;
+        padding: 12px;
+        align-items: center;
+    }
 
-                                    <div class="product-meta-details">
-                                <h4>Order Summary - {{ order.items.count }} Item{{ order.items.count|pluralize }}</h4>
-                                <p style="font-size: 13px; color: #64748b;">
-                                    {% with first_item=order.items.all|first %}
-                                        {{ first_item.product.name }} 
-                                    {% endwith %}
-                                    
-                                    {% if order.items.count > 1 %}
-                                        and {{ order.items.count|add:"-1" }} other product{{ order.items.count|add:"-1"|pluralize }}...
-                                    {% endif %}
-                                </p>
-                                <span style="color: #0284c7; font-size: 12px; font-weight: 600;">Click to view all items <i class="fa fa-chevron-down"></i></span>
-                            </div>
-                                </div>
+    .fk-price-col {
+        display: none; /* Price hidden or merged in title on true mobile list view */
+    }
 
-                                <div id="items-list-{{ order.id }}" style="display: none; margin-top: 20px; border-top: 1px dashed #e2e8f0; padding-top: 20px;">
-                                    
-                                    {% for item in order.items.all %}
-                                        <div class="nested-item-flex-row {% if forloop.counter > 5 %}extra-item-{{ order.id }}{% endif %}" 
-                                            style="{% if forloop.counter > 5 %}display: none;{% endif %}">
-                                            
-                                            {% if item.product.images.first %}
-                                                <img class="product-avatar" src="{{ item.product.images.first.image.url }}" style="width: 50px; height: 50px;">
-                                            {% endif %}
-                                            
-                                            <div class="product-meta-details">
-                                                <h5 style="font-size: 14px; margin: 0;">{{ item.product.name }}</h5>
-                                                <small>Qty: {{ item.quantity }} | Price: ₹{{ item.price }}</small>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
+    .fk-detail-col {
+        display: none; /* Mobile shifts order timeline texts to status block */
+    }
 
-                                    {% if order.items.count > 5 %}
-                                    <div style="text-align: center; margin-top: 10px;">
-                                        <button id="btn-more-{{ order.id }}" onclick="showAllItems('{{ order.id }}')" 
-                                                style="background: none; border: none; color: #0284c7; font-weight: 600; cursor: pointer; font-size: 13px;">
-                                            View {{ order.items.count|add:"-5" }} more products...
-                                        </button>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
+    .mobile-chevron {
+        display: flex;
+    }
 
-                        <!-- Bottom Strip Address Metadata & Operations Area -->
-                        <div class="order-footer-workflow-strip">
-                            
-                            <!-- FIXED: Connected securely to address relationship model keys -->
-                            <div class="address-delivery-block">
-                                <i class="fa fa-map-pin"></i>
-                                <div class="address-text-wrapper">
-                                    {% if order.address %}
-                                        <span class="customer-name">Delivery Sent To:</span>
-                                        <strong>{{ order.address.full_name }}</strong> — Phone: {{ order.address.phone }}<br>
-                                        {{ order.address.address }}, {{ order.address.city }}, {{ order.address.state }} - <strong>{{ order.address.pincode }}</strong>
-                                    {% else %}
-                                        <span class="customer-name" style="color:#94a3b8; font-style: italic;">No address record linked to this invoice layout.</span>
-                                    {% endif %}
-                                </div>
-                            </div>
+    /* Status Column full restructuring for mobile text */
+    .fk-status-col {
+        grid-column: 2;
+    }
 
-                            <!-- Buttons Operations Cluster -->
-                            <div class="checkout-actions-cluster">
-                                <a href="{% url 'order_details' order.id %}" 
-                                class="action-btn-checkout btn-checkout-secondary">
+    .status-text-main {
+        font-size: 14px;
+    }
 
-                                    <i class="fa fa-eye"></i> Details
+    .status-text-sub {
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+    }
 
-                                </a>
-                                {% if order.status == "Delivered" %}
-
-<a href="{% url 'invoice' order.id %}"
-   class="action-btn-checkout btn-checkout-secondary">
-
-    <i class="fa fa-file-invoice-dollar"></i>
-
-    Download Invoice
-
-</a>
-
-{% endif %}
-
-                                {% if order.status == "Pending" %}
-                                <a href="#" class="action-btn-checkout btn-checkout-primary">
-                                    <i class="fa fa-truck-ramp-box"></i> Logistics Track
-                                </a>
-                                {% endif %}
-
-                                {% if order.status == "Delivered" %}
-                                <a href="#" class="action-btn-checkout btn-checkout-success">
-                                    <i class="fa fa-signature"></i> Leave Review
-                                </a>
-                                {% endif %}
-
-                                {% if order.status == "Pending" %}
-                                <form 
-                                    method="POST" 
-                                    action="#" 
-                                    style="display: inline; margin: 0;"
-                                    onsubmit="return confirm('Process immediate cancellation of this active order index?');"
-                                >
-                                    {% csrf_token %}
-                                    <button type="submit" class="action-btn-checkout btn-checkout-alert">
-                                        <i class="fa fa-ban"></i> Void Order
-                                    </button>
-                                </form>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                    </div>
-                    {% endfor %}
-                
-                {% else %}
-                    <!-- Minimalist Empty Panel Layout -->
-                    <div class="minimalist-blank-panel">
-                        <i class="fa fa-receipt"></i>
-                        <h3>No transaction history found</h3>
-                        <p>We could not pull up any registered invoices matching your account filtering configuration right now.</p>
-                        <a href="{% url 'shop' %}" class="action-btn-checkout btn-checkout-primary" style="height: 46px; padding: 0 24px;">
-                            Return to Store Marketplace
-                        </a>
-                    </div>
-                {% endif %}
-
-            </main>
-
+    .rate-review-link {
+        display: none;
+    }
+}
+</style>
+<div class="container-fluid">
+    <div class="row px-xl-5">
+        <div class="col-12">
+            <nav class="breadcrumb bg-light mb-30">
+                <a class="breadcrumb-item text-dark" href="{% url 'index' %}">
+                    Home
+                </a>
+                <a class="breadcrumb-item text-dark" href="{% url 'shop' %}">
+                    Shop
+                </a>
+                <span class="breadcrumb-item active">
+                    Orders
+                </span>
+            </nav>
         </div>
+    </div>
+</div>
+<div class="orders-section">
+    <div class="orders-container">
+        
+        <!-- 1. FILTERS SIDEBAR (DESKTOP) -->
+        <aside class="fk-filter-sidebar">
+            <h2 class="filter-title-main">Filters</h2>
+            
+            <form method="GET" action="">
+                <!-- Order Status Filters -->
+                <div class="filter-section-box">
+                    <h3 class="filter-header-sub">Order Status</h3>
+                    <label class="fk-checkbox-label">
+                        <input type="checkbox" name="status" value="On the way" {% if request.GET.status == 'On the way' %}checked{% endif %} onchange="this.form.submit()"> On the way
+                    </label>
+                    <label class="fk-checkbox-label">
+                        <input type="checkbox" name="status" value="Delivered" {% if request.GET.status == 'Delivered' %}checked{% endif %} onchange="this.form.submit()"> Delivered
+                    </label>
+                    <label class="fk-checkbox-label">
+                        <input type="checkbox" name="status" value="Cancelled" {% if request.GET.status == 'Cancelled' %}checked{% endif %} onchange="this.form.submit()"> Cancelled
+                    </label>
+                    <label class="fk-checkbox-label">
+                        <input type="checkbox" name="status" value="Returned" {% if request.GET.status == 'Returned' %}checked{% endif %} onchange="this.form.submit()"> Returned
+                    </label>
+                </div>
+
+                <!-- Order Time Filters -->
+                <div class="filter-section-box">
+                    <h3 class="filter-header-sub">Order Time</h3>
+                    <label class="fk-checkbox-label">
+                        <input type="checkbox" name="time" value="last_30" {% if request.GET.time == 'last_30' %}checked{% endif %} onchange="this.form.submit()"> Last 30 days
+                    </label>
+                    <label class="fk-checkbox-label">
+                        <input type="checkbox" name="time" value="2026" {% if request.GET.time == '2026' %}checked{% endif %} onchange="this.form.submit()"> 2026
+                    </label>
+                    <label class="fk-checkbox-label">
+                        <input type="checkbox" name="time" value="2025" {% if request.GET.time == '2025' %}checked{% endif %} onchange="this.form.submit()"> 2025
+                    </label>
+                    <label class="fk-checkbox-label">
+                        <input type="checkbox" name="time" value="older" {% if request.GET.time == 'older' %}checked{% endif %} onchange="this.form.submit()"> Older
+                    </label>
+                </div>
+            </form>
+        </aside>
+
+        <!-- 2. STREAM HOUSING CARD LAYOUT -->
+        <main class="orders-stream-box">
+            
+            <!-- Search Control Row -->
+            <form method="GET" action="">
+                <div class="fk-search-wrapper">
+                    <input type="text" name="q" value="{{ request.GET.q|default:'' }}" class="fk-search-input" placeholder="Search your orders here">
+                    <button type="submit" class="fk-search-btn">
+                        <i class="fa fa-search"></i> <span>Search Orders</span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Horizontal Carousel Filter Pills (Mobile Only View) -->
+            <div class="mobile-filter-pills">
+                <a href="?status=" class="pill-item {% if not request.GET.status %}active{% endif %}">All</a>
+                <a href="?status=On the way" class="pill-item {% if request.GET.status == 'On the way' %}active{% endif %}">On the way</a>
+                <a href="?status=Delivered" class="pill-item {% if request.GET.status == 'Delivered' %}active{% endif %}">Delivered</a>
+                <a href="?status=Cancelled" class="pill-item {% if request.GET.status == 'Cancelled' %}active{% endif %}">Cancelled</a>
+            </div>
+
+            <!-- Orders Listing Loop -->
+            {% if orders %}
+                {% for order in orders %}
+                <!-- Clicking card takes user to exact details view layout page directly -->
+                <a href="{% url 'order_details' order.id %}" class="fk-order-card">
+                    
+                    <!-- COLUMN 1: IMAGE COMPONENT (SINGLE OR MULTIPLE THUMBNAILS ACCORDING TO ITEMS CAP) -->
+                    <div class="fk-img-container">
+                        {% if order.items.count > 1 %}
+                            <!-- Grid for multi item order matching image_1edf5c.png -->
+                            <div class="multi-img-grid">
+                                {% for item in order.items.all|slice:":4" %}
+                                <div class="thumb-frame">
+                                    {% if item.product.images.first %}
+                                        <img src="{{ item.product.images.first.image.url }}" alt="Item">
+                                    {% else %}
+                                        <img src="{% static 'img/no-image.png' %}" alt="No Image">
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <!-- Single Image Showcase -->
+                            <div class="single-img-frame">
+                                {% with first_item=order.items.all|first %}
+                                    {% if first_item.product.images.first %}
+                                        <img src="{{ first_item.product.images.first.image.url }}" alt="Product">
+                                    {% else %}
+                                        <img src="{% static 'img/no-image.png' %}" alt="No Image">
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- COLUMN 2: DESCRIPTION COLUMN (Desktop Text Engine) -->
+                    <div class="fk-detail-col">
+                        <h3 class="prod-title">
+                            {% with first_item=order.items.all|first %}
+                                {{ first_item.product.name|truncatechars:45 }}
+                            {% endwith %}
+                            {% if order.items.count > 1 %}
+                                ... ({{ order.items.count }} Items)
+                            {% endif %}
+                        </h3>
+                        {% with first_item=order.items.all|first %}
+                            <p class="prod-meta">
+                                {% if first_item.color %}Color: {{ first_item.color }}{% endif %}
+                                {% if first_item.size %} | Size: {{ first_item.size }}{% endif %}
+                            </p>
+                        {% endwith %}
+                    </div>
+
+                    <!-- COLUMN 3: PRICE STRIP (Desktop View) -->
+                    <div class="fk-price-col">
+                        ₹{{ order.total_price }}
+                    </div>
+
+                    <!-- COLUMN 4: TRACKING TEXT STATUS (Dynamic responsive context mapping) -->
+                    <div class="fk-status-col">
+                        <div>
+                            {% if order.status == "Delivered" %}
+                                <span class="status-indicator st-green"></span>
+                                <span class="status-text-main">Delivered on {{ order.created_at|date:"M d, Y" }}</span>
+                                <p class="status-text-sub">Your item has been delivered</p>
+                                <span class="rate-review-link"><i class="fa fa-star"></i> Rate & Review Product</span>
+                            {% elif order.status == "Cancelled" %}
+                                <span class="status-indicator st-red"></span>
+                                <span class="status-text-main">Cancelled on {{ order.created_at|date:"M d, Y" }}</span>
+                                <p class="status-text-sub">Reason: {{ order.cancel_reason|default:"Cancelled by user" }}</p>
+                            {% else %}
+                                <span class="status-indicator st-orange"></span>
+                                <span class="status-text-main">Pickup by {{ order.created_at|date:"D, M d" }}</span>
+                                <p class="status-text-sub">Status is currently expected as {{ order.status }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- MOBILE EXTRA RIGHT ARROW CHEVRON ELEMENT -->
+                    <div class="mobile-chevron">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+                    </div>
+
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="fk-empty-state">
+                    <img src="{% static 'img/no-orders.png' %}" alt="" style="width:120px; opacity:0.6; margin-bottom:16px;">
+                    <h3>No Orders Found</h3>
+                    <p style="color:#878787; font-size:14px;">Looks like you haven't placed any orders matching this criteria.</p>
+                </div>
+            {% endif %}
+
+        </main>
 
     </div>
 </div>
-<script>
-function toggleOrderItems(orderId) {
-    const list = document.getElementById('items-list-' + orderId);
-    if (list.style.display === "none") {
-        list.style.display = "block";
-    } else {
-        list.style.display = "none";
-    }
-}
 
-function showAllItems(orderId) {
-    const extraItems = document.querySelectorAll('.extra-item-' + orderId);
-    extraItems.forEach(item => {
-        item.style.display = "grid"; 
-    });
-    
-    document.getElementById('btn-more-' + orderId).style.display = "none";
-}
-</script>
 {% endblock content %}

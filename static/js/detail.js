@@ -1,371 +1,290 @@
-// ======================================
-// PRODUCT IMAGE GALLERY
-// ======================================
+// ================= GLOBAL VARIABLES =================
+let selectedColor = "";
+let selectedSize = "";
+let currentVisibleIndex = 0; 
+let actionType = "";
+let currentProductId = "";
 
-const thumbnails = document.querySelectorAll(".small-product-image");
-
-const mainImage = document.getElementById(
-    "mainProductImage"
-);
-
-let currentImageIndex = 0;
-
-let autoSlide;
+// ================= IMAGE GALLERY LOGIC =================
 
 
-// CHANGE IMAGE
-function changeMainImage(element, index){
+function updateMainImageFromVisible(index) {
+    let visibleThumbs = Array.from(document.querySelectorAll(".thumb-wrapper"))
+                             .filter(wrapper => wrapper.style.display !== "none");
 
-    mainImage.src = element.src;
+    if (visibleThumbs.length === 0) return;
 
-    thumbnails.forEach(img => {
+    if (visibleThumbs.length === 1) {
+        index = 0;
+    } else {
+        if (index >= visibleThumbs.length) index = 0;
+        if (index < 0) index = visibleThumbs.length - 1;
+    }
 
-        img.classList.remove(
-            "active-thumb"
-        );
+    currentVisibleIndex = index;
 
+    let targetImg = visibleThumbs[currentVisibleIndex].querySelector("img");
+    document.getElementById("mainProductImage").src = targetImg.src;
+
+    document.querySelectorAll(".small-product-image").forEach(t => t.classList.remove("active-thumb"));
+    targetImg.classList.add("active-thumb");
+}
+
+function nextImage() {
+    updateMainImageFromVisible(currentVisibleIndex + 1);
+}
+
+function previousImage() {
+    updateMainImageFromVisible(currentVisibleIndex - 1);
+}
+
+function changeMainImage(element) {
+    document.getElementById("mainProductImage").src = element.src;
+    document.querySelectorAll(".small-product-image").forEach(thumb => thumb.classList.remove("active-thumb"));
+    element.classList.add("active-thumb");
+    
+    let visibleThumbs = Array.from(document.querySelectorAll(".thumb-wrapper"))
+                             .filter(wrapper => wrapper.style.display !== "none");
+    currentVisibleIndex = visibleThumbs.findIndex(wrapper => wrapper.contains(element));
+}
+
+// ================= COLOR & SIZE SELECTION =================
+
+document.addEventListener("DOMContentLoaded", function() {
+    
+    // COLOR SELECTION
+    document.querySelectorAll(".color-box").forEach(box => {
+        box.addEventListener("click", function() {
+            document.querySelectorAll(".color-box").forEach(c => c.classList.remove("active"));
+            this.classList.add("active");
+
+            selectedColor = this.dataset.color.trim().toLowerCase();
+            currentVisibleIndex = 0; 
+
+            let foundFirstImage = false;
+            document.querySelectorAll(".thumb-wrapper").forEach(wrapper => {
+                let imgColor = wrapper.getAttribute("data-thumb-color");
+
+                if (imgColor === selectedColor) {
+                    wrapper.style.display = "block";
+                    if (!foundFirstImage) {
+                        updateMainImageFromVisible(0);
+                        foundFirstImage = true;
+                    }
+                } else {
+                    wrapper.style.display = "none";
+                }
+            });
+        });
     });
 
-    element.classList.add(
-        "active-thumb"
-    );
-
-    currentImageIndex = index;
-}
-
-
-// UPDATE IMAGE
-function updateMainImage(){
-
-    if(!thumbnails.length) return;
-
-    const currentThumb =
-    thumbnails[currentImageIndex];
-
-    mainImage.src = currentThumb.src;
-
-    thumbnails.forEach(img => {
-
-        img.classList.remove(
-            "active-thumb"
-        );
-
+    // SIZE SELECTION
+    document.querySelectorAll(".size-badge").forEach(box => {
+        box.addEventListener("click", function() {
+            if(this.classList.contains("active")){
+                this.classList.remove("active");
+                selectedSize = "";
+                return;
+            }
+            document.querySelectorAll(".size-badge").forEach(s => s.classList.remove("active"));
+            this.classList.add("active");
+            selectedSize = this.dataset.size;
+        });
     });
 
-    currentThumb.classList.add(
-        "active-thumb"
-    );
-
-}
-
-
-// NEXT IMAGE
-function nextImage(){
-
-    currentImageIndex++;
-
-    if(currentImageIndex >= thumbnails.length){
-
-        currentImageIndex = 0;
-
-    }
-
-    updateMainImage();
-
-}
-
-
-// PREVIOUS IMAGE
-function previousImage(){
-
-    currentImageIndex--;
-
-    if(currentImageIndex < 0){
-
-        currentImageIndex =
-        thumbnails.length - 1;
-
-    }
-
-    updateMainImage();
-
-}
-
-
-// AUTO SLIDE
-function startAutoSlide(){
-
-    autoSlide = setInterval(() => {
-
-        if(thumbnails.length > 1){
-
-            nextImage();
-
+    // QUANTITY LOGIC
+    $('.btn-plus').on('click', function() {
+        let input = $('.details-quantity-input');
+        let currentVal = parseInt(input.val());
+        let maxStock = parseInt(input.data('stock'));
+        if (currentVal < maxStock) {
+            input.val(currentVal + 1);
+            $('.btn-minus').prop('disabled', false);
         }
+        if (parseInt(input.val()) >= maxStock) { $(this).prop('disabled', true); }
+    });
 
-    }, 3000);
+    $('.btn-minus').on('click', function() {
+        let input = $('.details-quantity-input');
+        let currentVal = parseInt(input.val());
+        if (currentVal > 1) {
+            input.val(currentVal - 1);
+            $('.btn-plus').prop('disabled', false);
+        }
+        if (parseInt(input.val()) <= 1) { $(this).prop('disabled', true); }
+    });
+});
 
+// ================= RATINGS POPOVER =================
+
+const popover = document.getElementById("ratingModal");
+const openTxt = document.getElementById("openRatingPopup");
+const summaryView = document.getElementById("summary-view");
+const reviewsListView = document.getElementById("popover-reviews-list");
+
+if(openTxt){
+    openTxt.addEventListener("click", function(e){
+        e.stopPropagation();
+        popover.classList.toggle("show");
+        if(popover.classList.contains("show")){
+            summaryView.style.display = "block";
+            reviewsListView.style.display = "none";
+            document.querySelectorAll(".progress-bar").forEach(bar => {
+                const originalWidth = bar.style.width;
+                bar.style.width = "0%";
+                setTimeout(() => {
+                    bar.style.transition = "width 1s ease";
+                    bar.style.width = originalWidth;
+                }, 100);
+            });
+        }
+    });
 }
 
+$("#show-popover-reviews").click(function(){ $("#summary-view").hide(); $("#popover-reviews-list").show(); });
+$("#back-to-summary").click(function(){ $("#popover-reviews-list").hide(); $("#summary-view").show(); });
+$(".rating-close-btn").click(function(){ 
+    document.getElementById("ratingModal").classList.remove("show"); 
+});
 
-// STOP AUTO SLIDE
-function stopAutoSlide(){
+document.addEventListener("click", function(e) {
+    const popoverBox = document.getElementById("ratingModal");
+    const triggerTxt = document.getElementById("openRatingPopup");
+    
+    if (popoverBox && popoverBox.classList.contains("show")) {
+        if (!popoverBox.contains(e.target) && e.target !== triggerTxt && !triggerTxt.contains(e.target)) {
+            popoverBox.classList.remove("show");
+        }
+    }
+});
 
-    clearInterval(autoSlide);
+// ================= VARIANT MODAL & AJAX =================
 
+function checkVariantSelection(){
+    let hasColor = $(".popup-color-box").length > 0;
+    let hasSize = $(".popup-size-box").length > 0;
+    let colorOk = !hasColor || selectedPopupColor;
+    let sizeOk = !hasSize || selectedPopupSize;
+    $("#continueVariantBtn").prop("disabled", !(colorOk && sizeOk));
 }
 
-
-// START GALLERY
-const imageBox =
-document.querySelector(".main-image-box");
-
-if(imageBox){
-
-    startAutoSlide();
-
-    imageBox.addEventListener(
-        "mouseenter",
-        stopAutoSlide
-    );
-
-    imageBox.addEventListener(
-        "mouseleave",
-        startAutoSlide
-    );
-
-}
-
-
-
-// ======================================
-// CSRF TOKEN
-// ======================================
-
-function getCSRFToken(){
-
-    const csrf =
-    document.querySelector(
-        "[name=csrfmiddlewaretoken]"
-    );
-
-    if(csrf){
-        return csrf.value;
+$(".buy-now, .add-to-cart").click(function(e){
+    e.preventDefault();
+    currentProductId = $(this).data("id");
+    actionType = $(this).hasClass("buy-now") ? "buy" : "cart";
+    
+    let hasColor = $(".color-box").length > 0;
+    let hasSize = $(".size-badge").length > 0;
+    
+    if((!hasColor || selectedColor) && (!hasSize || selectedSize)){
+        handleFinalAction(); 
+        return;
     }
 
-    return "";
+    $("#variantModal").fadeIn();
+});
+$(".close-variant").click(function(){
+    $("#variantModal").fadeOut();
+});
+
+$(window).click(function(event) {
+    if (event.target == document.getElementById("variantModal")) {
+        $("#variantModal").fadeOut();
+    }
+});
+$(".popup-color-box").click(function(){
+    $(".popup-color-box").removeClass("active");
+    $(this).addClass("active");
+    selectedPopupColor = $(this).data("color");
+    selectedColor = selectedPopupColor;
+    $('.color-box[data-color="' + selectedColor + '"]').trigger("click");
+    checkVariantSelection();
+});
+
+$(".popup-size-box").click(function(){
+    $(".popup-size-box").removeClass("active");
+    $(this).addClass("active");
+    
+    selectedPopupSize = $(this).attr("data-size") ? $(this).attr("data-size").trim() : $(this).text().trim();
+    selectedSize = selectedPopupSize;
+    
+    $('.size-badge').removeClass("active");
+    $('.size-badge[data-size="' + selectedSize + '"]').addClass("active");
+    
+    popupCheckSelection();
+});
+$("#continueVariantBtn").click(function(){ handleFinalAction(); });
+
+function handleFinalAction(){
+    let qty = $(".details-quantity-input").val() || 1;
+    let csrfToken = $("input[name=csrfmiddlewaretoken]").val();
+
+    if(actionType == "cart"){
+        $.ajax({
+            url: "/cart/add/" + currentProductId + "/",
+            type: "POST",
+            contentType: "application/json",
+            headers: { "X-CSRFToken": csrfToken, "X-Requested-With": "XMLHttpRequest" },
+            data: JSON.stringify({ quantity: qty, color: selectedColor, size: selectedSize }),
+            success:function(response){
+                $("#variantModal").fadeOut();
+                typeof showToast === "function" ? showToast("Added To Cart") : alert("Added To Cart");
+            }
+        });
+    } else {
+        let checkoutUrl = "{% url 'checkout' %}?buy_now=" + currentProductId +
+    "&qty=" + qty + "&color=" + encodeURIComponent(selectedColor) + "&size=" + encodeURIComponent(selectedSize);
+        window.location.href = checkoutUrl;
+    }
 }
-
-
-
-// ======================================
-// QUANTITY
-// ======================================
-
-const quantityInput =
-document.querySelector(
-    ".details-quantity-input"
-);
-
-const plusBtn =
-document.querySelector(
-    ".btn-plus"
-);
-
-const minusBtn =
-document.querySelector(
-    ".btn-minus"
-);
-
-// PRODUCT ID
-const mainCartBtn =
-document.querySelector(
-    ".add-to-cart"
-);
-
-let mainProductId = null;
-
-if(mainCartBtn){
-
-    mainProductId =
-    mainCartBtn.dataset.id;
-
+function popupCheckSelection() {
+    let hasColor = $(".popup-color-box").length > 0;
+    let hasSize = $(".popup-size-box").length > 0;
+    
+    let colorOk = !hasColor || selectedColor;
+    let sizeOk = !hasSize || selectedSize;
+    
+    $("#continueVariantBtn").prop("disabled", !(colorOk && sizeOk));
 }
+document.addEventListener("DOMContentLoaded", function () {
 
+    const btn = document.querySelector(".view-more-name");
 
-// STORAGE KEY
-const storageKey =
-`product_qty_${mainProductId}`;
+    if(btn){
 
+        btn.addEventListener("click", function(){
 
+            const shortName = document.querySelector(".short-name");
+            const fullName = document.querySelector(".full-name");
 
-// LOAD SAVED QTY
-if(quantityInput){
+            if(fullName.style.display === "none"){
 
-    const savedQty =
-    localStorage.getItem(storageKey);
+                fullName.style.display = "inline";
+                shortName.style.display = "none";
+                btn.innerText = " View Less";
 
-    if(savedQty){
+            }else{
 
-        quantityInput.value =
-        savedQty;
-
-    }
-
-}
-
-
-
-// UPDATE BUTTON STATE
-function updateQuantityButtons(){
-
-    if(!quantityInput) return;
-
-    let qty =
-    parseInt(quantityInput.value);
-
-    let maxStock =
-    parseInt(
-        quantityInput.dataset.stock
-    );
-
-    // PLUS BUTTON
-    if(qty >= maxStock){
-
-        plusBtn.disabled = true;
-
-    }
-    else{
-
-        plusBtn.disabled = false;
-
-    }
-
-    // MINUS BUTTON
-    if(qty <= 1){
-
-        minusBtn.disabled = true;
-
-    }
-    else{
-
-        minusBtn.disabled = false;
-
-    }
-
-}
-
-
-
-// PLUS
-if(plusBtn){
-
-    plusBtn.addEventListener(
-        "click",
-        function(){
-
-            let qty =
-            parseInt(quantityInput.value);
-
-            const maxStock =
-            parseInt(
-                quantityInput.dataset.stock
-            );
-
-            if(qty < maxStock){
-
-                qty++;
-
-                quantityInput.value = qty;
-
-                localStorage.setItem(
-                    storageKey,
-                    qty
-                );
-
-                updateQuantityButtons();
+                fullName.style.display = "none";
+                shortName.style.display = "inline";
+                btn.innerText = " View More";
 
             }
+        });
 
-        }
-    );
+    }
 
+});
+// ================= THUMBNAIL ONLY SCROLL LOGIC =================
+function scrollThumbnails(direction) {
+    const track = document.getElementById('thumbScrollTrack');
+    if (!track) return;
+
+    const scrollAmount = 190; 
+    
+    if (direction === 'left') {
+        track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    } else if (direction === 'right') {
+        track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
 }
-
-
-
-// MINUS
-if(minusBtn){
-
-    minusBtn.addEventListener(
-        "click",
-        function(){
-
-            let qty =
-            parseInt(quantityInput.value);
-
-            if(qty > 1){
-
-                qty--;
-
-                quantityInput.value = qty;
-
-                localStorage.setItem(
-                    storageKey,
-                    qty
-                );
-
-                updateQuantityButtons();
-
-            }
-
-        }
-    );
-
-}
-
-
-
-// MANUAL INPUT
-if(quantityInput){
-
-    quantityInput.addEventListener(
-        "input",
-        function(){
-
-            let qty =
-            parseInt(this.value);
-
-            const maxStock =
-            parseInt(
-                this.dataset.stock
-            );
-
-            if(isNaN(qty) || qty < 1){
-
-                qty = 1;
-
-            }
-
-            if(qty > maxStock){
-
-                qty = maxStock;
-
-            }
-
-            this.value = qty;
-
-            localStorage.setItem(
-                storageKey,
-                qty
-            );
-
-            updateQuantityButtons();
-
-        }
-    );
-
-}
-
-
-updateQuantityButtons();

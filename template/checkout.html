@@ -15,6 +15,8 @@
         {% csrf_token %}
         <input type="hidden" name="buy_now_id" value="{{ buy_now_id|default:'' }}">
         <input type="hidden" name="buy_now_qty" value="{{ buy_now_qty|default:'' }}">
+        <input type="hidden" name="buy_now_color" value="{{ buy_now_color|default:'' }}">
+        <input type="hidden" name="buy_now_size" value="{{ buy_now_size|default:'' }}">
         <div class="checkout-left-side">
             <div class="step-content active-step" id="step1">
 
@@ -37,6 +39,8 @@
                                 <div>
                                     <div class="order-name">{{ item.product.name }}</div>
                                     <div class="order-meta">Qty : {{ item.quantity }}</div>
+                                    <div class="order-meta">Color : {{ item.color }}</div>
+                                    <div class="order-meta">Size : {{ item.size }}</div>
                                 </div>
 
                             </div>

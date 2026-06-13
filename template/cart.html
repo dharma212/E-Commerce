@@ -95,7 +95,17 @@
                                     <h6>
                                         {{ item.product.name }}
                                     </h6>
+    {% if item.color %}
+    <small class="d-block text-primary">
+        Color : {{ item.color }}
+    </small>
+    {% endif %}
 
+    {% if item.size %}
+    <small class="d-block text-success">
+        Size : {{ item.size }}
+    </small>
+    {% endif %}
                                     <small class="text-muted">
                                         ₹{{ item.product.final_price }}
                                     </small>

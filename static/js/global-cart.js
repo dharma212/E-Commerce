@@ -254,6 +254,10 @@ document.addEventListener(
 
         const productId =
             button.dataset.id;
+            const isInCart =
+    button.classList.contains(
+        "active-cart-btn"
+    );
 
         // =====================================
         // QUANTITY
@@ -314,37 +318,85 @@ document.addEventListener(
         `;
 
         try{
+let selectedColor = "";
+let selectedSize = "";
 
-            const response =
-                await fetch(
-                    `/cart/add/${productId}/`,
-                    {
-                        method:"POST",
+/* COLOR */
 
-                        headers:{
+const activeColor =
+document.querySelector(".color-box.active");
 
-                            "Content-Type":
-                            "application/json",
+if(activeColor){
 
-                            "X-CSRFToken":
-                            getCSRFToken(),
+    selectedColor =
+        activeColor.dataset.color ||
+        activeColor.getAttribute("data-color") ||
+        activeColor.title ||
+        "";
+}
 
-                            "X-Requested-With":
-                            "XMLHttpRequest"
+/* SIZE */
 
-                        },
+const activeSize =
+document.querySelector(".size-badge.active");
 
-                        body: JSON.stringify({
+if(activeSize){
 
-                            quantity: quantity
+    selectedSize =
+        activeSize.dataset.size ||
+        activeSize.getAttribute("data-size") ||
+        activeSize.innerText.trim() ||
+        "";
+}
 
-                        })
+/* VALIDATION */
 
-                    }
-                );
+const hasColor = document.querySelectorAll(".color-box").length > 0;
+const hasSize = document.querySelectorAll(".size-badge").length > 0;
 
-            const data =
-                await response.json();
+if ((hasColor && !selectedColor) || (hasSize && !selectedSize)) {
+
+    button.disabled = false;
+    button.dataset.loading = "false";
+    button.innerHTML = oldHtml;
+
+    // OPEN POPUP
+    if ($("#variantModal").length) {
+
+        currentProductId = productId;
+        actionType = "cart";
+
+        $("#variantModal").fadeIn();
+    }
+
+    return;
+}
+
+const response =
+await fetch(
+    `/cart/add/${productId}/`,
+    {
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json",
+            "X-CSRFToken":getCSRFToken(),
+            "X-Requested-With":"XMLHttpRequest"
+        },
+
+        body: JSON.stringify({
+
+            quantity: quantity,
+
+            color: selectedColor,
+
+            size: selectedSize
+
+        })
+    }
+);
+
+const data = await response.json();
 
             // =====================================
             // CART COUNT
@@ -511,3 +563,132 @@ document.addEventListener(
 
     }
 );
+/* =========================================
+VARIANT POPUP CONTINUE
+========================================= */
+
+let popupProductId = null;
+
+document.addEventListener("click", function(e){
+
+    const continueBtn =
+        e.target.closest("#continueBtn");
+
+    if(!continueBtn){
+        return;
+    }
+
+    e.preventDefault();
+
+    const activeColor =
+        document.querySelector(
+            "#popupColors .variant-option.active"
+        );
+
+    const activeSize =
+        document.querySelector(
+            "#popupSizes .variant-option.active"
+        );
+
+    const selectedColor =
+        activeColor
+        ? activeColor.innerText.trim()
+        : "";
+
+    const selectedSize =
+        activeSize
+        ? activeSize.innerText.trim()
+        : "";
+
+    if(!selectedColor){
+
+        showCartToast(
+            "Please select color",
+            "error"
+        );
+
+        return;
+    }
+
+    if(!selectedSize){
+
+        showCartToast(
+            "Please select size",
+            "error"
+        );
+
+        return;
+    }
+
+    fetch(
+        `/cart/add/${popupProductId}/`,
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json",
+                "X-CSRFToken":getCSRFToken(),
+                "X-Requested-With":"XMLHttpRequest"
+            },
+
+            body:JSON.stringify({
+
+                quantity:1,
+                color:selectedColor,
+                size:selectedSize
+
+            })
+        }
+    )
+
+    .then(res=>res.json())
+
+    .then(data=>{
+
+        if(data.status==="added"){
+
+            document.getElementById(
+                "variantPopup"
+            ).style.display="none";
+
+            showCartToast(
+                `${selectedColor} / ${selectedSize} Added To Cart`,
+                "success"
+            );
+
+            const cartCount =
+                document.getElementById(
+                    "cart-count"
+                );
+
+            if(
+                cartCount &&
+                data.cart_count !== undefined
+            ){
+
+                cartCount.innerText =
+                    data.cart_count;
+
+            }
+
+        }else{
+
+            showCartToast(
+                "Something Went Wrong",
+                "error"
+            );
+
+        }
+
+    })
+
+    .catch(()=>{
+
+        showCartToast(
+            "Server Error",
+            "error"
+        );
+
+    });
+
+});

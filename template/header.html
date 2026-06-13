@@ -105,8 +105,11 @@
                                     <div class="mega-product-dropdown">
                                         <div class="mega-product-header">{{ type.name }} Products</div>
                                         {% for product in type.product_set.all|slice:":6" %}
-                                        <a href="{% url 'product_detail' product.id %}" class="mega-product-item">
-                                            <div class="mega-product-info">
+{% if product.slug %}
+    <a href="{% url 'product_detail' product.slug %}">
+{% else %}
+    <a href="{% url 'product_detail' product.slug %}">
+{% endif %}                                            <div class="mega-product-info">
                                                 <div class="mega-product-name">{{ product.name }}</div>
                                             </div>
                                         </a>
