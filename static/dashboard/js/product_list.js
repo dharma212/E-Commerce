@@ -9,7 +9,7 @@ function showToast(message, type = "success") {
         document.getElementById("toastContainer");
 
     // AUTO CREATE CONTAINER
-    if(!toastContainer){
+    if (!toastContainer) {
 
         toastContainer = document.createElement("div");
 
@@ -38,11 +38,11 @@ function showToast(message, type = "success") {
     toast.style.opacity = "0";
     toast.style.transition = "0.3s";
 
-    if(type === "success"){
+    if (type === "success") {
 
         toast.style.background = "#198754";
 
-    }else{
+    } else {
 
         toast.style.background = "#dc3545";
 
@@ -76,17 +76,17 @@ function showToast(message, type = "success") {
 // CSRF TOKEN
 // ========================================
 
-function getCSRFToken(){
+function getCSRFToken() {
 
     let cookieValue = null;
 
     const cookies = document.cookie.split(';');
 
-    for(let i = 0; i < cookies.length; i++){
+    for (let i = 0; i < cookies.length; i++) {
 
         const cookie = cookies[i].trim();
 
-        if(cookie.startsWith('csrftoken=')){
+        if (cookie.startsWith('csrftoken=')) {
 
             cookieValue = cookie.substring('csrftoken='.length);
 
@@ -102,35 +102,35 @@ function getCSRFToken(){
 // LOAD PRODUCTS
 // ========================================
 
-function loadProducts(){
+function loadProducts() {
 
     fetch('/api/products/')
 
-    .then(res => {
+        .then(res => {
 
-        if(!res.ok){
+            if (!res.ok) {
 
-            throw new Error("Failed to load products");
-        }
-
-        return res.json();
-
-    })
-
-    .then(data => {
-
-        let tbody = '';
-
-        data.forEach((item, index) => {
-
-            let imageUrl = '';
-
-            if(item.images && item.images.length > 0){
-
-                imageUrl = item.images[0].image;
+                throw new Error("Failed to load products");
             }
 
-            tbody += `
+            return res.json();
+
+        })
+
+        .then(data => {
+
+            let tbody = '';
+
+            data.forEach((item, index) => {
+
+                let imageUrl = '';
+
+                if (item.images && item.images.length > 0) {
+
+                    imageUrl = item.images[0].image;
+                }
+
+                tbody += `
 
             <tr>
 
@@ -138,8 +138,7 @@ function loadProducts(){
 
                 <td>
 
-                    ${
-                        imageUrl
+                    ${imageUrl
 
                         ?
 
@@ -160,22 +159,20 @@ function loadProducts(){
 
                     <div class="product-title">
 
-                        ${
-                            item.name && item.name.length > 35
+                        ${item.name && item.name.length > 35
 
-                            ?
+                        ?
 
-                            item.name.substring(0, 35) + '...'
+                        item.name.substring(0, 35) + '...'
 
-                            :
+                        :
 
-                            item.name
-                        }
+                        item.name
+                    }
 
                     </div>
 
-                    ${
-                        item.discount > 0
+                    ${item.discount > 0
 
                         ?
 
@@ -193,31 +190,29 @@ function loadProducts(){
                 <td>${item.type_name || 'N/A'}</td>
 
                 <td>
-    ${
-        item.colors && item.colors.length > 0
-        ?
-        item.colors.map(c => `
+    ${item.colors && item.colors.length > 0
+                        ?
+                        item.colors.map(c => `
             <span class="color-badge" style="background:${c.name.toLowerCase()}">
                 ${c.name}
             </span>
         `).join(' ')
-        :
-        'N/A'
-    }
+                        :
+                        'N/A'
+                    }
 </td>
 
                 <td>
-    ${
-        item.sizes && item.sizes.length > 0
-        ?
-        item.sizes.map(s => `
+    ${item.sizes && item.sizes.length > 0
+                        ?
+                        item.sizes.map(s => `
             <span class="size-badge">
                 ${s.name}
             </span>
         `).join(' ')
-        :
-        'N/A'
-    }
+                        :
+                        'N/A'
+                    }
 </td>
 
                 <td class="price">
@@ -228,8 +223,7 @@ function loadProducts(){
 
                     </div>
 
-                    ${
-                        item.discount > 0
+                    ${item.discount > 0
 
                         ?
 
@@ -244,8 +238,7 @@ function loadProducts(){
 
                 <td>
 
-                    ${
-                        item.discount > 0
+                    ${item.discount > 0
 
                         ?
 
@@ -264,8 +257,7 @@ function loadProducts(){
 
                 <td>
 
-                    ${
-                        item.stock > 0
+                    ${item.stock > 0
 
                         ?
 
@@ -307,94 +299,97 @@ function loadProducts(){
             </tr>
 
             `;
-        });
+            });
 
-        // ==========================
-        // ADD HTML
-        // ==========================
+            // ==========================
+            // ADD HTML
+            // ==========================
 
-        $('#productTable tbody').html(tbody);
+            $('#productTable tbody').html(tbody);
 
-        // ==========================
-        // DESTROY OLD TABLE
-        // ==========================
+            // ==========================
+            // DESTROY OLD TABLE
+            // ==========================
 
-        if($.fn.DataTable.isDataTable('#productTable')){
+            if (
+                $.fn.DataTable &&
+                $.fn.DataTable.isDataTable('#productTable')
+            ) {
 
-            $('#productTable').DataTable().destroy();
-        }
-
-        // ==========================
-        // INIT DATATABLE
-        // ==========================
-
-        $('#productTable').DataTable({
-
-            destroy:true,
-
-            pageLength:10,
-
-            ordering:true,
-
-            responsive:false,
-
-            autoWidth:false,
-
-            scrollX:false,
-
-            columnDefs:[
-
-                {
-                    targets:-1,
-                    orderable:false,
-                    searchable:false
-                }
-
-            ],
-
-            language:{
-
-                lengthMenu:
-                    "Show _MENU_ entries",
-
-                zeroRecords:
-                    "No matching products found",
-
-                info:
-                    "Showing _START_ to _END_ of _TOTAL_ products",
-
-                infoEmpty:
-                    "No products available",
-
-                search:"",
-
-                searchPlaceholder:
-                    "Search products...",
-
-                paginate:{
-
-                    previous:
-                        "<i class='bi bi-chevron-left'></i>",
-
-                    next:
-                        "<i class='bi bi-chevron-right'></i>"
-                }
+                $('#productTable').DataTable().destroy();
             }
-        });
 
-        // ==========================
-        // DELETE BUTTON
-        // ==========================
+            // ==========================
+            // INIT DATATABLE
+            // ==========================
 
-        $('.delete-btn').off('click').on('click', function(){
+            $('#productTable').DataTable({
 
-            let id = $(this).data('id');
+                destroy: true,
 
-            deleteProduct(id);
+                pageLength: 10,
 
-        });
+                ordering: true,
 
-    })
+                responsive: false,
+
+                autoWidth: false,
+
+                scrollX: false,
+
+                columnDefs: [
+
+                    {
+                        targets: -1,
+                        orderable: false,
+                        searchable: false
+                    }
+
+                ],
+
+                language: {
+
+                    lengthMenu:
+                        "Show _MENU_ entries",
+
+                    zeroRecords:
+                        "No matching products found",
+
+                    info:
+                        "Showing _START_ to _END_ of _TOTAL_ products",
+
+                    infoEmpty:
+                        "No products available",
+
+                    search: "",
+
+                    searchPlaceholder:
+                        "Search products...",
+
+                    paginate: {
+
+                        previous:
+                            "<i class='bi bi-chevron-left'></i>",
+
+                        next:
+                            "<i class='bi bi-chevron-right'></i>"
+                    }
+                }
+            });
+
+            // ==========================
+            // DELETE BUTTON
+            // ==========================
+
+            $('.delete-btn').off('click').on('click', function () {
+
+                let id = $(this).data('id');
+
+                deleteProduct(id);
+
+            });
+
+        })
 
     // .catch(error => {
 
@@ -414,60 +409,53 @@ function loadProducts(){
 // PAGE LOAD
 // ================================
 
-document.addEventListener("DOMContentLoaded", function(){
-
-    loadProducts();
-
-});
-
-
 // ========================================
 // DELETE PRODUCT
 // ========================================
 
-function deleteProduct(id){
+function deleteProduct(id) {
 
     fetch(`/api/products/${id}/delete/`, {
 
-        method:"DELETE",
+        method: "DELETE",
 
-        headers:{
+        headers: {
 
             "X-CSRFToken": getCSRFToken(),
-            "Content-Type":"application/json"
+            "Content-Type": "application/json"
 
         }
 
     })
 
-    .then(res => {
+        .then(res => {
 
-        if(!res.ok){
+            if (!res.ok) {
 
-            throw new Error("Delete failed");
-        }
+                throw new Error("Delete failed");
+            }
 
-        return res.json();
-    })
+            return res.json();
+        })
 
-    .then(data => {
+        .then(data => {
 
-        showToast(data.message, "success");
+            showToast(data.message, "success");
 
-        loadProducts();
+            loadProducts();
 
-    })
+        })
 
-    .catch(error => {
+        .catch(error => {
 
-        console.log(error);
+            console.log(error);
 
-        showToast(
-    "Failed to delete product",
-    "error"
-);
+            showToast(
+                "Failed to delete product",
+                "error"
+            );
 
-    });
+        });
 }
 
 
@@ -477,13 +465,13 @@ function deleteProduct(id){
 
 const closeBtn = document.querySelector(".close-btn");
 
-if(closeBtn){
+if (closeBtn) {
 
-    closeBtn.onclick = function(){
+    closeBtn.onclick = function () {
 
         const modal = document.getElementById("imageModal");
 
-        if(modal){
+        if (modal) {
 
             modal.style.display = "none";
         }
@@ -495,11 +483,11 @@ if(closeBtn){
 // CLOSE MODAL ON OUTSIDE CLICK
 // ========================================
 
-window.onclick = function(event){
+window.onclick = function (event) {
 
     const modal = document.getElementById("imageModal");
 
-    if(event.target === modal){
+    if (event.target === modal) {
 
         modal.style.display = "none";
     }
@@ -510,7 +498,7 @@ window.onclick = function(event){
 // IMAGE GALLERY
 // ========================================
 
-function openImageGallery(images){
+function openImageGallery(images) {
 
     let modal = document.getElementById("imageModal");
 
@@ -522,7 +510,7 @@ function openImageGallery(images){
 
     thumbContainer.innerHTML = "";
 
-    if(!images || images.length === 0){
+    if (!images || images.length === 0) {
         return;
     }
 
@@ -537,7 +525,7 @@ function openImageGallery(images){
 
         thumb.className = "thumb-img";
 
-        if(index === 0){
+        if (index === 0) {
 
             thumb.classList.add("active");
         }
@@ -547,7 +535,7 @@ function openImageGallery(images){
             mainImg.src = imgObj.image;
 
             document.querySelectorAll(".thumb-img")
-            .forEach(el => el.classList.remove("active"));
+                .forEach(el => el.classList.remove("active"));
 
             thumb.classList.add("active");
         };
@@ -561,7 +549,7 @@ function openImageGallery(images){
 // INITIAL LOAD
 // ========================================
 
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded", function () {
 
     loadProducts();
 

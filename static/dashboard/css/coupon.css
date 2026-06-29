@@ -1,0 +1,188 @@
+.content-wrapper {
+    background: #f8fafc; 
+    min-height: 100vh;
+    padding: 2rem;
+}
+.page-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+.btn-create {
+    background: #2563eb;
+    color: #ffffff !important;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    transition: all 0.2s;
+}
+.btn-create:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.table-responsive-custom {
+    background: transparent;
+    border: none;
+}
+
+.table-custom {
+    border-collapse: separate !important;
+    border-spacing: 0 12px !important; 
+    width: 100% !important;
+}
+.table-custom thead th {
+    background: #1e293b !important; 
+    color: #ffffff !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    padding: 16px !important;
+    border: none !important;
+}
+.table-custom thead tr th:first-child {
+    border-top-left-radius: 10px !important;
+    border-bottom-left-radius: 10px !important;
+}
+.table-custom thead tr th:last-child {
+    border-top-right-radius: 10px !important;
+    border-bottom-right-radius: 10px !important;
+}
+
+.table-custom tbody tr {
+    background: #ffffff !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important;
+    border-radius: 10px !important;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.table-custom tbody tr:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;
+}
+.table-custom td {
+    padding: 16px !important;
+    vertical-align: middle !important;
+    border: none !important;
+    color: #334155;
+    font-size: 0.95rem;
+}
+.table-custom tbody tr td:first-child {
+    border-top-left-radius: 10px !important;
+    border-bottom-left-radius: 10px !important;
+}
+.table-custom tbody tr td:last-child {
+    border-top-right-radius: 10px !important;
+    border-bottom-right-radius: 10px !important;
+}
+
+.badge-coupon {
+    font-family: monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: #f1f5f9 !important;
+    color: #1e293b !important;
+    border: 1px solid #e2e8f0;
+    padding: 6px 12px !important;
+    border-radius: 6px;
+}
+
+.discount-text {
+    color: #16a34a !important;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.status-active {
+    background: #dcfce7 !important;
+    color: #16a34a !important;
+    padding: 6px 14px !important;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+.status-inactive {
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
+    padding: 6px 14px !important;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.btn-action {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    margin: 0 4px;
+    transition: all 0.2s;
+    border: none;
+    color: #ffffff !important;
+}
+.btn-edit-custom {
+    background: #2563eb;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+}
+.btn-edit-custom:hover {
+    background: #1d4ed8;
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.4);
+}
+.btn-delete-custom {
+    background: #ef4444;
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+}
+.btn-delete-custom:hover {
+    background: #dc2626;
+    box-shadow: 0 6px 14px rgba(239, 68, 68, 0.4);
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid #cbd5e1 !important;
+    color: #334155 !important;
+    border-radius: 8px;
+    padding: 8px 14px;
+    width: 250px;
+    outline: none;
+}
+.dataTables_wrapper .dataTables_filter input:focus {
+    border-color: #2563eb !important;
+}
+
+.clean-modal {
+    background: #ffffff;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+.clean-modal .modal-header {
+    border-bottom: 1px solid #f1f5f9;
+    padding: 20px 24px;
+}
+.form-label-custom {
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+}
+.form-control-custom {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    padding: 10px 14px !important;
+    height: auto !important;
+    font-size: 0.95rem;
+}
+.form-control-custom:focus {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12) !important;
+}

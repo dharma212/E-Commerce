@@ -1113,3 +1113,38 @@ DETAILS PAGE QUANTITY
     font-weight: 700 !important;
     line-height: 1;
 }
+body, 
+html, 
+main,
+.container-fluid, 
+.row, 
+.product-detail-row {
+    overflow: visible !important;
+}
+
+.product-detail-row {
+    display: flex !important;
+    align-items: flex-start !important;
+}
+
+.product-detail-row > .col-lg-5 {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 30px !important; 
+    z-index: 99 !important;
+    height: max-content !important; 
+}
+
+.sticky-product-gallery {
+    height: auto !important;
+}
+
+@media (max-width: 991px) {
+    .product-detail-row {
+        display: block !important;
+    }
+    .product-detail-row > .col-lg-5 {
+        position: static !important;
+        top: initial !important;
+    }
+}

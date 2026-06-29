@@ -37,7 +37,7 @@
                                 {% endif %}
 
                                 <div>
-                                    <div class="order-name">{{ item.product.name }}</div>
+                                    <div class="order-name">{{ item.product.name | truncatechars:75 }}</div>
                                     <div class="order-meta">Qty : {{ item.quantity }}</div>
                                     <div class="order-meta">Color : {{ item.color }}</div>
                                     <div class="order-meta">Size : {{ item.size }}</div>
@@ -179,22 +179,129 @@
                 </div>
             </div>
         </div>
-
-        <div class="checkout-right-side">
-            <h4 class="mb-4">Price Details</h4>
-            <div class="total-box">
-                <div class="total-line"><span>Subtotal</span><span>₹{{ subtotal }}</span></div>
-                <div class="total-line"><span>Shipping</span><span>₹{{ shipping }}</span></div>
-                <div class="total-line final"><span>Total</span><span>₹{{ grand_total }}</span></div>
+<div class="checkout-right-side">
+    <div class="coupon-action-section mb-4">
+        {% if not coupon_code %}
+        <div class="coupon-banner-box" data-toggle="modal" data-target="#couponModal" style="cursor: pointer; border: 1px solid #ddd; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-percentage text-primary mr-2"></i>
+                <div class="banner-text-sub">Apply coupon code to get discount</div>
             </div>
-            <div class="action-controller">
-                <button type="button"class="btn-theme"id="primaryActionBtn"{% if not cart_items %}disabled style="opacity:0.6; cursor:not-allowed; color:black;"{% endif %}>
-                    {% if cart_items %}Continue{% else %}No Products{% endif %}
+            <button type="button" class="btn btn-sm btn-outline-success">Apply</button>
+        </div>
+        {% else %}
+        <div class="applied-coupon-box" style="background: #f0fff4; padding: 10px; border-radius: 8px; border: 1px solid #22c55e; display: flex; justify-content: space-between; align-items: center;">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle text-success mr-2"></i>
+                <div>
+                    <div style="font-size: 12px; font-weight: 600; color: #388e3c;">Coupon Applied</div>
+                    <div style="font-weight: 700; color: #166534;">{{ coupon_code }}</div>
+                </div>
+            </div>
+            <button type="submit" form="removeCouponForm" class="text-danger" style="background:none; border:none; padding:0; text-decoration:underline; font-size: 13px; cursor:pointer;">
+                Remove
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+    <h4 class="mb-4">Price Details</h4>
+    
+    <div class="total-box">
+        <div class="total-line">
+            <span>MRP (Incl. of all taxes)</span>
+            <span style="text-decoration: line-through; color: #878787;">₹{{ total_mrp }}</span>
+        </div>
+
+        {% if total_savings and not coupon_code %}
+        <div class="total-line">
+            <span>Discount</span>
+            <span style="color: #388e3c;">₹{{ total_savings }}</span>
+        </div>
+        {% endif %}
+
+        <div class="total-line">
+            <span>Selling Price (Subtotal)</span>
+            <span>₹{{ subtotal }}</span>
+        </div>
+
+        <div class="total-line">
+            <span>Platform Fee</span>
+            <span style="font-weight: 500;">₹{{ shipping }}</span>
+        </div>
+
+        {% if coupon_code %}
+        <div class="total-line" style="background-color: #f0fff4; padding: 6px 10px; border-radius: 4px; margin: 4px 0;">
+            <span style="color: #22c55e; font-weight: 600;"><i class="fas fa-ticket-alt mr-1"></i> Coupon ({{ coupon_code }})</span>
+            <span style="color: #22c55e; font-weight: 600;">- ₹{{ coupon_discount }}</span>
+        </div>
+        {% endif %}
+
+        <div class="total-line final">
+            <span>Total Amount</span>
+            <span>₹{{ grand_total }}</span>
+        </div>
+    </div>
+
+    {% if total_savings %}
+    <div class="savings-box" style="color: #388e3c; font-size: 14px; font-weight: 600; background: #f5f9f5; padding: 10px; border-radius: 4px; margin: 15px 0; text-align: center; border: 1px dashed #388e3c;">
+        <i class="fas fa-tag"></i> 
+        <span>You will save ₹{{ total_savings }} on this order</span>
+    </div>
+    {% endif %}
+
+    <div class="action-controller">
+        <button type="button" class="btn-theme" id="primaryActionBtn" {% if not cart_items %}disabled style="opacity:0.6; cursor:not-allowed;"{% endif %}>
+            {% if cart_items %}Continue{% else %}No Products{% endif %}
+        </button>
+        <button type="button" class="btn-outline-theme mt-2" id="secondaryBackBtn" style="display:none;">Back</button>
+    </div>
+</div>
+</form> 
+
+<form id="removeCouponForm" method="POST" action="{% url 'remove_coupon' %}" style="display:none;">
+    {% csrf_token %}
+</form>
+<div class="modal fade" id="couponModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 450px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden;">
+            
+            <div class="modal-header border-0 px-4 py-3 align-items-center">
+                <h5 class="modal-title font-weight-bold">Available Coupons</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
                 </button>
-                <button type="button" class="btn-outline-theme mt-2" id="secondaryBackBtn" style="display:none;">Back</button>
+            </div>
+            
+            <div class="modal-body px-4 pb-4" style="max-height: 70vh; overflow-y: auto; scrollbar-width: thin;">
+                
+                <div class="coupon-list">
+                    {% for coupon in available_coupons %}
+                    <div class="coupon-card p-3 mb-3 d-flex justify-content-between align-items-center" 
+                         style="border: 1px solid #eef2f7; border-radius: 16px; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                        
+                        <div class="coupon-info">
+                            <div class="font-weight-bold" style="font-size: 1.05rem; color: #1a202c;">{{ coupon.code }}</div>
+                            <div class="text-muted" style="font-size: 0.75rem;">Valid till: {{ coupon.valid_to|date:"d M, Y" }}</div>
+                        </div>
+                        
+                        <form method="POST" action="{% url 'apply_coupon' %}" class="m-0">
+                            {% csrf_token %}
+                            <input type="hidden" name="coupon_id" value="{{ coupon.id }}">
+                            <button type="submit" class="btn btn-dark btn-sm px-3" style="border-radius: 10px; font-weight: 600;">Apply</button>
+                        </form>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-ticket-alt fa-2x mb-2 opacity-50"></i>
+                        <p>No coupons available.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                
             </div>
         </div>
-    </form>
+    </div>
 </div>
 
 <div class="modal fade" id="addressModal" tabindex="-1">
@@ -301,5 +408,105 @@ if(step === 4) {
     });
 });
 </script>
+<style>
+    .coupon-card{
 
+padding:20px;
+
+border:1px solid #eee;
+
+border-radius:15px;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:15px;
+
+background:white;
+
+}
+
+.coupon-card.used{
+
+background:#f5f5f5;
+
+opacity:.7;
+
+}
+.coupon-banner-box {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fff9 100%);
+    border: 2px solid #22c55e;
+    padding: 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
+    transition: all 0.4s ease;
+    animation: pulse-border 2s infinite; 
+}
+
+.coupon-banner-box:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.25);
+}
+
+.coupon-icon-wrap {
+    width: 40px;
+    height: 40px;
+    background: #22c55e;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.banner-text-main {
+    font-weight: 800;
+    color: #166534;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+}
+
+.banner-text-sub {
+    font-size: 12px;
+    color: #4a5568;
+    margin-top: 2px;
+}
+
+@keyframes pulse-border {
+    0% { border-color: #22c55e; }
+    50% { border-color: #86efac; }
+    100% { border-color: #22c55e; }
+}
+.applied-coupon-box {
+    background: #f0fff4;
+    border: 1px solid #22c55e;
+    padding: 12px 15px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.applied-text {
+    font-size: 12px;
+    color: #22c55e;
+    font-weight: 600;
+}
+
+.coupon-code-label {
+    font-weight: 800;
+    color: #166534;
+    font-size: 14px;
+}
+
+</style>
 {% endblock content %}

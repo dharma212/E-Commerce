@@ -1,10 +1,8 @@
-console.log("GLOBAL CART LOADED");
-
 /* =========================================
 CSRF TOKEN
 ========================================= */
 
-function getCSRFToken(){
+function getCSRFToken() {
 
     const token =
         document.querySelector(
@@ -17,8 +15,6 @@ function getCSRFToken(){
 
 }
 
-
-
 /* =========================================
 MODERN TOAST
 ========================================= */
@@ -26,7 +22,7 @@ MODERN TOAST
 function showCartToast(
     message,
     type = "success"
-){
+) {
 
     // REMOVE OLD
     const oldToast =
@@ -34,7 +30,7 @@ function showCartToast(
             ".cart-toast"
         );
 
-    if(oldToast){
+    if (oldToast) {
 
         oldToast.remove();
 
@@ -50,24 +46,24 @@ function showCartToast(
     // ICON
     let icon = "";
 
-    if(type === "success"){
+    if (type === "success") {
 
         icon =
-        `<i class="fa fa-check-circle mr-2"></i>`;
+            `<i class="fa fa-check-circle mr-2"></i>`;
 
     }
 
-    else if(type === "error"){
+    else if (type === "error") {
 
         icon =
-        `<i class="fa fa-times-circle mr-2"></i>`;
+            `<i class="fa fa-times-circle mr-2"></i>`;
 
     }
 
-    else{
+    else {
 
         icon =
-        `<i class="fa fa-info-circle mr-2"></i>`;
+            `<i class="fa fa-info-circle mr-2"></i>`;
 
     }
 
@@ -111,7 +107,7 @@ TOAST CSS
 ========================================= */
 
 const toastStyle =
-document.createElement("style");
+    document.createElement("style");
 
 toastStyle.innerHTML = `
 
@@ -229,23 +225,23 @@ GLOBAL CART
 
 document.addEventListener(
     "click",
-    async function(e){
+    async function (e) {
 
         const button =
-            e.target.closest(
-                ".add-to-cart"
-            );
-
-        if(!button){
+            e.target.closest(".add-to-cart, .buy-now");
+        popupAction = button.classList.contains("buy-now")
+            ? "buy"
+            : "cart";
+        if (!button) {
             return;
         }
 
         e.preventDefault();
 
         // DOUBLE CLICK PREVENT
-        if(
+        if (
             button.dataset.loading === "true"
-        ){
+        ) {
             return;
         }
 
@@ -254,11 +250,88 @@ document.addEventListener(
 
         const productId =
             button.dataset.id;
-            const isInCart =
-    button.classList.contains(
-        "active-cart-btn"
-    );
+        // PRODUCT HAS VARIANTS ?
+        const hasColors =
+            button.dataset.colors &&
+            button.dataset.colors.trim() !== "";
 
+        const hasSizes =
+            button.dataset.sizes &&
+            button.dataset.sizes.trim() !== "";
+
+        // OPEN POPUP FIRST
+        if (hasColors || hasSizes) {
+
+            popupProductId = productId;
+            const nameEl = document.getElementById("popupProductName");
+            if (nameEl) {
+                nameEl.innerText = btn.dataset.name;
+            }
+
+            const colorsDiv =
+                document.getElementById("popupColors");
+
+            const sizesDiv =
+                document.getElementById("popupSizes");
+
+            colorsDiv.innerHTML = "";
+            sizesDiv.innerHTML = "";
+
+            (button.dataset.colors || "")
+                .split(",")
+                .forEach(color => {
+
+                    color = color.trim();
+
+                    if (color) {
+                        colorsDiv.innerHTML += `
+                <span class="variant-option">
+                    ${color}
+                </span>
+            `;
+                    }
+
+                });
+
+            (button.dataset.sizes || "")
+                .split(",")
+                .forEach(size => {
+
+                    size = size.trim();
+
+                    if (size) {
+                        sizesDiv.innerHTML += `
+                <span class="variant-option">
+                    ${size}
+                </span>
+            `;
+                    }
+
+                });
+
+            const variantPopup =
+                document.getElementById("variantPopup");
+
+            if (variantPopup) {
+                variantPopup.style.display = "flex";
+            }
+
+            button.dataset.loading = "false";
+
+            return; // IMPORTANT
+        }
+        const isInCart =
+            button.classList.contains(
+                "active-cart-btn"
+            );
+        if (
+            popupAction === "cart" &&
+            isInCart &&
+            button.classList.contains("px-3")
+        ) {
+            window.location.href = "/cart/";
+            return;
+        }
         // =====================================
         // QUANTITY
         // =====================================
@@ -266,38 +339,38 @@ document.addEventListener(
         let quantity = 1;
 
         // DETAILS PAGE
-        if(
+        if (
             button.classList.contains("px-3")
-        ){
+        ) {
 
             const quantityInput =
                 document.querySelector(
                     ".quantity input"
                 );
 
-            if(quantityInput){
+            if (quantityInput) {
 
                 quantity =
-                parseInt(
-                    quantityInput.value
-                );
+                    parseInt(
+                        quantityInput.value
+                    );
 
-                if(
+                if (
                     isNaN(quantity)
                     || quantity < 1
-                ){
+                ) {
 
                     quantity = 1;
 
                 }
 
                 const maxStock =
-                parseInt(
-                    quantityInput.dataset.stock
-                );
+                    parseInt(
+                        quantityInput.dataset.stock
+                    );
 
                 // MAX STOCK
-                if(quantity > maxStock){
+                if (quantity > maxStock) {
 
                     quantity = maxStock;
 
@@ -317,86 +390,86 @@ document.addEventListener(
             <span class="spinner-border spinner-border-sm"></span>
         `;
 
-        try{
-let selectedColor = "";
-let selectedSize = "";
+        try {
+            let selectedColor = "";
+            let selectedSize = "";
 
-/* COLOR */
+            /* COLOR */
 
-const activeColor =
-document.querySelector(".color-box.active");
+            const activeColor =
+                document.querySelector(".color-box.active");
 
-if(activeColor){
+            if (activeColor) {
 
-    selectedColor =
-        activeColor.dataset.color ||
-        activeColor.getAttribute("data-color") ||
-        activeColor.title ||
-        "";
-}
+                selectedColor =
+                    activeColor.dataset.color ||
+                    activeColor.getAttribute("data-color") ||
+                    activeColor.title ||
+                    "";
+            }
 
-/* SIZE */
+            /* SIZE */
 
-const activeSize =
-document.querySelector(".size-badge.active");
+            const activeSize =
+                document.querySelector(".size-badge.active");
 
-if(activeSize){
+            if (activeSize) {
 
-    selectedSize =
-        activeSize.dataset.size ||
-        activeSize.getAttribute("data-size") ||
-        activeSize.innerText.trim() ||
-        "";
-}
+                selectedSize =
+                    activeSize.dataset.size ||
+                    activeSize.getAttribute("data-size") ||
+                    activeSize.innerText.trim() ||
+                    "";
+            }
 
-/* VALIDATION */
+            /* VALIDATION */
 
-const hasColor = document.querySelectorAll(".color-box").length > 0;
-const hasSize = document.querySelectorAll(".size-badge").length > 0;
+            const hasColor = document.querySelectorAll(".color-box").length > 0;
+            const hasSize = document.querySelectorAll(".size-badge").length > 0;
 
-if ((hasColor && !selectedColor) || (hasSize && !selectedSize)) {
+            if ((hasColor && !selectedColor) || (hasSize && !selectedSize)) {
 
-    button.disabled = false;
-    button.dataset.loading = "false";
-    button.innerHTML = oldHtml;
+                button.disabled = false;
+                button.dataset.loading = "false";
+                button.innerHTML = oldHtml;
 
-    // OPEN POPUP
-    if ($("#variantModal").length) {
+                // OPEN POPUP
+                if ($("#variantModal").length) {
 
-        currentProductId = productId;
-        actionType = "cart";
+                    currentProductId = productId;
+                    actionType = "cart";
 
-        $("#variantModal").fadeIn();
-    }
+                    $("#variantModal").fadeIn();
+                }
 
-    return;
-}
+                return;
+            }
 
-const response =
-await fetch(
-    `/cart/add/${productId}/`,
-    {
-        method:"POST",
+            const response =
+                await fetch(
+                    `/cart/add/${productId}/`,
+                    {
+                        method: "POST",
 
-        headers:{
-            "Content-Type":"application/json",
-            "X-CSRFToken":getCSRFToken(),
-            "X-Requested-With":"XMLHttpRequest"
-        },
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": getCSRFToken(),
+                            "X-Requested-With": "XMLHttpRequest"
+                        },
 
-        body: JSON.stringify({
+                        body: JSON.stringify({
 
-            quantity: quantity,
+                            quantity: quantity,
 
-            color: selectedColor,
+                            color: selectedColor,
 
-            size: selectedSize
+                            size: selectedSize
 
-        })
-    }
-);
+                        })
+                    }
+                );
 
-const data = await response.json();
+            const data = await response.json();
 
             // =====================================
             // CART COUNT
@@ -407,10 +480,10 @@ const data = await response.json();
                     "cart-count"
                 );
 
-            if(
+            if (
                 cartCount &&
                 data.cart_count !== undefined
-            ){
+            ) {
 
                 cartCount.innerText =
                     data.cart_count;
@@ -421,16 +494,16 @@ const data = await response.json();
             // ADDED
             // =====================================
 
-            if(
+            if (
                 data.status === "added"
-            ){
+            ) {
 
                 // DETAIL PAGE BUTTON
-                if(
+                if (
                     button.classList.contains(
                         "px-3"
                     )
-                ){
+                ) {
 
                     button.classList.remove(
                         "btn-primary"
@@ -448,7 +521,7 @@ const data = await response.json();
                 }
 
                 // SHOP PAGE BUTTON
-                else{
+                else {
 
                     button.classList.remove(
                         "btn-outline-dark"
@@ -475,16 +548,16 @@ const data = await response.json();
             // REMOVED
             // =====================================
 
-            else if(
+            else if (
                 data.status === "removed"
-            ){
+            ) {
 
                 // DETAIL PAGE
-                if(
+                if (
                     button.classList.contains(
                         "px-3"
                     )
-                ){
+                ) {
 
                     button.classList.remove(
                         "btn-success"
@@ -502,7 +575,7 @@ const data = await response.json();
                 }
 
                 // SHOP PAGE
-                else{
+                else {
 
                     button.classList.remove(
                         "btn-warning"
@@ -525,7 +598,7 @@ const data = await response.json();
 
             }
 
-            else{
+            else {
 
                 button.innerHTML = oldHtml;
 
@@ -538,7 +611,7 @@ const data = await response.json();
 
         }
 
-        catch(error){
+        catch (error) {
 
             console.log(error);
 
@@ -552,7 +625,7 @@ const data = await response.json();
 
         }
 
-        finally{
+        finally {
 
             button.disabled = false;
 
@@ -568,13 +641,13 @@ VARIANT POPUP CONTINUE
 ========================================= */
 
 let popupProductId = null;
-
-document.addEventListener("click", function(e){
+let popupAction = "cart";
+document.addEventListener("click", function (e) {
 
     const continueBtn =
         e.target.closest("#continueBtn");
 
-    if(!continueBtn){
+    if (!continueBtn) {
         return;
     }
 
@@ -592,15 +665,15 @@ document.addEventListener("click", function(e){
 
     const selectedColor =
         activeColor
-        ? activeColor.innerText.trim()
-        : "";
+            ? activeColor.innerText.trim()
+            : "";
 
     const selectedSize =
         activeSize
-        ? activeSize.innerText.trim()
-        : "";
+            ? activeSize.innerText.trim()
+            : "";
 
-    if(!selectedColor){
+    if (!selectedColor) {
 
         showCartToast(
             "Please select color",
@@ -610,7 +683,7 @@ document.addEventListener("click", function(e){
         return;
     }
 
-    if(!selectedSize){
+    if (!selectedSize) {
 
         showCartToast(
             "Please select size",
@@ -623,72 +696,346 @@ document.addEventListener("click", function(e){
     fetch(
         `/cart/add/${popupProductId}/`,
         {
-            method:"POST",
+            method: "POST",
 
-            headers:{
-                "Content-Type":"application/json",
-                "X-CSRFToken":getCSRFToken(),
-                "X-Requested-With":"XMLHttpRequest"
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+                "X-Requested-With": "XMLHttpRequest"
             },
 
-            body:JSON.stringify({
+            body: JSON.stringify({
 
-                quantity:1,
-                color:selectedColor,
-                size:selectedSize
+                quantity: 1,
+                color: selectedColor,
+                size: selectedSize
 
             })
         }
     )
 
-    .then(res=>res.json())
+        .then(res => res.json())
 
-    .then(data=>{
+        .then(data => {
 
-        if(data.status==="added"){
+            if (data.status === "added") {
 
-            document.getElementById(
-                "variantPopup"
-            ).style.display="none";
-
-            showCartToast(
-                `${selectedColor} / ${selectedSize} Added To Cart`,
-                "success"
-            );
-
-            const cartCount =
                 document.getElementById(
-                    "cart-count"
+                    "variantPopup"
+                ).style.display = "none";
+
+                // BUY NOW CLICK HATU ?
+                if (popupAction === "buy") {
+
+                    window.location.href = "/checkout/";
+                    return;
+                }
+
+                // NORMAL ADD TO CART
+                showCartToast(
+                    `${selectedColor} / ${selectedSize} Added To Cart`,
+                    "success"
                 );
 
-            if(
-                cartCount &&
-                data.cart_count !== undefined
-            ){
+                const cartCount =
+                    document.getElementById(
+                        "cart-count"
+                    );
 
-                cartCount.innerText =
-                    data.cart_count;
+                if (
+                    cartCount &&
+                    data.cart_count !== undefined
+                ) {
+
+                    cartCount.innerText =
+                        data.cart_count;
+
+                }
+
+            } else {
+
+                showCartToast(
+                    "Something Went Wrong",
+                    "error"
+                );
 
             }
 
-        }else{
+        })
+        .catch(() => {
 
             showCartToast(
-                "Something Went Wrong",
+                "Server Error",
                 "error"
             );
 
-        }
-
-    })
-
-    .catch(()=>{
-
-        showCartToast(
-            "Server Error",
-            "error"
-        );
-
-    });
+        });
 
 });
+let defaultProductImage = "";
+
+document.addEventListener("click", function (e) {
+    const btn = e.target.closest(".add-to-cart");
+    if (!btn) return;
+
+    e.preventDefault();
+
+    const hasColors = btn.dataset.colors && btn.dataset.colors.trim() !== "";
+    const hasSizes = btn.dataset.sizes && btn.dataset.sizes.trim() !== "";
+
+    if (!hasColors && !hasSizes) {
+        return;
+    }
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    popupProductId = btn.dataset.id;
+    document.getElementById("popupProductName").innerText =
+        btn.dataset.name;
+
+    let mainProductImg = btn.dataset.image;
+    if (!mainProductImg || mainProductImg === "" || mainProductImg.includes("None")) {
+        const productCard = btn.closest(".product-item, .card, .product-card");
+        if (productCard) {
+            const cardImg = productCard.querySelector("img");
+            if (cardImg) mainProductImg = cardImg.src;
+        }
+    }
+    defaultProductImage = mainProductImg || "/static/img/no-image.png";
+    const popupImg =
+        document.getElementById("popupProductImage");
+
+    if (popupImg) {
+        popupImg.src = defaultProductImage;
+    }
+
+    const colorsDiv = document.getElementById("popupColors");
+    const sizesDiv = document.getElementById("popupSizes");
+
+    colorsDiv.innerHTML = "";
+    sizesDiv.innerHTML = "";
+
+    let colorImageMap = {};
+    if (btn.dataset.colorImages) {
+        btn.dataset.colorImages.split(",").forEach(item => {
+            const parts = item.split(":");
+            if (parts.length >= 2) {
+                const cName = parts[0].trim().toLowerCase();
+                const cUrl = parts.slice(1).join(":").trim();
+                if (cName && cUrl) {
+                    colorImageMap[cName] = cUrl;
+                }
+            }
+        });
+    }
+
+    (btn.dataset.colors || "").split(",").forEach(color => {
+        color = color.trim();
+        if (color) {
+            const lowerColor = color.toLowerCase();
+            const finalColorImg = colorImageMap[lowerColor] ? colorImageMap[lowerColor] : defaultProductImage;
+
+            colorsDiv.innerHTML += `
+                <span class="variant-option" data-color-img="${finalColorImg}">
+                    <img src="${finalColorImg}" alt="${color}" onerror="this.src='${defaultProductImage}'">
+                    ${color}
+                </span>
+            `;
+        }
+    });
+
+    (btn.dataset.sizes || "").split(",").forEach(size => {
+        size = size.trim();
+        if (size) {
+            sizesDiv.innerHTML += `
+                <span class="variant-option">
+                    ${size}
+                </span>
+            `;
+        }
+    });
+
+    document.getElementById("variantPopup").style.display = "flex";
+});
+
+/* ========================================= */
+let wishlistDefaultImage = "";
+
+document.addEventListener("click", function (e) {
+
+    const btn = e.target.closest(".wishlist-add-to-cart");
+
+    if (!btn) return;
+
+    e.preventDefault();
+
+    popupProductId = btn.dataset.id;
+    popupAction = "cart";
+
+    document.getElementById("popupProductName").innerText =
+        btn.dataset.name || "";
+
+    wishlistDefaultImage = btn.dataset.image || "";
+    let firstColorImage = wishlistDefaultImage;
+
+    if (btn.dataset.colorImages) {
+
+        const items = btn.dataset.colorImages
+            .split(",")
+            .map(i => i.trim())
+            .filter(i => i.includes(":"));
+
+        for (let i = 0; i < items.length; i++) {
+
+            const index = items[i].indexOf(":");
+            const color = items[i].substring(0, index).trim();
+            const img = items[i].substring(index + 1).trim();
+
+            if (img) {
+                firstColorImage = img;
+                break;
+            }
+        }
+    }
+
+    document.getElementById("popupProductImage").src =
+        firstColorImage;
+    /* -----------------------------
+       COLOR IMAGE MAP
+    ------------------------------ */
+
+    let colorImageMap = {};
+
+    if (btn.dataset.colorImages) {
+
+        btn.dataset.colorImages
+            .split(",")
+            .forEach(item => {
+
+                const parts = item.split(":");
+
+                if (parts.length >= 2) {
+
+                    colorImageMap[
+                        parts[0].trim().toLowerCase()
+                    ] = parts.slice(1).join(":").trim();
+
+                }
+
+            });
+
+    }
+
+    /* -----------------------------
+       COLORS
+    ------------------------------ */
+
+    const colorsDiv =
+        document.getElementById("popupColors");
+
+    colorsDiv.innerHTML = "";
+
+    (btn.dataset.colors || "")
+        .split(",")
+        .forEach(color => {
+
+            color = color.trim();
+
+            if (!color) return;
+
+            const img =
+                colorImageMap[color.toLowerCase()] ||
+                wishlistDefaultImage;
+
+            colorsDiv.innerHTML += `
+
+        <span class="variant-option"
+              data-color-img="${img}">
+
+            <img src="${img}"
+                 style="
+                    width:40px;
+                    height:40px;
+                    object-fit:cover;
+                    border-radius:8px;
+                    margin-right:8px;
+                 ">
+
+            <span>${color}</span>
+
+        </span>
+
+        `;
+
+        });
+
+    /* -----------------------------
+       SIZES
+    ------------------------------ */
+
+    const sizesDiv =
+        document.getElementById("popupSizes");
+
+    sizesDiv.innerHTML = "";
+
+    (btn.dataset.sizes || "")
+        .split(",")
+        .forEach(size => {
+
+            size = size.trim();
+
+            if (!size) return;
+
+            sizesDiv.innerHTML += `
+    <span class="variant-option">
+        ${size}
+    </span>
+`;
+
+        });
+
+    document.getElementById("variantPopup").style.display = "flex";
+
+});
+
+
+/* =========================================
+SELECT COLOR / SIZE
+========================================= */
+
+document.addEventListener("click", function (e) {
+
+    const option =
+        e.target.closest(".variant-option");
+
+    if (!option) return;
+
+    const parent =
+        option.parentElement;
+
+    parent
+        .querySelectorAll(".variant-option")
+        .forEach(x => x.classList.remove("active"));
+
+    option.classList.add("active");
+
+    // Color selected
+    if (parent.id === "popupColors") {
+        document.getElementById("popupProductImage").src =
+            option.dataset.colorImg;
+    }
+
+    // Size selected
+    if (parent.id === "popupColors") {
+    }
+
+});
+
+function closeVariantPopup() {
+
+    document.getElementById(
+        "variantPopup"
+    ).style.display = "none";
+
+}

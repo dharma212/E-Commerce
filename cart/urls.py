@@ -22,4 +22,15 @@ path(
     RemoveCartView.as_view(),
     name='remove_cart'
 ),
+path(
+    "apply-coupon/",
+    ApplyCouponView.as_view(),
+    name="apply_coupon"
+),
+
+path(
+    "remove-coupon/",
+    RemoveCouponView.as_view(),
+    name="remove_coupon"
+),
 ]

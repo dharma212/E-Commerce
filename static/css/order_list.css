@@ -1,439 +1,360 @@
-/* =========================================
-   PREMIUM SLATE & GLASS CHECKOUT LAYOUT
-   ========================================= */
+/* ==========================================================================
+   FLIPKART EXACT ORDER LIST STYLE
+   ========================================================================== */
 body {
-    background: #fdfdfd;
-    font-family: 'Inter', 'Poppins', sans-serif;
-    color: #2b2f3a;
+    background: #f1f3f6;
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, "Segoe UI", Arial, sans-serif;
+    color: #212121;
 }
 
 .orders-section {
-    padding: 50px 0;
+    padding: 16px 0;
     min-height: 100vh;
 }
 
-.orders-wrapper {
-    max-width: 1400px;
+.orders-container {
+    max-width: 1248px;
     margin: 0 auto;
-    padding: 0 24px;
-}
-
-/* Two-Column Split Pane (Matches High-End Checkout Modules) */
-.layout-split-grid {
+    padding: 0 16px;
     display: grid;
-    grid-template-columns: 360px 1fr;
-    gap: 40px;
+    grid-template-columns: 280px 1fr;
+    gap: 16px;
     align-items: start;
 }
 
-/* =========================================
-   LEFT SIDEBAR: ANALYTICS & INTERACTIVE FILTER
-   ========================================= */
-.checkout-control-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    padding: 30px;
-    position: sticky;
-    top: 40px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
+/* ==========================================
+   LEFT SIDEBAR: FILTERS (Desktop Only)
+   ========================================== */
+.fk-filter-sidebar {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.08);
+    border: 1px solid #e0e0e0;
 }
 
-.panel-header-title h2 {
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.8px;
-    color: #0f172a;
-    margin-bottom: 8px;
+.filter-title-main {
+    font-size: 18px;
+    font-weight: 500;
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    margin: 0;
 }
 
-.panel-header-title p {
-    font-size: 13.5px;
-    color: #64748b;
-    line-height: 1.5;
-    margin-bottom: 25px;
+.filter-section-box {
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
 }
 
-/* Integrated Search & Select Pill Systems */
-.interactive-search-form {
-    position: relative;
-    margin-bottom: 16px;
+.filter-section-box:last-child {
+    border-bottom: none;
 }
 
-.interactive-search-form input {
-    width: 100%;
-    height: 52px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 0 16px 0 46px;
-    font-size: 14px;
-    color: #0f172a;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-sizing: border-box;
+.filter-header-sub {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: #212121;
+    margin: 0 0 12px 0;
+    letter-spacing: 0.5px;
 }
 
-.interactive-search-form input:focus {
-    background: #ffffff;
-    border-color: #0f172a;
-    box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.06);
-    outline: none;
-}
-
-.interactive-search-form i {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #94a3b8;
-    font-size: 15px;
-}
-
-.custom-select-element {
-    width: 100%;
-    height: 52px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 0 16px;
-    font-size: 14px;
-    color: #334155;
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%2364748b' viewBox='0 0 16 16'><path d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>");
-    background-repeat: no-repeat;
-    background-position: calc(100% - 18px) center;
-}
-
-.custom-select-element:focus {
-    border-color: #0f172a;
-    background-color: #ffffff;
-}
-
-.pane-divider {
-    height: 1px;
-    background: #edf2f7;
-    margin: 25px 0;
-}
-
-/* Account Summary Dashboard Blocks */
-.metric-row {
+.fk-checkbox-label {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 14px;
-    font-size: 13.5px;
+    gap: 10px;
+    font-size: 14px;
+    color: #212121;
+    margin-bottom: 10px;
+    cursor: pointer;
 }
-.metric-label { color: #64748b; font-weight: 500; }
-.metric-value { font-weight: 700; color: #0f172a; }
 
-/* =========================================
-   RIGHT SIDEBAR: ACTIVE ORDERS STREAM
-   ========================================= */
-.orders-stream-container {
+.fk-checkbox-label input {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+/* ==========================================
+   RIGHT CONTENT: ORDERS STREAM
+   ========================================== */
+.orders-stream-box {
     display: flex;
     flex-direction: column;
-    gap: 25px;
-}
-
-.slate-order-wrapper-row {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    overflow: hidden;
-    transition: all 0.25s ease;
-}
-
-.slate-order-wrapper-row:hover {
-    box-shadow: 0 12px 30px rgba(0,0,0,0.025);
-    border-color: #cbd5e1;
-}
-
-/* Order Meta Top Header Strip */
-.order-strip-header {
-    background: #f8fafc;
-    padding: 22px 30px;
-    border-bottom: 1px solid #e2e8f0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.order-headline-meta-grid {
-    display: flex;
-    align-items: center;
-    gap: 35px;
-}
-
-.headline-block .cap {
-    font-size: 11px;
-    text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: #94a3b8;
-    margin-bottom: 5px;
-}
-
-.headline-block .det {
-    font-size: 14.5px;
-    font-weight: 700;
-    color: #0f172a;
-}
-
-.headline-block .det.order-id-accent {
-    color: #0284c7;
-    font-family: monospace;
-    font-size: 15px;
-}
-
-/* Pill Status Configs */
-.badge-pill-status {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.6px;
-    padding: 6px 14px;
-    border-radius: 8px;
-    text-transform: uppercase;
-    display: inline-block;
-}
-.badge-pill-status.st-delivered { background: #dcfce7; color: #15803d; }
-.badge-pill-status.st-pending { background: #fef9c3; color: #a16207; }
-.badge-pill-status.st-cancelled { background: #fee2e2; color: #b91c1c; }
-
-/* Product Rows Inside Canvas */
-.order-canvas-body {
-    padding: 30px;
-}
-
-.nested-item-flex-row {
-    display: grid;
-    grid-template-columns: 85px 1fr auto;
-    gap: 25px;
-    align-items: center;
-    padding-bottom: 25px;
-    margin-bottom: 25px;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.nested-item-flex-row:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-
-.product-avatar {
-    width: 85px;
-    height: 85px;
-    border-radius: 12px;
-    object-fit: cover;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-}
-
-.product-meta-details h4 {
-    font-size: 16px;
-    font-weight: 700;
-    margin: 0 0 6px 0;
-    color: #0f172a;
-}
-
-.product-attribute-pills {
-    display: flex;
     gap: 12px;
-    align-items: center;
-    flex-wrap: wrap;
 }
 
-.attribute-tag {
-    background: #f1f5f9;
-    padding: 3px 10px;
-    border-radius: 6px;
-    font-size: 11.5px;
+/* Search Bar Component */
+.fk-search-wrapper {
+    display: flex;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.04);
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+.fk-search-input {
+    flex: 1;
+    border: none;
+    padding: 12px 16px;
+    font-size: 14px;
+    outline: none;
+    color: #212121;
+}
+
+.fk-search-btn {
+    background: #2874f0;
+    color: #fff;
+    border: none;
+    padding: 0 24px;
+    font-size: 14px;
     font-weight: 500;
-    color: #475569;
-}
-
-.attribute-tag.color-tag {
-    display: inline-flex;
+    cursor: pointer;
+    display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
-.color-dot {
+.fk-search-btn:hover {
+    background: #125ece;
+}
+
+/* Mobile Category Pills */
+.mobile-filter-pills {
+    display: none;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0 12px 0;
+    scrollbar-width: none;
+}
+.mobile-filter-pills::-webkit-scrollbar {
+    display: none;
+}
+
+.pill-item {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    padding: 6px 16px;
+    border-radius: 16px;
+    font-size: 13px;
+    white-space: nowrap;
+    color: #212121;
+    text-decoration: none;
+}
+
+.pill-item.active {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+}
+
+/* Flipkart Order Row Card */
+.fk-order-card {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.05);
+    border: 1px solid #e0e0e0;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: auto 2.5fr 1fr 1.8fr;
+    gap: 24px;
+    align-items: start;
+    text-decoration: none !important;
+    color: unset !important;
+    transition: box-shadow 0.2s ease;
+}
+
+.fk-order-card:hover {
+    box-shadow: 0 4px 12px 0 rgba(0,0,0,.1);
+}
+
+/* Image Matrix Engine */
+.fk-img-container {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    width: 90px;
+}
+
+.single-img-frame {
+    width: 80px;
+    height: 80px;
+    border: 1px solid #f0f0f0;
+    padding: 4px;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.single-img-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Multi-image thumbnail block for layout matching */
+.multi-img-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 40px);
+    gap: 4px;
+    width: 84px;
+}
+
+.thumb-frame {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #f0f0f0;
+    border-radius: 2px;
+    background: #fff;
+    padding: 2px;
+    overflow: hidden;
+}
+
+.thumb-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Content Blocks */
+.fk-detail-col .prod-title {
+    font-size: 14px;
+    font-weight: 400;
+    color: #212121;
+    margin: 0 0 6px 0;
+    line-height: 1.4;
+}
+
+.fk-detail-col .prod-meta {
+    font-size: 12px;
+    color: #878787;
+    margin: 0;
+}
+
+.fk-price-col {
+    font-size: 14px;
+    font-weight: 500;
+    color: #212121;
+    white-space: nowrap;
+}
+
+.fk-status-col {
+    font-size: 14px;
+}
+
+.status-indicator {
+    display: inline-block;
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #ccc;
-    display: inline-block;
+    margin-right: 8px;
 }
 
-.product-price-bracket {
-    text-align: right;
+.st-green { background: #26a541; }
+.st-red { background: #e53935; }
+.st-orange { background: #ff9f00; }
+
+.status-text-main {
+    font-weight: 500;
+    color: #212121;
 }
 
-.product-price-bracket .item-unit-price {
-    font-size: 17px;
-    font-weight: 800;
-    color: #0f172a;
-}
-
-.product-price-bracket .item-multiplier-label {
+.status-text-sub {
     font-size: 12px;
-    color: #94a3b8;
-    margin-top: 3px;
+    color: #878787;
+    margin-top: 6px;
+    line-height: 1.4;
 }
 
-/* =========================================
-   BOTTOM WORKFLOW FOOTER & ACTIONS PANEL
-   ========================================= */
-.order-footer-workflow-strip {
-    background: #ffffff;
-    border-top: 1px solid #e2e8f0;
-    padding: 24px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 30px;
-}
-
-/* Address Card Sub-Component */
-.address-delivery-block {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    max-width: 55%;
-}
-
-.address-delivery-block i {
-    color: #64748b;
-    font-size: 16px;
-    margin-top: 3px;
-}
-
-.address-text-wrapper {
-    font-size: 13px;
-    color: #475569;
-    line-height: 1.5;
-}
-
-.address-text-wrapper .customer-name {
-    font-weight: 700;
-    color: #0f172a;
-    display: block;
-    margin-bottom: 2px;
-    font-size: 13.5px;
-}
-
-/* Checkout Functional Buttons */
-.checkout-actions-cluster {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.action-btn-checkout {
-    height: 42px;
-    padding: 0 18px;
-    font-size: 13px;
-    font-weight: 600;
-    border-radius: 10px;
+.rate-review-link {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    text-decoration: none !important;
-    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    border: 1px solid transparent;
+    gap: 6px;
+    color: #2874f0;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 12px;
+    text-decoration: none;
 }
 
-.btn-checkout-primary { background: #0f172a; color: #ffffff; }
-.btn-checkout-primary:hover { background: #000000; }
+/* Mobile Chevron */
+.mobile-chevron {
+    display: none;
+    color: #212121;
+    align-items: center;
+}
 
-.btn-checkout-secondary { background: #ffffff; border-color: #cbd5e1; color: #334155; }
-.btn-checkout-secondary:hover { background: #f8fafc; border-color: #94a3b8; color: #0f172a; }
-
-.btn-checkout-alert { background: #fff5f5; color: #c53030; border-color: #feb2b2; }
-.btn-checkout-alert:hover { background: #fff5f5; border-color: #9b2c2c; }
-
-.btn-checkout-success { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
-.btn-checkout-success:hover { background: #dcfce7; }
-
-/* =========================================
-   BLANK ARCHIVE LAYOUT
-   ========================================= */
-.minimalist-blank-panel {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    padding: 90px 40px;
+/* Minimalist Empty Layout */
+.fk-empty-state {
+    background: #fff;
+    padding: 40px;
     text-align: center;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
 }
 
-.minimalist-blank-panel i {
-    font-size: 56px;
-    color: #cbd5e1;
-    margin-bottom: 24px;
-}
-
-.minimalist-blank-panel h3 {
-    font-size: 22px;
-    font-weight: 800;
-    color: #0f172a;
-    margin-bottom: 8px;
-}
-
-.minimalist-blank-panel p {
-    font-size: 14.5px;
-    color: #64748b;
-    margin-bottom: 30px;
-}
-
-/* =========================================
-   MEDIA QUERY LAYOUT FIXES
-   ========================================= */
-@media (max-width: 1024px) {
-    .layout-split-grid {
-        grid-template-columns: 1fr;
-    }
-    .checkout-control-card {
-        position: static;
-    }
-}
-
+/* ==========================================
+   RESPONSIVE DESIGN (MOBILE LAYOUT CONTROL)
+   ========================================== */
 @media (max-width: 768px) {
-    .order-strip-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 20px;
+    .orders-container {
+        grid-template-columns: 1fr;
+        padding: 0 8px;
     }
-    .order-headline-meta-grid {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
+
+    .fk-filter-sidebar {
+        display: none; /* Hide Sidebar on Mobile */
     }
-    .order-footer-workflow-strip {
-        flex-direction: column;
-        align-items: flex-start;
+
+    .mobile-filter-pills {
+        display: flex; /* Show pills carousel */
     }
-    .address-delivery-block {
-        max-width: 100%;
+
+    .fk-search-btn span {
+        display: none; /* Only search icon on mobile */
     }
-    .checkout-actions-cluster {
-        width: 100%;
-        flex-wrap: wrap;
+    
+    .fk-search-btn {
+        padding: 0 16px;
     }
-    .action-btn-checkout {
-        flex: 1 1 calc(50% - 10px);
+
+    /* Flip Card to Full Mobile View */
+    .fk-order-card {
+        grid-template-columns: auto 1fr auto;
+        gap: 12px;
+        padding: 12px;
+        align-items: center;
     }
-    .nested-item-flex-row {
-        grid-template-columns: auto 1fr;
+
+    .fk-price-col {
+        display: none; /* Price hidden or merged in title on true mobile list view */
     }
-    .product-price-bracket {
+
+    .fk-detail-col {
+        display: none; /* Mobile shifts order timeline texts to status block */
+    }
+
+    .mobile-chevron {
+        display: flex;
+    }
+
+    /* Status Column full restructuring for mobile text */
+    .fk-status-col {
         grid-column: 2;
-        text-align: left;
-        margin-top: 5px;
+    }
+
+    .status-text-main {
+        font-size: 14px;
+    }
+
+    .status-text-sub {
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+    }
+
+    .rate-review-link {
+        display: none;
     }
 }

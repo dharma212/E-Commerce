@@ -273,7 +273,19 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order #{self.id}"
+    
+    @property
+    def total_listing_price(self):
+        total_mrp = 0
+        for item in self.items.all():
+            total_mrp += item.product.mrp * item.quantity
+        return total_mrp
 
+    @property
+    def total_savings(self):
+        savings = self.total_listing_price - float(self.total_price)
+        return max(0, savings) 
+    
 # ====================================
 # ORDER ITEM
 # ====================================
@@ -305,3 +317,65 @@ class Review(models.Model):
     description = models.TextField()
 
     created_at = models.DateTimeField(auto_now_add=True)
+    
+class LoginActivity(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    login_time = models.DateTimeField(auto_now_add=True)
+    logout_time = models.DateTimeField(null=True, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    
+class AdminNotification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.created_at}"
+    
+
+class Coupon(models.Model):
+    code = models.CharField(max_length=50, unique=True)
+    discount = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    DISCOUNT_TYPE = (
+        ('fixed', 'Fixed Amount'),
+        ('percent', 'Percentage'),
+    )
+
+    discount_type = models.CharField(
+        max_length=20,
+        choices=DISCOUNT_TYPE,
+        default='fixed'
+    )
+
+    minimum_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
+
+    active = models.BooleanField(default=True)
+
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+
+    def is_valid(self):
+        now = timezone.now()
+        return (
+            self.active and
+            self.valid_from <= now <= self.valid_to
+        )
+
+    def __str__(self):
+        return self.code
+    
+class UserCoupon(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order,on_delete=models.CASCADE,related_name='earned_coupons')
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
+    is_used = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.coupon.code}"

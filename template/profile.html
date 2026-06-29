@@ -131,6 +131,13 @@
                             Orders
 
                         </button>
+                        <!-- Add this inside <div class="sidebar-menu"> -->
+<button class="sidebar-link" onclick="showTab('coupons',this)">
+    <div class="sidebar-icon">
+        <i class="fa fa-tags"></i>
+    </div>
+    Coupons
+</button>
 
                         <form action="{% url 'logout' %}" method="POST">
 
@@ -642,6 +649,50 @@
                     </div>
 
                 </div>
+                <div id="couponsTab" class="tab-content-box d-none">
+                    <div class="profile-card">
+                        <h4 class="mb-4 font-weight-bold">My Used Coupons</h4>
+                        <div class="row" id="coupon-container">
+                            {% for order in used_coupons %}
+                            <div class="col-md-6 col-lg-4 mb-3 coupon-item {% if forloop.counter > 10 %}d-none{% endif %}">
+                                <div class="fk-coupon-card">
+                                    <div class="fk-icon">
+                                        <i class="fa fa-check-circle" style="color: #28a745;"></i>
+                                    </div>
+                                    
+                                    <div class="fk-title">Used by: {{ order.user.username }}</div>                    
+                                    <div class="fk-details mt-2">
+                                        <p class="mb-1"><strong>Products:</strong> 
+                                            {% for item in order.items.all %}
+                                                {{ item.product.name |truncatechars:40 }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </p>
+                                        
+                                        <p class="mb-1 text-danger"><strong>Total Price:</strong> ₹{{ order.total_price }}</p>
+                                        <p class="mb-0 text-muted small">Order ID: #{{ order.id }}</p>
+                                    </div>
+
+                                    <div class="fk-footer mt-3">
+                                        <span class="text-muted small">Applied on: {{ order.created_at|date:"d M, Y" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12 text-center">
+                                <p>No coupons used yet.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        {% if used_coupons|length > 10 %}
+                            <div class="text-center mt-4">
+                                <button id="viewMoreBtn" class="btn btn-outline-primary" onclick="toggleCoupons()">
+                                    View More
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
 
             </div>
 
@@ -801,6 +852,62 @@ function setDefaultAddress(addressId){
     });
 
 }
+function toggleCoupons() {
+    const hiddenItems = document.querySelectorAll('.coupon-item.d-none');
+    const btn = document.getElementById('viewMoreBtn');
+    
+    hiddenItems.forEach(item => {
+        item.classList.remove('d-none');
+        item.classList.add('fade-in'); 
+    });
+    btn.style.display = 'none';
+}
 
 </script>
+<style>
+.fade-in {
+    animation: fadeInAnimation 0.5s ease;
+}
+@keyframes fadeInAnimation {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.fk-coupon-card {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: 0.3s;
+    height: 100%;
+}
+.fk-coupon-card:hover { 
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    border-color: #2874f0;
+}
+.fk-icon {
+    width: 50px;
+    height: 50px;
+    background: #e8f5e9;
+    border-radius: 50%;
+    margin: 0 auto 15px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+.fk-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+}
+.fk-details p {
+    font-size: 13px;
+    color: #555;
+}
+.fk-footer {
+    border-top: 1px solid #f0f0f0;
+    padding-top: 10px;
+}
+</style>
 {% endblock %}

@@ -42,9 +42,7 @@
 
 <!-- CART -->
 <div class="container-fluid">
-
-    <div class="row px-xl-5">
-
+    <div class="row px-xl-5 cart-main-row">
         <!-- =====================================
         DESKTOP TABLE
         ====================================== -->
@@ -93,19 +91,19 @@
                                 <div>
 
                                     <h6>
-                                        {{ item.product.name }}
+                                        {{ item.product.name | truncatechars:50 }}
                                     </h6>
-    {% if item.color %}
-    <small class="d-block text-primary">
-        Color : {{ item.color }}
-    </small>
-    {% endif %}
+                                        {% if item.color %}
+                                        <small class="d-block text-primary">
+                                            Color : {{ item.color }}
+                                        </small>
+                                        {% endif %}
 
-    {% if item.size %}
-    <small class="d-block text-success">
-        Size : {{ item.size }}
-    </small>
-    {% endif %}
+                                        {% if item.size %}
+                                        <small class="d-block text-success">
+                                            Size : {{ item.size }}
+                                        </small>
+                                        {% endif %}
                                     <small class="text-muted">
                                         ₹{{ item.product.final_price }}
                                     </small>
@@ -339,125 +337,113 @@
         RIGHT SIDE
         ====================================== -->
 
-        <div class="col-lg-4">
-
-            <!-- COUPON -->
-            <form class="mb-30 coupon-mobile">
-
-                <div class="input-group">
-
-                    <input type="text" class="form-control border-0 p-4" placeholder="Coupon Code">
-
+        <div class="col-lg-4 sticky-cart-sidebar">
+            <form id="couponForm" class="mb-30 test coupon-desktop" action="">
+                {% csrf_token %}
+                <div class="input-group" style="box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <input type="text" id="couponCode" class="form-control border-0 p-4" placeholder="Enter Coupon Code" 
+                        value="{{ coupon_code|default:'' }}" {% if coupon_code %} readonly {% endif %} style="background-color: #fff;">
+                    
                     <div class="input-group-append">
-
-                        <button class="btn btn-primary">
-
-                            Apply Coupon
-
+                        <button type="submit" id="couponActionBtn" class="btn {% if coupon_code %}btn-danger{% else %}btn-primary{% endif %} font-weight-bold px-4">
+                            {% if coupon_code %}Remove{% else %}Apply{% endif %}
                         </button>
-
                     </div>
-
                 </div>
-
+                
+                <small id="couponError" class="text-danger d-block mt-2 font-weight-bold" style="display: none;"></small>
+                
+                <small id="couponSuccess" class="text-success d-block mt-2 font-weight-bold">
+                    {% if coupon_code %}
+                        Coupon "{{ coupon_code }}" Applied Successfully
+                    {% endif %}
+                </small>
             </form>
 
-
-            <!-- SUMMARY -->
-            <h5 class="section-title position-relative text-uppercase mb-3">
-
-                <span class="bg-secondary pr-3">
-
-                    Cart Summary
-
-                </span>
-
-            </h5>
-
-            <div class="bg-light p-30 mb-5 summary-box">
-
-                <div class="border-bottom pb-2">
-
-                    <div class="d-flex justify-content-between mb-3">
-
-                        <h6>Subtotal</h6>
-
-                        <h6>
-
-                            ₹{{ subtotal }}
-
-                        </h6>
-
-                    </div>
-
-                    <div class="d-flex justify-content-between">
-
-                        <h6 class="font-weight-medium">
-
-                            Shipping
-
-                        </h6>
-
-                        <h6 class="font-weight-medium">
-
-                            ₹{{ shipping }}
-
-                        </h6>
-
-                    </div>
-
-                </div>
-
-                <div class="pt-2">
-
-                    <div class="d-flex justify-content-between mt-2">
-
-                        <h5>Total</h5>
-
-                        <h5>
-
-                            ₹{{ grand_total }}
-
-                        </h5>
-
-                    </div>
-
-                    {% if not has_items %}
-
-                        <button class="btn btn-block btn-secondary font-weight-bold my-3 py-3"
-                                disabled
-                                style="cursor:not-allowed; opacity:0.6;">
-
-                            Your Cart is Empty
-
-                        </button>
-
+    <!-- SUMMARY BOX -->
+    <h5 class="section-title position-relative text-uppercase mb-3">
+        <span class="bg-secondary pr-3">
+            Cart Summary
+        </span>
+    </h5>
+    
+    <div class="bg-light p-30 mb-4 summary-box" style="border: 1px solid #edf1f7; border-radius: 4px;">
+        <!-- PRICE DETAILS SECTION -->
+        <div class="border-bottom pb-2">
+            <!-- 1. Total MRP -->
+            <div class="d-flex justify-content-between mb-3">
+                <h6 class="text-muted font-weight-normal">MRP (Incl. of all taxes)</h6>
+                <h6 class="text-muted" style="text-decoration: line-through;">
+                    ₹{{ total_mrp }}
+                </h6>
+            </div>
+            
+            <!-- 2. Product Listing Discount -->
+            <div class="d-flex justify-content-between mb-3">
+                <h6 class="text-muted font-weight-normal">Product Discount</h6>
+                <h6 class="text-success font-weight-bold">
+                    - ₹{{ listing_discount }}
+                </h6>
+            </div>
+            
+            <!-- 3. Selling Price -->
+            <div class="d-flex justify-content-between mb-3">
+                <h6 class="font-weight-bold">Selling Price</h6>
+                <h6 class="font-weight-bold">
+                    ₹{{ subtotal }}
+                </h6>
+            </div>
+            
+            <!-- 4. Shipping -->
+            <div class="d-flex justify-content-between mb-2">
+                <h6 class="text-muted font-weight-normal">Shipping Fee</h6>
+                <h6 class="text-muted font-weight-medium">
+                    {% if shipping > 0 %}
+                        ₹{{ shipping }}
                     {% else %}
-
-                        {% if has_out_of_stock %}
-
-                            <button class="btn btn-block btn-warning font-weight-bold my-3 py-3"
-                                    disabled
-                                    style="cursor:not-allowed; opacity:0.7;">
-
-                                Remove Out of Stock Items First
-
-                            </button>
-
-                        {% else %}
-
-                            <a href="{% url 'checkout' %}"
-                            class="btn btn-block btn-primary font-weight-bold my-3 py-3">
-
-                                Proceed To Checkout
-
-                            </a>
-
-                        {% endif %}
-
+                        <span class="text-success font-weight-bold">FREE</span>
                     {% endif %}
+                </h6>
+            </div>
+        </div>
+        
+        <!-- DYNAMIC ZONE (COUPON & TOTAL) -->
+        <div class="pt-3">
+            <!-- 5. Coupon Discount -->
+            <div class="d-flex justify-content-between mb-3">
+                <h6 class="text-muted font-weight-normal">Coupon Discount</h6>
+                <h6 id="discountAmount" class="text-success font-weight-bold">
+                    - ₹{{ discount }}
+                </h6>
+            </div>
+            
+            <!-- 6. Grand Total Box -->
+            <div class="d-flex justify-content-between pt-2 border-top">
+                <h5 class="font-weight-bold">Total Amount</h5>
+                <h5 id="grandTotal" class="font-weight-bold text-dark" style="font-size: 1.25rem;">
+                    ₹{{ final_total }}
+                </h5>
+            </div>
+        </div>
 
-                </div>
+
+    <!-- CHECKOUT BUTTON LOGIC -->
+    {% if not has_items %}
+        <button class="btn btn-block btn-secondary font-weight-bold my-3 py-3 text-uppercase" disabled style="cursor: not-allowed; opacity: 0.6; letter-spacing: 1px;">
+            Your Cart is Empty
+        </button>
+    {% else %}
+        {% if has_out_of_stock %}
+            <button class="btn btn-block btn-warning font-weight-bold my-3 py-3 text-uppercase" disabled style="cursor: not-allowed; opacity: 0.8; color: #fff; letter-spacing: 0.5px;">
+                Remove Out of Stock Items First
+            </button>
+        {% else %}
+            <a href="{% url 'checkout' %}" class="btn btn-block btn-primary font-weight-bold my-3 py-3 text-uppercase" style="box-shadow: 0 4px 6px rgba(0,0,0,0.1); letter-spacing: 1px; transition: all 0.3s ease;">
+                Proceed To Checkout
+            </a>
+        {% endif %}
+    {% endif %}
+</div>
 
             </div>
 
@@ -826,5 +812,99 @@ document.addEventListener(
     true
 );
 </script>
-    
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    const form = document.getElementById("couponForm");
+    if(!form) return;
+
+    form.addEventListener("submit", function(e){
+        e.preventDefault();
+        
+        const actionBtn = document.getElementById("couponActionBtn");
+        const couponInput = document.getElementById("couponCode");
+        const errorDiv = document.getElementById("couponError");
+        const successDiv = document.getElementById("couponSuccess");
+
+        errorDiv.innerText = "";
+        errorDiv.style.display = "none";
+
+        // --- જો બટન પર REMOVE લખેલું હોય તો કૂપન કાઢી નાખવાનું લોજિક ---
+        if (actionBtn.innerText.trim() === "Remove") {
+            fetch("{% url 'remove_coupon' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success){
+                    // બધી કિંમતો ઓરિજિનલ (ડિસ્કાઉન્ટ વગરની) સેટ કરો
+                    const subtotalText = document.getElementById("subtotalAmount")?.innerText || "0"; 
+                    // અહી જો તમારી પાસે શિપિંગ કે ગ્રાન્ડ ટોટલના આઈડી અલગ હોય તો એ પ્રમાણે સેટ કરવું
+                    
+                    // ફ્રન્ટએન્ડ અમાઉન્ટ્સ રીસેટ (પેજ રીફ્રેશ કરવાથી પણ ડાયરેક્ટ અપડેટ થઈ જશે)
+                    document.getElementById("discountAmount").innerText = "₹0.00";
+                    
+                    // સૌથી બેસ્ટ રીત એ છે કે અમાઉન્ટ સ્ટેટ સેટ કરવા માટે પેજ લોડ કરી દેવું અથવા લાઈવ ગણતરી કરવી
+                    location.reload(); // રીમુવ થયા પછી પેજ રીફ્રેશ કરવાથી બધી કિંમતો પ્રોપર બેકએન્ડથી સેટ થઈ જશે
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                errorDiv.innerText = "Failed to remove coupon.";
+                errorDiv.style.display = "block";
+            });
+            
+            return; // અહીથી ફંક્શન અટકાવી દેવું જેથી નીચેનું અપ્લાય લોજિક રન ન થાય
+        }
+
+        // --- કૂપન APPLY કરવાનું લોજિક ---
+        const codeValue = couponInput.value.trim();
+        if(!codeValue) {
+            errorDiv.innerText = "Please enter a coupon code.";
+            errorDiv.style.display = "block";
+            return;
+        }
+
+        fetch("{% url 'apply_coupon' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+                coupon: codeValue
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success){
+                document.getElementById("discountAmount").innerText = "₹" + data.discount;
+                document.getElementById("grandTotal").innerText = "₹" + data.final_total;
+                
+                successDiv.innerText = "Coupon '" + codeValue + "' Applied Successfully";
+                errorDiv.innerText = "";
+                errorDiv.style.display = "none";
+                
+                // બટન ચેન્જ કરો
+                couponInput.readOnly = true;
+                actionBtn.innerText = "Remove";
+                actionBtn.classList.remove("btn-primary");
+                actionBtn.classList.add("btn-danger");
+            }else{
+                errorDiv.innerText = data.message;
+                errorDiv.style.display = "block";
+                successDiv.innerText = "";
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            errorDiv.innerText = "Something went wrong";
+            errorDiv.style.display = "block";
+        });
+    });
+});
+</script>
 {% endblock %}

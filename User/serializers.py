@@ -53,6 +53,28 @@ class ProductSerializer(serializers.ModelSerializer):
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
+
+    role = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email']
+        fields = [
+            'id',
+            'username',
+            'email',
+            'role'
+        ]
+
+    def get_role(self, obj):
+        try:
+            return obj.profile.role
+        except:
+            return "Customer"
+        
+
+class LoginActivitySerializer(serializers.ModelSerializer):
+    user = serializers.CharField(source='user.username')
+
+    class Meta:
+        model = LoginActivity
+        fields = ['user', 'login_time', 'logout_time', 'ip_address']

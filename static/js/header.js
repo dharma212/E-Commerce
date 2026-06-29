@@ -152,10 +152,12 @@ function logout(){
                         if (matches.length > 0) {
                             matches.forEach(row => {
                                 structuralHtml += `
-                                <a href="/product/${row.id}/" class="search-product-item">
+                                <a href="/product/${row.slug}/" class="search-product-item">
                                     <img src="${row.image}">
                                     <div class="search-product-info">
-                                        <div class="search-product-name">${row.name}</div>
+                                        <div class="search-product-name">
+                                            ${row.name.length > 30 ? row.name.substring(0, 50) + '...' : row.name}
+                                        </div>
                                         <div class="search-product-price">₹${row.price}</div>
                                     </div>
                                 </a>`;

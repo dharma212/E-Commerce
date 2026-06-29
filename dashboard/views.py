@@ -8,23 +8,26 @@ from django.db.models import Sum, Count
 from rest_framework import generics
 from User.models import *
 from User.serializers import *
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.views import APIView
 import json
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import status
 from dashboard.serializers import OrderSerializer
+from django.utils.timezone import now
+from datetime import timedelta
+from django.utils.dateparse import parse_date
+from django.contrib import messages
+from dashboard.serializers import CouponSerializer
+from django.db.models import Count, Q
+from django.db.models.functions import TruncHour
+from django.contrib.auth import authenticate
+from .serializers import DashboardLoginSerializer
+
 # ====================================
 # Dashboard View
 # ====================================
-
-from django.views.generic import TemplateView
-from django.contrib.auth.models import User
-from django.db.models import Sum
-from django.utils.timezone import now
-from datetime import timedelta
-
 class Dashboardview(TemplateView):
 
     template_name = "dashboard/index.html"
@@ -319,7 +322,7 @@ class AdminCartView(LoginRequiredMixin, TemplateView):
 
         # ADMIN ONLY
         if not request.user.is_superuser:
-            return redirect("home")
+            return redirect("index")
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -373,10 +376,6 @@ class UserListView(ListView):
 
     ordering = ['-id']
 
-
-# ====================================
-# USER EDIT PAGE VIEW
-# ====================================
 
 # ====================================
 # USER EDIT PAGE VIEW
@@ -556,14 +555,14 @@ class UserDeleteView(View):
 # ====================================
 
 class adminOrderListView(ListView):
-
     model = Order
-
     template_name = "dashboard/order_list.html"
-
     context_object_name = "orders"
-
     ordering = ['-id']
+
+    def get_queryset(self):
+        return Order.objects.exclude(status__icontains="cancel").order_by('-id')
+
 
 class OrderListAPI(APIView):
 
@@ -571,7 +570,29 @@ class OrderListAPI(APIView):
 
         orders = Order.objects.prefetch_related(
             'items__product__images'
-        ).all().order_by('-id')
+        ).all()
+
+        # --------------------
+        # STATUS FILTER
+        # --------------------
+        status = request.GET.get('status')
+
+        if status:
+            orders = orders.filter(status__iexact=status)
+
+        # --------------------
+        # DATE FILTER
+        # --------------------
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+
+        if start_date:
+            orders = orders.filter(created_at__date__gte=parse_date(start_date))
+
+        if end_date:
+            orders = orders.filter(created_at__date__lte=parse_date(end_date))
+
+        orders = orders.order_by('-id')
 
         serializer = OrderSerializer(
             orders,
@@ -583,46 +604,20 @@ class OrderListAPI(APIView):
 # ====================================
 # Order Detail View
 # ====================================
-
-from django.views.generic import DetailView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
-from django.contrib import messages
-
-from User.models import Order
-
-
-class AdminOrderDetailView(
-    LoginRequiredMixin,
-    DetailView
-):
-
+class AdminOrderDetailView(LoginRequiredMixin,DetailView):
     model = Order
-
     template_name = "dashboard/order_details.html"
-
     context_object_name = "order"
-
     pk_url_kwarg = "id"
-
     login_url = "/"
 
     def dispatch(self, request, *args, **kwargs):
-
         if not request.user.is_staff:
-
             return redirect("/")
-
-        return super().dispatch(
-            request,
-            *args,
-            **kwargs
-        )
+        return super().dispatch(request,*args,**kwargs)
 
     def post(self, request, *args, **kwargs):
-
         order = self.get_object()
-
         status = request.POST.get("status")
 
         if status:
@@ -861,101 +856,51 @@ class AddTypeView(View):
 
             }, status=500)
             
-from django.contrib.auth import authenticate
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .serializers import DashboardLoginSerializer
-
-
-# =========================
-# DASHBOARD LOGIN API
-# =========================
 
 class DashboardLoginAPIView(APIView):
 
     def post(self, request):
-
-        serializer = DashboardLoginSerializer(
-            data=request.data
-        )
+        serializer = DashboardLoginSerializer(data=request.data)
 
         if serializer.is_valid():
+            username = serializer.validated_data.get("username")
+            password = serializer.validated_data.get("password")
 
-            username = serializer.validated_data.get(
-                "username"
-            )
-
-            password = serializer.validated_data.get(
-                "password"
-            )
-
-            user = authenticate(
-                request,
-                username=username,
-                password=password
-            )
+            user = authenticate(request, username=username, password=password)
 
             if user is not None:
-
-                # ONLY ADMIN LOGIN
-
                 if user.is_staff:
+                    request.session["dashboard_user_id"] = user.id
+                    request.session["dashboard_username"] = user.username
+                    request.session["dashboard_email"] = user.email
 
-                    # =========================
-                    # IMPORTANT
-                    # DON'T USE login(request,user)
-                    # =========================
-
-                    # CREATE SEPARATE DASHBOARD SESSION
-
-                    request.session[
-                        "dashboard_user_id"
-                    ] = user.id
-
-                    request.session[
-                        "dashboard_username"
-                    ] = user.username
-
-                    request.session[
-                        "dashboard_email"
-                    ] = user.email
+                    current_time = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+                    notification_msg = f"User '{user.username}' logged in successfully at {current_time}."
+                    
+                    AdminNotification.objects.create(
+                        user=user,
+                        message=notification_msg
+                    )
 
                     return Response({
-
                         "status": "success",
-
-                        "message":
-                        "Dashboard Login Successful"
-
+                        "message": "Dashboard Login Successful"
                     })
-
+                
                 return Response({
-
                     "status": "error",
-
-                    "message":
-                    "You are not admin"
-
-                })
+                    "message": "Access Denied: You are not authorized as an Admin."
+                }, status=status.HTTP_403_FORBIDDEN)
 
             return Response({
-
                 "status": "error",
-
-                "message":
-                "Invalid Username or Password"
-
+                "message": "Invalid Username or Password"
             })
 
         return Response({
-
             "status": "error",
-
             "errors": serializer.errors
-
-        },
-        status=status.HTTP_400_BAD_REQUEST)
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 # =========================
@@ -992,15 +937,10 @@ class DashboardLogoutAPIView(APIView):
 
         })
         
-from django.views.generic import ListView
-
-from django.views.generic import TemplateView
 
 class CancelledOrdersTablePage(TemplateView):
     template_name = "dashboard/cancelled_orders.html"
         
-from rest_framework.views import APIView
-from rest_framework.response import Response
 
 class CancelledOrderListAPI(APIView):
 
@@ -1039,40 +979,193 @@ class CancelledOrderListAPI(APIView):
 
         return Response(data)        
         
-from django.views.generic import TemplateView
-
 class CancelledOrderCalendarView(TemplateView):
     template_name = "dashboard/cancelled_order_calendar.html"
     
-from django.views import View
-from django.http import JsonResponse
-from django.db.models.functions import TruncHour
-from django.db.models import Count
-
-
-
-class CancelledOrderCalendarEvents(View):
+class OrderCalendarEvents(View):
 
     def get(self, request, *args, **kwargs):
-
         orders = (
             Order.objects
-            .filter(status__iexact="Cancelled")
             .annotate(hour=TruncHour("created_at"))
             .values("hour")
-            .annotate(count=Count("id"))
+            .annotate(
+                cancelled_count=Count("id", filter=Q(status__iexact="cancelled")),
+                other_count=Count("id", filter=~Q(status__iexact="cancelled"))
+            )
             .order_by("hour")
         )
 
         events = []
 
         for order in orders:
-
-            events.append({
-                "title": f"{order['count']} Cancelled Orders",
-                "start": order["hour"].isoformat(),
-                "allDay": False,
-                "color": "#dc3545"
-            })
+            if order["hour"]:
+                time_str = order["hour"].isoformat()
+                
+                if order["cancelled_count"] > 0:
+                    events.append({
+                        "title": f"{order['cancelled_count']} Cancelled Orders",
+                        "start": time_str,
+                        "allDay": False,
+                        "color": "#dc3545" # Red
+                    })
+                
+                if order["other_count"] > 0:
+                    events.append({
+                        "title": f"{order['other_count']} Other Orders",
+                        "start": time_str,
+                        "allDay": False,
+                        "color": "#007bff" # Blue
+                    })
 
         return JsonResponse(events, safe=False)
+    
+
+class UserAPI(APIView):
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
+
+    def get(self, request):
+        users = User.objects.all().order_by('-id')
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
+        role = request.data.get('role', 'Customer') 
+
+        # Validation
+        if not username or not password:
+            return Response({"message": "Username And Password Is Required!"}, status=400)
+
+        if User.objects.filter(username=username).exists():
+            return Response({"message": "Username Already Exists!"}, status=400)
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        if role.lower() == 'admin':
+            user.is_staff = True      
+            user.is_superuser = True 
+            user.save()
+        else:
+            user.is_staff = False    
+            user.save()
+
+        Profile.objects.create(
+            user=user,
+            role=role
+        )
+
+        return Response({"message": f"User successfully added as a {role}!"}, status=201)
+    
+class LoginActivityAPI(APIView):
+
+    def get(self, request):
+        logs = LoginActivity.objects.all().order_by('-login_time')
+        serializer = LoginActivitySerializer(logs, many=True)
+        return Response(serializer.data)
+    
+
+class SettingsPageView(TemplateView):
+    template_name = "dashboard/settings.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if "dashboard_user_id" not in request.session:
+            return redirect("/login-page-url/")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['users'] = User.objects.all().order_by('-id')
+        context['logs'] = LoginActivity.objects.all().order_by('-login_time')
+        
+        session_user_id = self.request.session.get("dashboard_user_id")
+        if session_user_id:
+            context['admin'] = User.objects.filter(id=session_user_id).first()
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if "dashboard_user_id" in request.session:
+            AdminNotification.objects.filter(is_read=False).update(is_read=True)
+            return JsonResponse({"status": "success", "message": "Notifications marked as read"})
+        return JsonResponse({"status": "error", "message": "Unauthorized"}, status=403)
+    
+    
+class CouponAPI(APIView):
+
+    def get(self, request):
+        coupons = Coupon.objects.all().order_by("-id")
+        serializer = CouponSerializer(coupons, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = CouponSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "success": True,
+                "message": "Coupon added successfully"
+            }, status=status.HTTP_201_CREATED)
+            
+        return Response({
+            "success": False,
+            "errors": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CouponDetailAPI(APIView):
+    def get(self, request, pk):
+        try:
+            coupon = Coupon.objects.get(id=pk)
+            serializer = CouponSerializer(coupon)
+            return Response(serializer.data)
+        except Coupon.DoesNotExist:
+            return Response({
+                "success": False,
+                "message": "Coupon not found"
+            }, status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, pk):
+        try:
+            coupon = Coupon.objects.get(id=pk)
+        except Coupon.DoesNotExist:
+            return Response({
+                "success": False,
+                "message": "Coupon not found"
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = CouponSerializer(coupon, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "success": True,
+                "message": "Coupon updated successfully"
+            })
+            
+        return Response({
+            "success": False,
+            "errors": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        try:
+            coupon = Coupon.objects.get(id=pk)
+            coupon.delete()
+            return Response({
+                "success": True,
+                "message": "Coupon deleted successfully"
+            })
+        except Coupon.DoesNotExist:
+            return Response({
+                "success": False,
+                "message": "Coupon not found"
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+class CouponListView(TemplateView):
+    template_name = "dashboard/coupon_list.html"

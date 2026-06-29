@@ -1,21 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Corona Admin</title>
-    <!-- plugins:css -->
     <link rel="stylesheet" href="../../assets/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="../../assets/vendors/css/vendor.bundle.base.css">
-    <!-- endinject -->
-    <!-- Plugin css for this page -->
-    <!-- End plugin css for this page -->
-    <!-- inject:css -->
-    <!-- endinject -->
-    <!-- Layout styles -->
     <link rel="stylesheet" href="../../assets/css/style.css">
-    <!-- End layout styles -->
     <link rel="shortcut icon" href="../../assets/images/favicon.png" />
   </head>
   <body>
@@ -26,14 +17,18 @@
             <div class="card col-lg-4 mx-auto">
               <div class="card-body px-5 py-5">
                 <h3 class="card-title text-left mb-3">Login</h3>
-                <form>
+                
+                <div id="api-message-box" class="alert d-none mb-3" style="border-radius: 6px; font-size: 14px;"></div>
+
+                <form id="dashboardLoginForm">
+                  {% csrf_token %}
                   <div class="form-group">
-                    <label>Username or email *</label>
-                    <input type="text" class="form-control p_input">
+                    <label>Username *</label>
+                    <input type="text" id="dashboard_username" name="username" class="form-control p_input" required placeholder="Enter admin username">
                   </div>
                   <div class="form-group">
                     <label>Password *</label>
-                    <input type="text" class="form-control p_input">
+                    <input type="password" id="dashboard_password" name="password" class="form-control p_input" required placeholder="Enter password">
                   </div>
                   <div class="form-group d-flex align-items-center justify-content-between">
                     <div class="form-check">
@@ -46,9 +41,9 @@
                     <button type="submit" class="btn btn-primary btn-block enter-btn">Login</button>
                   </div>
                   <div class="d-flex">
-                    <button class="btn btn-facebook mr-2 col">
+                    <button type="button" class="btn btn-facebook mr-2 col">
                       <i class="mdi mdi-facebook"></i> Facebook </button>
-                    <button class="btn btn-google col">
+                    <button type="button" class="btn btn-google col">
                       <i class="mdi mdi-google-plus"></i> Google plus </button>
                   </div>
                   <p class="sign-up">Don't have an Account?<a href="#"> Sign Up</a></p>
@@ -56,24 +51,77 @@
               </div>
             </div>
           </div>
-          <!-- content-wrapper ends -->
+          </div>
         </div>
-        <!-- row ends -->
       </div>
-      <!-- page-body-wrapper ends -->
-    </div>
-    <!-- container-scroller -->
-    <!-- plugins:js -->
     <script src="../../assets/vendors/js/vendor.bundle.base.js"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
     <script src="../../assets/js/off-canvas.js"></script>
     <script src="../../assets/js/hoverable-collapse.js"></script>
     <script src="../../assets/js/misc.js"></script>
     <script src="../../assets/js/settings.js"></script>
     <script src="../../assets/js/todolist.js"></script>
-    <!-- endinject -->
+
+    <script>
+      function getCsrfTokenFromCookie() {
+          let name = 'csrftoken';
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                  const cookie = cookies[i].trim();
+                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
+                  }
+              }
+          }
+          return cookieValue;
+      }
+
+      document.getElementById("dashboardLoginForm").addEventListener("submit", async function(event) {
+          event.preventDefault(); 
+
+          const msgBox = document.getElementById("api-message-box");
+          const username = document.getElementById("dashboard_username").value.trim();
+          const password = document.getElementById("dashboard_password").value.trim();
+
+          msgBox.className = "alert d-none";
+          msgBox.innerText = "";
+
+          try {
+              const response = await fetch("/api/dashboard-login/", { 
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                      "X-CSRFToken": getCsrfTokenFromCookie()
+                  },
+                  body: JSON.stringify({
+                      username: username,
+                      password: password
+                  })
+              });
+
+              const data = await response.json();
+
+              if (response.ok && data.status === "success") {
+
+                  msgBox.className = "alert alert-success d-block text-white";
+                  msgBox.innerText = data.message;
+                  
+                  setTimeout(() => {
+                      window.location.href = "/dashboard/settings/"; 
+                  }, 1500);
+              } else {
+                  msgBox.className = "alert alert-danger d-block text-white";
+                  msgBox.innerText = data.message || "Invalid credentials provided.";
+              }
+
+          } catch (error) {
+              console.error("Error during API communication:", error);
+              msgBox.className = "alert alert-danger d-block text-white";
+              msgBox.innerText = "Internal connection error. Please try again.";
+          }
+      });
+    </script>
   </body>
 </html>

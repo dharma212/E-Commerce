@@ -41,5 +41,11 @@ path(
     "order/<int:pk>/reorder/",
     ReOrderView.as_view(),
     name="reorder_order"
-),   
+),
+path(
+    "apply-coupon/",
+    ApplyCouponView.as_view(),
+    name="apply_coupon"
+),
+path('dismiss-coupon/', DismissCouponView.as_view(), name='dismiss_coupon'),   
 ]

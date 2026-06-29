@@ -1,15 +1,11 @@
 from django.http import JsonResponse
 from django.views.generic import TemplateView
-from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from User.models import *
-
 import json
-from django.http import JsonResponse
 from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.cache import cache
+
 
 class WishlistAPIView(LoginRequiredMixin, View):
 
@@ -85,10 +81,10 @@ class WishlistDataAPIView(LoginRequiredMixin, View):
             data.append({
                 "id": item.product.id,
                 "name": item.product.name,
+                "slug": item.product.slug,
                 "price": str(item.product.price),
             })
 
-        # STORE CACHE FOR 5 MINUTES
         cache.set(cache_key, data, timeout=300)
 
         return JsonResponse({
@@ -129,13 +125,27 @@ class WishlistPageView(TemplateView):
                     cart__user=self.request.user,
                     product=product
                 ).exists()
+                
+                reviews = Review.objects.filter(
+                    order__items__product=product
+                )
+
+                avg_rating = reviews.aggregate(
+                    Avg("rating")
+                )["rating__avg"] or 0
+
+                avg_rating = round(avg_rating, 1)
+
+                total_reviews = reviews.count()
 
                 wishlist_data.append({
 
                     "id": product.id,
 
                     "name": product.name,
-
+                    
+                    "slug": product.slug,
+                    
                     "mrp": product.mrp,
                     
                     "final_price": product.final_price(),
@@ -150,7 +160,13 @@ class WishlistPageView(TemplateView):
                     if product.images.first()
                     else "",
 
-                    "in_cart": in_cart
+                    "in_cart": in_cart,
+                    "colors": product.colors.all(),
+                    "sizes": product.sizes.all(),
+                    "images": product.images.all(),
+                    
+                    "avg_rating": avg_rating,
+                    "total_reviews": total_reviews,
 
                 })
 

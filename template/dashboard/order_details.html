@@ -648,7 +648,7 @@ function renderItems(){
                 <div class="order-product-name">${name}</div>
 
                 <div class="order-product-meta">
-                    Qty: ${qty} | ₹${price} | Total: ₹${total}
+                    Qty: ${qty} | ₹${item.price} | Total: ₹${(item.price * item.quantity).toFixed(2)}
                 </div>
 
             </div>

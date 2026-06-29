@@ -50,15 +50,21 @@
                         <!-- ACTION BUTTONS -->
                         <div class="product-action">
                             <a href="javascript:void(0)"
-                            class="btn btn-square add-to-cart cart-btn
-                            {% if item.in_cart %}btn-warning active-cart{% else %}btn-outline-dark{% endif %}"
-                            data-id="{{ item.id }}">
+                                class="btn btn-square wishlist-add-to-cart cart-btn"
 
-                                {% if item.in_cart %}
-                                    <i class="fa fa-check"></i>
-                                {% else %}
+                                data-id="{{ item.id }}"
+                                data-name="{{ item.name }}"
+                                data-image="{{ item.image }}"
+
+                                data-colors="{% for c in item.colors %}{{ c.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
+
+                                data-sizes="{% for s in item.sizes %}{{ s.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
+
+                                data-color-images="{% for img in item.images %}{% if img.color %}{{ img.color.name }}:{{ img.image.url }}{% if not forloop.last %},{% endif %}{% endif %}{% endfor %}"
+
+                                data-in-cart="{{ item.in_cart }}">
+
                                     <i class="fa fa-shopping-cart"></i>
-                                {% endif %}
 
                             </a>
                             <!-- REMOVE -->
@@ -68,7 +74,7 @@
 
                             <!-- DETAIL -->
                             <a class="btn btn-outline-dark btn-square"
-                            href="{% url 'product_detail' item.id %}">
+                            href="{% url 'product_detail' item.slug %}">
                                 <i class="fa fa-search"></i>
                             </a>
                         </div>
@@ -77,7 +83,7 @@
                     <!-- CONTENT -->
                     <div class="text-center py-4">
                         <!-- PRODUCT NAME -->
-                        <a class="h6 text-decoration-none product-name" href="{% url 'product_detail' item.id %}">
+                        <a class="h6 text-decoration-none product-name" href="{% url 'product_detail' item.slug %}">
                             {{ item.name|truncatechars:50 }}
                         </a>
 
@@ -103,12 +109,19 @@
                         {% endif %}
                         <!-- STATIC RATING -->
                         <div class="d-flex align-items-center justify-content-center mb-1 mt-2">
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small>(99)</small>
+
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= item.avg_rating %}
+                                    <small class="fa fa-star text-primary mr-1"></small>
+                                {% else %}
+                                    <small class="fa fa-star text-muted mr-1"></small>
+                                {% endif %}
+                            {% endfor %}
+
+                            <small class="ml-1">
+                                ({{ item.total_reviews }})
+                            </small>
+
                         </div>
                     </div>
                 </div>
@@ -128,33 +141,4 @@
         {% endif %}
     </div>
 </div>
-<style>
-
-/* =========================
-ACTIVE CART BUTTON
-========================= */
-.cart-btn.active-cart{
-    background-color: #ffd333 !important;
-    border-color: #ffd333 !important;
-}
-.cart-btn.active-cart i{
-    color: #000 !important;
-}
-/* =========================
-NORMAL BUTTON
-========================= */
-.cart-btn{
-    transition: 0.3s;
-}
-/* =========================
-HOVER SAME COLOR
-========================= */
-.cart-btn.active-cart:hover{
-    background-color: #3D464D !important;
-    border-color: #3D464D !important;
-}
-.cart-btn.active-cart:hover i{
-    color: white !important;
-}
-</style>
 {% endblock %}

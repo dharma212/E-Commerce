@@ -368,24 +368,27 @@
                             <div class="product-action">
 
                                 <!-- CART -->
-                                <a
-                                    href="javascript:void(0)"
-                                    class="btn btn-square add-to-cart
+                                <a class="btn btn-outline-dark btn-square add-to-cart stock-btn
 
-                                    {% if product.id in cart_product_ids %}
-                                        btn-warning active-cart-btn
-                                    {% else %}
-                                        btn-outline-dark
-                                    {% endif %}
-                                    "
+{% if product.id in cart_product_ids %}
+active-cart-btn
+{% endif %}
 
-                                    data-id="{{ product.id }}"
-                                >
+{% if product.stock <= 0 %}
+out-of-stock
+{% endif %}
 
-                                    <i class="fa fa-shopping-cart"></i>
+"
+href="javascript:void(0)"
+data-id="{{ product.id }}"
+data-name="{{ product.name }}"
+data-colors="{% for c in product.colors.all %}{{ c.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
+data-sizes="{% for s in product.sizes.all %}{{ s.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
+data-in-cart="{% if product.id in cart_product_ids %}true{% else %}false{% endif %}">
 
-                                </a>
+    <i class="fa fa-shopping-cart"></i>
 
+</a>
 
 
                                 <!-- WISHLIST -->
@@ -499,15 +502,17 @@
                             <!-- RATING -->
                             <div class="d-flex align-items-center justify-content-center mt-3">
 
-                                <small class="fa fa-star text-primary mr-1"></small>
-                                <small class="fa fa-star text-primary mr-1"></small>
-                                <small class="fa fa-star text-primary mr-1"></small>
-                                <small class="fa fa-star text-primary mr-1"></small>
-                                <small class="fa fa-star text-primary mr-1"></small>
+    {% for i in "12345" %}
+        {% if forloop.counter <= product.avg_rating %}
+            <small class="fa fa-star text-primary mr-1"></small>
+        {% else %}
+            <small class="fa fa-star text-muted mr-1"></small>
+        {% endif %}
+    {% endfor %}
 
-                                <small class="ml-1">(99)</small>
+    <small class="ml-1">({{ product.total_reviews }})</small>
 
-                            </div>
+</div>
 
                         </div>
 

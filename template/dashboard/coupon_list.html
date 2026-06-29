@@ -1,0 +1,200 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    /* Toast Notification CSS */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 999999;
+    }
+    .custom-toast {
+        background: #0f172a;
+        color: #fff;
+        padding: 14px 24px;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        transform: translateX(120%);
+        transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        border-left: 4px solid #4f46e5;
+    }
+    .custom-toast.show {
+        transform: translateX(0);
+    }
+    .custom-toast.toast-success { border-left-color: #22c55e; }
+    .custom-toast.toast-error { border-left-color: #ef4444; }
+    .custom-toast i { margin-right: 12px; font-size: 18px; }
+
+    /* Client-side Validation Styles */
+    .is-invalid-custom {
+        border-color: #ef4444 !important;
+        background-color: rgba(239, 68, 68, 0.03) !important;
+    }
+    .invalid-feedback-custom {
+        color: #ef4444;
+        font-size: 12px;
+        margin-top: 5px;
+        display: none;
+        font-weight: 500;
+    }
+
+    /* Beautiful Toggle Switch Styles */
+    .switch-custom {
+        position: relative;
+        display: inline-block;
+        width: 46px;
+        height: 24px;
+    }
+    .switch-custom input { 
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    .slider-custom {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #cbd5e1;
+        transition: .3s;
+        border-radius: 24px;
+    }
+    .slider-custom:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .3s;
+        border-radius: 50%;
+    }
+    input:checked + .slider-custom {
+        background-color: #22c55e;
+    }
+    input:focus + .slider-custom {
+        box-shadow: 0 0 1px #22c55e;
+    }
+    input:checked + .slider-custom:before {
+        transform: translateX(22px);
+    }
+    .badge-type {
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 4px 10px !important;
+        border-radius: 6px;
+    }
+</style>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="content-wrapper">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="page-title">Product Coupons</h3>
+        <button class="btn btn-create" onclick="openAddModal()">
+            <i class="fa-solid fa-plus mr-2"></i> Add Coupon
+        </button>
+    </div>
+
+    <div class="table-responsive table-responsive-custom">
+        <table class="table table-custom" id="couponDataTable" style="width:100%;">
+            <thead>
+                <tr>
+                    <th style="width: 60px;">#</th>
+                    <th>Coupon Code</th>
+                    <th>Type</th>
+                    <th>Discount</th>
+                    <th>Min Amount</th>
+                    <th>Expiry Date</th>
+                    <th>Status</th>
+                    <th class="text-center" style="width: 120px;">Action</th>
+                </tr>
+            </thead>
+            <tbody id="couponTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="couponModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content clean-modal">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold" id="modalTitle" style="color: #0f172a;">Add Coupon</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="outline: none;">
+                    <span aria-hidden="true" style="font-size: 1.4rem; color: #64748b;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="couponForm" novalidate>
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 form-group mb-3">
+                            <label class="form-label-custom">Coupon Code</label>
+                            <input type="text" id="code" class="form-control form-control-custom" placeholder="e.g. MEGA70">
+                            <div class="invalid-feedback-custom">Coupon code is required.</div>
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            <label class="form-label-custom">Discount Type</label>
+                            <select id="discount_type" class="form-control form-control-custom">
+                                <option value="fixed">Fixed Amount (₹)</option>
+                                <option value="percent">Percentage (%)</option>
+                            </select>
+                            <div class="invalid-feedback-custom">Discount type is required.</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group mb-3">
+                            <label class="form-label-custom">Discount Value</label>
+                            <input type="number" id="coupondiscount" class="form-control form-control-custom" placeholder="e.g. 500">
+                            <div class="invalid-feedback-custom">Discount value is required.</div>
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            <label class="form-label-custom">Minimum Amount</label>
+                            <input type="number" id="minimum_amount" class="form-control form-control-custom" placeholder="4999">
+                            <div class="invalid-feedback-custom">Minimum amount is required.</div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label-custom">Valid From</label>
+                        <input type="datetime-local" id="valid_from" class="form-control form-control-custom">
+                        <div class="invalid-feedback-custom">Valid From date is required.</div>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label class="form-label-custom">Expiry Date</label>
+                        <input type="datetime-local" id="valid_to" class="form-control form-control-custom">
+                        <div class="invalid-feedback-custom">Expiry Date is required.</div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-light mr-2" data-dismiss="modal" style="border: 1px solid #cbd5e1; border-radius: 8px;">Cancel</button>
+                        <button type="submit" class="btn btn-create px-4" id="saveBtn">Save Coupon</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+
+<script>
+    const couponApiUrl = "{% url 'coupon_api' %}";
+    if (typeof loadCoupons === 'function') {
+        loadCoupons();
+    }
+</script>
+{% endblock %}

@@ -1,5 +1,3 @@
-<!-- templates/dashboard/order/order_list.html -->
-
 {% extends "dashboard/base.html" %}
 {% load static %}
 
@@ -18,8 +16,38 @@
 
     <div class="order-card">
 
-        <h2 class="page-title">Order List </h2>
+<div class="order-header">
 
+    <h2 class="page-title">Order List</h2>
+
+    <div class="order-actions">
+
+        <!-- STATUS BUTTONS -->
+        <div class="status-filters">
+
+            <button class="btn active" style="background: #3498db;" onclick="filterStatus('')">All</button>
+            <button class="btn pending" onclick="filterStatus('pending')">Pending</button>
+            <button class="btn shipped" onclick="filterStatus('shipped')">Shipped</button>
+            <button class="btn delivered" onclick="filterStatus('delivered')">Delivered</button>
+            <button class="btn cancelled" onclick="filterStatus('cancelled')">Cancelled</button>
+
+        </div>
+
+        <!-- DATE FILTER -->
+        <div class="date-filters">
+
+            <input type="date" id="startDate">
+            <input type="date" id="endDate">
+
+            <button class="filter-btn" onclick="applyDateFilter()">
+                Filter
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
         <table id="orderTable"
                class="table table-hover table-striped text-center align-middle">
 
@@ -60,7 +88,9 @@
 // ========================================
 // DATATABLE
 // ========================================
-
+let currentStatus = "";
+let startDate = "";
+let endDate = "";
 let table;
 
 function initTable(){
@@ -131,7 +161,22 @@ function showToast(type, message){
 
     },3000);
 }
+function filterStatus(status){
 
+    currentStatus = status;
+
+    document.querySelectorAll('.status-filters .btn')
+        .forEach(btn => btn.classList.remove('active'));
+
+    event.target.classList.add('active');
+
+    loadOrders();
+}
+function applyDateFilter(){
+    startDate = document.getElementById("startDate").value;
+    endDate = document.getElementById("endDate").value;
+    loadOrders();
+}
 
 // ========================================
 // LOAD ORDERS
@@ -139,7 +184,21 @@ function showToast(type, message){
 
 function loadOrders(){
 
-    fetch("/api/orders/")
+    let url = "/api/orders/?";
+
+if(currentStatus){
+    url += `status=${currentStatus}&`;
+}
+
+if(startDate){
+    url += `start_date=${startDate}&`;
+}
+
+if(endDate){
+    url += `end_date=${endDate}&`;
+}
+
+fetch(url)
 
     .then(res => {
 
@@ -172,7 +231,7 @@ function loadOrders(){
 
                     <td>
 
-                        ${order.items.slice(0,2).map(item => `
+                        ${order.items.slice(0,1).map(item => `
 
                             <div class="product-badge">
 
@@ -253,16 +312,16 @@ function loadOrders(){
 
                     <td>
 
-    <a href="/invoice/${order.id}/"
-       class="icon-btn view-btn"
-       title="Download Invoice"
-       download>
+                        <a href="/invoice/${order.id}/"
+                        class="icon-btn view-btn"
+                        title="Download Invoice"
+                        download>
 
-        <i class="fa-solid fa-file-invoice"></i>
+                            <i class="fa-solid fa-file-invoice"></i>
 
-    </a>
+                        </a>
 
-</td>
+                    </td>
                 </tr>
 
             `;
@@ -270,12 +329,15 @@ function loadOrders(){
 
         document.getElementById("orderBody").innerHTML = html;
 
-        if($.fn.DataTable.isDataTable('#orderTable')){
+        setTimeout(() => {
 
-            $('#orderTable').DataTable().destroy();
-        }
+            if ($.fn.DataTable.isDataTable('#orderTable')) {
+                $('#orderTable').clear().destroy();
+            }
 
-        initTable();
+            initTable();
+
+        }, 50);
 
     })
 
@@ -367,4 +429,83 @@ function deleteOrder(id){
 
 loadOrders();
 </script>
+<style>
+/* HEADER LAYOUT */
+.order-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+/* RIGHT SIDE WRAPPER */
+.order-actions{
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* STATUS BUTTONS */
+.status-filters{
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* BASE BUTTON STYLE */
+.status-filters .btn{
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.2s;
+    color: #fff;
+}
+
+/* COLORS */
+.status-filters .btn.active{ background:#111; }
+.status-filters .pending{ background:#f39c12; }
+.status-filters .shipped{ background:#8e44ad; }
+.status-filters .delivered{ background:#2ecc71; }
+.status-filters .cancelled{ background:#e74c3c; }
+
+/* HOVER EFFECT */
+.status-filters .btn:hover{
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* DATE FILTER MODERN */
+.date-filters{
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.date-filters input{
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+    font-size: 13px;
+}
+
+/* FILTER BUTTON */
+.filter-btn{
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.filter-btn:hover{
+    background: #217dbb;
+}
+</style>
 {% endblock %}

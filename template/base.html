@@ -19,417 +19,59 @@
     <link rel="stylesheet" href="{% static "css/detail.css" %}">
     <link rel="stylesheet" href="{% static "css/index.css" %}">
     <link rel="stylesheet" href="{% static "css/login.css" %}">
+    <link rel="stylesheet" href="{% static "css/signup.css" %}">
+    <link rel="stylesheet" href="{% static "css/mobile_navbar.css" %}">
     <link rel="stylesheet" href="{% static "css/cart.css" %}">
     <link rel="stylesheet" href="{% static "css/order_list.css" %}">
     <link rel="stylesheet" href="{% static "css/checkout.css" %}">
     <link rel="stylesheet" href="{% static "css/header.css" %}">
+    <link rel="stylesheet" href="{% static "css/add_to_cart_popup.css" %}">
+    <link rel="stylesheet" href="{% static "css/order_detail.css" %}">
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body data-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}">
     {% include "header.html" %}
+    {% include 'login.html' %}
+    {% include 'add_to_cart_popup.html' %}
+    {% include 'mobile_navbar.html' %}
     {% block content %}{% endblock content %}
-<!-- LOGIN MODAL -->
-<div id="loginModal" class="login-modal">
-
-    <div class="login-box">
-
-        <!-- CLOSE -->
-        <button class="login-close" onclick="closeLoginModal()">
-            &times;
-        </button>
-
-        <!-- LOGO -->
-        <div class="login-logo">
-            <i class="fa fa-user-circle"></i>
-        </div>
-
-        <!-- TITLE -->
-        <h3 class="login-title">Welcome Back</h3>
-
-        <p class="login-subtitle">
-            Login with OTP to continue shopping
-        </p>
-
-        <!-- STEP 1 -->
-        <div id="popup_step1">
-
-            <div class="login-input-group">
-                <i class="fa fa-user"></i>
-
-                <input
-                    type="text"
-                    id="popup_username"
-                    placeholder="Enter Username"
-                    class="login-input"
-                >
-            </div>
-            <div class="login-error" id="username-error"></div>
-            <div class="login-input-group">
-                <i class="fa fa-envelope"></i>
-
-                <input
-                    type="text"
-                    id="popup_email"
-                    placeholder="Enter Email or Phone"
-                    class="login-input"
-                >
-            </div>
-            <div class="login-error" id="email-error"></div>
-
-            <button onclick="sendOTP()" class="login-btn">
-                Send OTP
-            </button>
-
-        </div>
-
-        <!-- STEP 2 -->
-        <div id="popup_step2" style="display:none;">
-
-            <div class="login-input-group">
-                <i class="fa fa-lock"></i>
-
-                <input
-                    type="text"
-                    id="popup_otp"
-                    placeholder="Enter OTP"
-                    class="login-input"
-                >
-            </div>
-            <div class="login-error" id="otp-error"></div>
-
-            <button onclick="verifyOTP()" class="login-btn success-btn">
-                Verify OTP
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-{% if messages %}
-
-<div class="toast-container">
-
-    {% for message in messages %}
-
-    <div class="custom-toast {{ message.tags }}">
-        {{ message }}
-    </div>
-
-    {% endfor %}
-
-</div>
-
-{% endif %}
- <!-- =======================================
-MOBILE BOTTOM NAVBAR
-======================================= -->
-
-<div class="mobile-bottom-navbar d-lg-none">
-
-    <!-- HOME -->
-<a href="{% url 'index' %}"
-   class="mobile-nav-item {% if request.path == '/' %}active{% endif %}">
-
-        <i class="fas fa-home"></i>
-
-        <span>Home</span>
-
-    </a>
-
-    <!-- WISHLIST -->
-    {% if request.user.is_authenticated %}
-
-<a href="{% url 'wishlist' %}"
-   class="mobile-nav-item {% if 'wishlist' in request.path %}active{% endif %}">
-
-        <div class="position-relative">
-
-            <i class="fas fa-heart"></i>
-
-            <small class="mobile-count">
-
-                {{ wishlist_count|default:0 }}
-
-            </small>
-
-        </div>
-
-        <span>Wishlist</span>
-
-    </a>
-
-    {% else %}
-
-    <a href="javascript:void(0)"
-       onclick="openLoginModal()"
-       class="mobile-nav-item">
-
-        <i class="fas fa-heart"></i>
-
-        <span>Wishlist</span>
-
-    </a>
-
-    {% endif %}
-
-    <!-- CART -->
-    {% if request.user.is_authenticated %}
-
-<a href="{% url 'cart' %}"
-   class="mobile-nav-item {% if 'cart' in request.path %}active{% endif %}">
-
-        <div class="position-relative">
-
-            <i class="fas fa-shopping-cart"></i>
-
-            <small class="mobile-count">
-
-                {{ cart_count|default:0 }}
-
-            </small>
-
-        </div>
-
-        <span>Cart</span>
-
-    </a>
-
-    {% else %}
-
-    <a href="javascript:void(0)"
-       onclick="openLoginModal()"
-       class="mobile-nav-item">
-
-        <i class="fas fa-shopping-cart"></i>
-
-        <span>Cart</span>
-
-    </a>
-
-    {% endif %}
-
-    <!-- ORDERS -->
-    {% if request.user.is_authenticated %}
-
-<a href="{% url 'my_orders' %}"
-   class="mobile-nav-item {% if 'orders' in request.path %}active{% endif %}">
-
-        <i class="fas fa-box"></i>
-
-        <span>Orders</span>
-
-    </a>
-
-    {% else %}
-
-    <a href="javascript:void(0)"
-       onclick="openLoginModal()"
-       class="mobile-nav-item">
-
-        <i class="fas fa-box"></i>
-
-        <span>Orders</span>
-
-    </a>
-
-    {% endif %}
-
-<!-- PROFILE / LOGIN -->
-{% if request.user.is_authenticated %}
-
-<a href="{% url 'profile' %}"
-   class="mobile-nav-item {% if 'profile' in request.path %}active{% endif %}">
-
-    <i class="fas fa-user"></i>
-
-    <span>Profile</span>
-
-</a>
-
-<!-- LOGOUT -->
-<a href="javascript:void(0)"
-   onclick="logout()"
-   class="mobile-nav-item">
-
-    <i class="fas fa-sign-out-alt"></i>
-
-    <span>Logout</span>
-
-</a>
-
-{% else %}
-
-<!-- LOGIN -->
-<a href="javascript:void(0)"
-   onclick="openLoginModal()"
-   class="mobile-nav-item">
-
-    <i class="fas fa-sign-in-alt"></i>
-
-    <span>Login</span>
-
-</a>
-
-{% endif %}
-
-</div>
-<style>
-/* =========================
-MOBILE BOTTOM NAVBAR
-========================= */
-
-.mobile-bottom-navbar{
-    position:fixed;
-    bottom:0;
-    left:0;
-    width:100%;
-    height:72px;
-
-    background:#ffffff;
-    display:flex;
-    justify-content:space-around;
-    align-items:center;
-
-    box-shadow:0 -5px 20px rgba(0,0,0,.08);
-
-    z-index:99999;
-
-    border-top:1px solid #f1f1f1;
-
-    padding-bottom:env(safe-area-inset-bottom);
-}
-
-.mobile-nav-item{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-
-    text-decoration:none;
-
-    color:#777;
-    font-size:11px;
-    font-weight:600;
-
-    position:relative;
-
-    width:100%;
-    height:100%;
-
-    transition:.25s ease;
-}
-
-.mobile-nav-item i{
-    font-size:21px;
-    margin-bottom:4px;
-    transition:.25s ease;
-}
-
-.mobile-nav-item span{
-    font-size:11px;
-    line-height:1;
-}
-
-/* Hover */
-
-.mobile-nav-item:hover{
-    color:#FFD333;
-    text-decoration:none;
-}
-
-/* Active */
-
-.mobile-nav-item.active{
-    color:#FFD333;
-}
-
-.mobile-nav-item.active i{
-    transform:translateY(-2px);
-}
-
-/* Active Top Indicator */
-
-.mobile-nav-item.active::before{
-    content:"";
-
-    position:absolute;
-
-    top:0;
-    left:50%;
-
-    transform:translateX(-50%);
-
-    width:26px;
-    height:3px;
-
-    background:#FFD333;
-
-    border-radius:10px;
-}
-
-/* Count Badge */
-
-.mobile-count{
-    position:absolute;
-
-    top:-7px;
-    right:-10px;
-
-    background:#ff3b30;
-    color:#fff;
-
-    border-radius:20px;
-
-    min-width:18px;
-    height:18px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-size:10px;
-    font-weight:700;
-
-    padding:0 4px;
-
-    border:2px solid #fff;
-
-    box-shadow:0 2px 8px rgba(255,59,48,.35);
-}
-
-/* Icon Wrapper */
-
-.position-relative{
-    position:relative;
-}
-
-/* Login Logout */
-
-.mobile-nav-item .fa-sign-in-alt,
-.mobile-nav-item .fa-sign-out-alt{
-    font-size:20px;
-}
-
-/* Desktop Hide */
-
-@media(min-width:992px){
-    .mobile-bottom-navbar{
-        display:none;
-    }
-}
-</style> 
-<!-- =======================================
- MOBILE NAVBAR
-======================================= -->
 
 {% include "footer.html" %}
+<a href="#page-top" class="btn btn-primary back-to-top" style="position: fixed; bottom: 30px; right: 30px; z-index: 99;">
+    <i class="fa fa-angle-double-up"></i>
+</a>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+<script>
+$(document).ready(function () {
+    
+    $(window).scroll(function () {
+        if ($(this).scrollTop() > 300) { 
+            $('.back-to-top').addClass('show');
+        } else {
+            $('.back-to-top').removeClass('show');
+        }
+    });
+
+    $('.back-to-top').click(function (e) {
+        e.preventDefault();
+        
+        $('html, body').animate({
+            scrollTop: 0
+        }, 800);
+        
+        return false;
+    });
+});
+</script>
 </body>
     <script src="{% static 'js/profile.js' %}"></script>
     <script src="{% static 'js/detail.js' %}"></script>
     <script src="{% static 'js/login_pop.js' %}"></script>
+    <script src="{% static 'js/signup_pop.js' %}"></script>
     <script src="{% static 'js/wishlist.js' %}"></script>
     <script src="{% static 'js/header.js' %}"></script>
     <script src="{% static 'js/global-cart.js' %}"></script>
+    <script src="{% static 'js/add-to-cart.js' %}"></script>
 </html>

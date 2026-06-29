@@ -1,114 +1,111 @@
-{% extends "base.html" %}
-{% block content %}
-{% load static %}
+<div id="loginModal" class="login-modal">
+    <div class="login-box">
+        <button class="login-close" onclick="closeLoginModal()">&times;</button>
+        <div class="login-logo"><i class="fa fa-user-circle"></i></div>
+        <h3 class="login-title">Welcome Back</h3>
+        <p class="login-subtitle">Login with OTP to continue shopping</p>
 
-<style>
-.auth-wrapper {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #ccc;
-}
+        <div id="popup_step1">
+            <div class="login-input-group">
+                <i class="fa fa-user"></i>
+                <input type="text" id="popup_username" placeholder="Enter Username" class="login-input">
+            </div>
+            <div class="login-error" id="username-error"></div>
 
-.auth-box {
-    width: 350px;
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    text-align: center;
-}
-</style>
+            <div class="login-input-group">
+                <i class="fa fa-envelope"></i>
+                <input type="text" id="popup_email" placeholder="Enter Email or Phone" class="login-input">
+            </div>
+            <div class="login-error" id="email-error"></div>
 
-<div class="auth-wrapper">
-<div class="auth-box">
+            <button onclick="sendOTP()" class="login-btn">Send OTP</button>
+            <p style="margin-top: 15px; font-size: 13px;">
+                Don't have an account? <a href="javascript:void(0)" onclick="openSignupModal()" style="color: #28a745; font-weight: bold; text-decoration: none;">Sign Up</a>
+            </p>
+        </div>
 
-    <h3>Login with OTP</h3>
-
-    <div id="step1">
-        <input type="text" id="email" placeholder="Enter Email or Phone">
-        <button onclick="sendOTP()">Send OTP</button>
+        <div id="popup_step2" style="display: none;">
+            <div class="login-input-group">
+                <i class="fa fa-lock"></i>
+                <input type="text" id="popup_otp" placeholder="Enter OTP" class="login-input">
+            </div>
+            <div class="login-error" id="otp-error"></div>
+            <button onclick="verifyOTP()" class="login-btn success-btn">Verify OTP</button>
+        </div>
     </div>
-
-    <div id="step2" style="display:none;">
-        <input type="text" id="otp" placeholder="Enter OTP">
-        <button onclick="verifyOTP()">Verify OTP</button>
-    </div>
-
-</div>
 </div>
 
-<script>
-// ✅ CSRF TOKEN FUNCTION
-function getCSRFToken() {
-    return document.cookie.split('; ')
-        .find(row => row.startsWith('csrftoken'))
-        ?.split('=')[1];
-}
+<div id="signupModal" class="login-modal">
+    <div class="login-box">
+        <button class="login-close" onclick="closeSignupModal()">&times;</button>
+        <div class="login-logo"><i class="fa fa-user-plus"></i></div>
+        <h3 class="login-title">Create Account</h3>
+        <p class="login-subtitle">Fill in details to set up your account</p>
 
+        <div>
+            <div class="signup-grid">
+                
+                <div class="full-width-row">
+                    <div class="login-input-group">
+                        <i class="fa fa-user"></i>
+                        <input type="text" id="signup_username" placeholder="Username" class="login-input">
+                    </div>
+                    <div class="login-error" id="signup-username-error"></div>
+                </div>
 
-// ✅ SEND OTP
-function sendOTP(){
+                <div>
+                    <div class="login-input-group">
+                        <i class="fa fa-id-card"></i>
+                        <input type="text" id="signup_firstname" placeholder="First Name" class="login-input">
+                    </div>
+                    <div class="login-error" id="signup-firstname-error"></div>
+                </div>
 
-    let email = document.getElementById("email").value;
+                <div>
+                    <div class="login-input-group">
+                        <i class="fa fa-id-card"></i>
+                        <input type="text" id="signup_lastname" placeholder="Last Name" class="login-input">
+                    </div>
+                    <div class="login-error" id="signup-lastname-error"></div>
+                </div>
 
-    if(!email){
-        alert("Enter email or phone");
-        return;
-    }
+                <div>
+                    <div class="login-input-group">
+                        <i class="fa fa-envelope"></i>
+                        <input type="email" id="signup_email" placeholder="Email Address" class="login-input">
+                    </div>
+                    <div class="login-error" id="signup-email-error"></div>
+                </div>
 
-    fetch('/api/send-otp/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken()
-        },
-        body: JSON.stringify({email: email})
-    })
-    .then(res => res.json())
-    .then(data => {
+                <div>
+                    <div class="login-input-group">
+                        <i class="fa fa-phone"></i>
+                        <input type="text" id="signup_phone" placeholder="10-Digit Phone" class="login-input">
+                    </div>
+                    <div class="login-error" id="signup-phone-error"></div>
+                </div>
 
-        if(data.status === "success"){
-            alert("OTP: check console 😎"); 
-            document.getElementById("step1").style.display = "none";
-            document.getElementById("step2").style.display = "block";
-        } else {
-            alert(data.message);
-        }
+            </div>
+            <button onclick="processSignupAndGoToLogin()" class="login-btn">Register & Go to Login</button>
+            
+            <p style="text-align: center; margin-top: 20px; font-size: 14px; color: #64748b;">
+                Already have an account? <a href="javascript:void(0)" onclick="openLoginModal()" style="color: #3d5afe; font-weight: 600; text-decoration: none;">Login</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% if messages %}
 
-    });
-}
+<div class="toast-container">
 
+    {% for message in messages %}
 
-// ✅ VERIFY OTP
-function verifyOTP(){
+    <div class="custom-toast {{ message.tags }}">
+        {{ message }}
+    </div>
 
-    let email = document.getElementById("email").value;
-    let otp = document.getElementById("otp").value;
+    {% endfor %}
 
-    fetch('/api/verify-otp/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken()
-        },
-        body: JSON.stringify({
-            email: email,
-            otp: otp
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
+</div>
 
-        if(data.status === "success"){
-            alert("Login success 🎉");
-            window.location.href = "/";
-        } else {
-            alert(data.message);
-        }
-
-    });
-}
-</script>
-
-{% endblock %}
+{% endif %}

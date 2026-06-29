@@ -3,6 +3,13 @@ from django.contrib import messages
 from django.views.generic import TemplateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from User.models import *
+import secrets
+from datetime import timedelta
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from django.http import JsonResponse
+from django.views import View
 
 class checkoutview(LoginRequiredMixin, TemplateView):
     template_name = "checkout.html"
@@ -15,10 +22,12 @@ class checkoutview(LoginRequiredMixin, TemplateView):
         buy_now_qty = self.request.GET.get('qty')
         buy_now_color = self.request.GET.get('color')
         buy_now_size = self.request.GET.get('size')
+
         if buy_now_id:
             product = get_object_or_404(Product, id=buy_now_id)
             qty = int(buy_now_qty) if buy_now_qty else 1
             subtotal = product.final_price() * qty 
+            total_mrp = product.mrp * qty
             
             context["cart_items"] = [{
                 'product': product,
@@ -35,12 +44,45 @@ class checkoutview(LoginRequiredMixin, TemplateView):
             cart, _ = Cart.objects.get_or_create(user=user)
             cart_items = CartItem.objects.filter(cart=cart).select_related("product")
             subtotal = sum(item.total_price for item in cart_items) if cart_items.exists() else 0
+            total_mrp = sum(item.product.mrp * item.quantity for item in cart_items) if cart_items.exists() else 0
             context["cart_items"] = cart_items
 
         shipping = 100 if subtotal > 0 else 0
+        grand_total = subtotal + shipping
+
+        coupon_id = self.request.session.get("coupon_id")
+        coupon_code = ""
+        coupon_discount = 0
+
+        if coupon_id:
+            coupon = Coupon.objects.filter(id=coupon_id).first()
+            if coupon and coupon.is_valid():
+                coupon_code = coupon.code
+                if coupon.discount_type == 'percent':
+                    coupon_discount = float(grand_total) * (float(coupon.discount) / 100.0)
+                    if coupon_discount > grand_total:
+                        coupon_discount = grand_total
+                else:
+                    coupon_discount = float(coupon.discount)
+            else:
+                self.request.session.pop("coupon_id", None)
+                self.request.session.pop("discount", None)
+
+        final_total = float(grand_total) - float(coupon_discount)
+        if final_total < 0:
+            final_total = 0
+
+        total_savings = (total_mrp - subtotal) + coupon_discount
+        if total_savings < 0:
+            total_savings = 0
+
+        context["total_mrp"] = total_mrp
+        context["total_savings"] = total_savings
         context["subtotal"] = subtotal
         context["shipping"] = shipping
-        context["grand_total"] = subtotal + shipping
+        context["grand_total"] = final_total 
+        context["coupon_code"] = coupon_code
+        context["coupon_discount"] = coupon_discount
         
         default_addr = Address.objects.filter(user=user, is_default=True).first()
         if not default_addr:
@@ -49,6 +91,25 @@ class checkoutview(LoginRequiredMixin, TemplateView):
         context["default_address"] = default_addr
         context["addresses"] = Address.objects.filter(user=user)
         context["profile"] = Profile.objects.filter(user=user).first()
+        all_coupons = Coupon.objects.filter(
+            valid_to__gte=timezone.now()
+        )
+
+        used_coupon_ids = UserCoupon.objects.filter(
+            user=user,
+            is_used=True
+        ).values_list(
+            "coupon_id",
+            flat=True
+        )
+
+        context["available_coupons"] = all_coupons.exclude(
+            id__in=used_coupon_ids
+        )
+
+        context["used_coupons"] = all_coupons.filter(
+            id__in=used_coupon_ids
+        )
         
         return context
 
@@ -70,24 +131,55 @@ class checkoutview(LoginRequiredMixin, TemplateView):
             messages.error(request, "Please add a delivery address first.")
             return redirect("add_address")
 
+        coupon_id = request.session.get("coupon_id")
+        coupon_discount = 0
+        coupon_code = ""
+        if coupon_id:
+            coupon = Coupon.objects.filter(id=coupon_id).first()
+            if coupon and coupon.is_valid():
+                coupon_code = coupon.code
+
         if buy_now_id:
             product = get_object_or_404(Product, id=buy_now_id)
             qty = int(buy_now_qty)
-            total = (product.final_price() * qty) + 100 
+            subtotal = product.final_price() * qty
+            grand_total = subtotal + 100
             
+            if coupon_id and coupon:
+                if coupon.discount_type == 'percent':
+                    coupon_discount = float(grand_total) * (float(coupon.discount) / 100.0)
+                else:
+                    coupon_discount = float(coupon.discount)
+
+            final_price = float(grand_total) - coupon_discount
+            if final_price < 0: final_price = 0
+
             order = Order.objects.create(
                 user=user, 
                 address=order_address, 
-                total_price=total, 
+                total_price=final_price, 
                 status="Pending",
-                payment_method=payment_method 
+                payment_method=payment_method,
+                # coupon_code=coupon_code,
+                # coupon_discount=coupon_discount
             )
-            # CHECK STOCK
+            if coupon_id and coupon:
+
+                UserCoupon.objects.update_or_create(
+
+                    user=user,
+                    coupon=coupon,
+
+                    defaults={
+                        "order": order,
+                        "is_used": True
+                    }
+
+                )
             if product.stock < qty:
                 messages.error(request, f"Only {product.stock} items available in stock.")
                 return redirect("checkout")
 
-            # CREATE ORDER ITEM
             OrderItem.objects.create(
                 order=order,
                 product=product,
@@ -97,7 +189,6 @@ class checkoutview(LoginRequiredMixin, TemplateView):
                 size=buy_now_size
             )
 
-            # MINUS STOCK
             product.stock -= qty
             product.save()
         else:
@@ -111,26 +202,53 @@ class checkoutview(LoginRequiredMixin, TemplateView):
             subtotal = sum(item.total_price for item in cart_items)
             grand_total = subtotal + 100
             
+            if coupon_id and coupon:
+                if coupon.discount_type == 'percent':
+                    coupon_discount = float(grand_total) * (float(coupon.discount) / 100.0)
+                else:
+                    coupon_discount = float(coupon.discount)
+
+            final_price = float(grand_total) - coupon_discount
+            if final_price < 0: final_price = 0
+
             order = Order.objects.create(
                 user=user, 
                 address=order_address, 
-                total_price=grand_total, 
-                status="Pending"
+                total_price=final_price, 
+                status="Pending",
+                payment_method=payment_method
+                # coupon_code=coupon_code,
+                # coupon_discount=coupon_discount
             )
-            
+            if coupon_id and coupon:
+
+                UserCoupon.objects.update_or_create(
+
+                    user=user,
+                    coupon=coupon,
+
+                    defaults={
+                        "order": order,
+                        "is_used": True
+                    }
+
+                )
+            random_code = f"DISC-{secrets.token_hex(3).upper()}"
+            new_coupon = Coupon.objects.create(
+                code=random_code,
+                discount=50.00,
+                discount_type='fixed',
+                valid_from=timezone.now(),
+                valid_to=timezone.now() + timedelta(days=7)
+            )
+            UserCoupon.objects.create(user=user, order=order, coupon=new_coupon)
+            request.session['just_earned_coupon'] = new_coupon.code
+            request.session.modified = True 
             for item in cart_items:
-
-                # CHECK STOCK
                 if item.product.stock < item.quantity:
-
-                    messages.error(
-                        request,
-                        f"Only {item.product.stock} stock available for {item.product.name}"
-                    )
-
+                    messages.error(request, f"Only {item.product.stock} stock available for {item.product.name}")
                     return redirect("cart")
 
-                # CREATE ORDER ITEM
                 OrderItem.objects.create(
                     order=order,
                     product=item.product,
@@ -140,10 +258,13 @@ class checkoutview(LoginRequiredMixin, TemplateView):
                     size=item.size
                 )
 
-                # MINUS STOCK
                 item.product.stock -= item.quantity
                 item.product.save()
+            
             cart_items.delete()
+
+        request.session.pop("coupon_id", None)
+        request.session.pop("discount", None)
 
         messages.success(request, "Order placed successfully!")
         return redirect("my_orders")
@@ -154,18 +275,17 @@ class OrderListView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        # જો કૂપન જોયા પછી યુઝર પાછો આવે તો સેશન ક્લિયર કરો
+        if self.request.GET.get('clear_coupon') == 'true':
+            if 'just_earned_coupon' in self.request.session:
+                del self.request.session['just_earned_coupon']
+        
         context['orders'] = Order.objects.filter(user=self.request.user)\
                                          .select_related('address')\
                                          .prefetch_related('items__product')\
                                          .order_by('-id')
-
         return context
-
-
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.views.generic import DetailView
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 class OrderDetailView(LoginRequiredMixin, DetailView):
     model = Order
@@ -181,27 +301,62 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
-            return JsonResponse({
-                "status": self.object.status,
-            })
-
+            return JsonResponse({"status": self.object.status})
         return super().get(request, *args, **kwargs)
 
-# views.py
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order = self.object
 
-from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, get_object_or_404
-from datetime import datetime
+        order_items = OrderItem.objects.filter(order=order).select_related("product")
+        
+        total_mrp = order.total_listing_price
+            
+        subtotal = sum(item.price * item.quantity for item in order_items)
 
+        listing_discount = total_mrp - float(subtotal)
+        if listing_discount < 0:
+            listing_discount = 0
 
-from django.views import View
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
-from django.template.loader import get_template
-from xhtml2pdf import pisa
+        expected_grand_total = float(subtotal) + 100
+        actual_paid_total = float(order.total_price)
+
+        coupon_discount = expected_grand_total - actual_paid_total
+        if coupon_discount < 0:
+            coupon_discount = 0
+
+        coupon_code = ""
+        if coupon_discount > 0:
+            matching_coupon = Coupon.objects.filter(discount=coupon_discount).first()
+            
+            if matching_coupon:
+                coupon_code = matching_coupon.code
+            else:
+                calculated_percent = round((coupon_discount / expected_grand_total) * 100)
+                matching_percent_coupon = Coupon.objects.filter(
+                    discount_type='percent', 
+                    discount=calculated_percent
+                ).first()
+                
+                if matching_percent_coupon:
+                    coupon_code = matching_percent_coupon.code
+                else:
+                    coupon_code = "Applied"  
+
+        total_savings = float(listing_discount) + float(coupon_discount)
+
+        context["order_items"] = order_items
+        context["total_mrp"] = total_mrp
+        context["subtotal"] = subtotal
+        context["listing_discount"] = listing_discount
+        context["coupon_discount"] = coupon_discount
+        context["coupon_code"] = coupon_code  
+        context["total_savings"] = total_savings
+        context["shipping"] = 100 if subtotal > 0 else 0
+
+        return context
+
 
 class InvoiceView(View):
     def get(self, request, pk, *args, **kwargs):
@@ -220,7 +375,6 @@ class InvoiceView(View):
                 'total': item_total
             })
 
-        # શિપિંગ ચાર્જ અને ગ્રાન્ડ ટોટલની ગણતરી
         shipping_charge = 100.0
         grand_total = subtotal + shipping_charge
 
@@ -239,13 +393,6 @@ class InvoiceView(View):
         pisa.CreatePDF(html, dest=response)
         return response
     
-# views.py
-
-from django.views import View
-from django.shortcuts import redirect, get_object_or_404
-from django.contrib import messages
-
-
 
 class AddReviewView(View):
 
@@ -300,13 +447,7 @@ class AddReviewView(View):
 
         return redirect('order_details', pk=order.id)
     
-from django.views import View
-from django.shortcuts import redirect, get_object_or_404
-from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
-
-# views.py
-
+    
 class ReOrderView(LoginRequiredMixin, View):
 
     def post(self, request, pk):
@@ -319,10 +460,7 @@ class ReOrderView(LoginRequiredMixin, View):
         cart, created = Cart.objects.get_or_create(
             user=request.user
         )
-
-        # Re-order કરતી વખતે જો જૂનું કાર્ટ ખાલી કરવું હોય તો નીચેની લાઇન અન-કમેન્ટ કરો:
-        # CartItem.objects.filter(cart=cart).delete()
-
+        
         for item in order.items.all():
             cart_item = CartItem.objects.filter(
                 cart=cart,
@@ -348,8 +486,7 @@ class ReOrderView(LoginRequiredMixin, View):
             "Items prepared for re-order."
         )
 
-        # કાર્ટમાં મોકલવાને બદલે સીધું જ CHECKOUT વ્યુ પર મોકલો!
-        return redirect("checkout") # તમારી url pattern નું નામ 'checkout' હોવું જોઈએ
+        return redirect("checkout")
 
 
 class CancelOrderView(LoginRequiredMixin, View):
@@ -364,7 +501,6 @@ class CancelOrderView(LoginRequiredMixin, View):
         reason = request.POST.get("cancel_reason")
         other_reason = request.POST.get("other_reason")
 
-        # જો યુઝરે રેડિયો બટનમાં "Other" સિલેક્ટ કર્યું હોય તો ટેક્સ્ટ બોક્સની વેલ્યુ લો
         if reason == "Other":
             reason = other_reason
 
@@ -378,6 +514,34 @@ class CancelOrderView(LoginRequiredMixin, View):
         )
 
         return redirect(
-            "order_details", # તમારા ઓર્ડર ડિટેલના url નેમ મુજબ રાખવું (pk=order.id સાથે)
+            "order_details", 
             pk=order.id
         )
+        
+
+class DismissCouponView(LoginRequiredMixin, View):
+    def post(self, request):
+        if 'just_earned_coupon' in request.session:
+            del request.session['just_earned_coupon']
+    
+        return redirect('checkout')
+    
+class ApplyCouponView(LoginRequiredMixin, View):
+
+    def post(self, request):
+
+        coupon_id = request.POST.get("coupon_id")
+
+        coupon = get_object_or_404(
+            Coupon,
+            id=coupon_id
+        )
+
+        request.session["coupon_id"] = coupon.id
+
+        messages.success(
+            request,
+            f"{coupon.code} applied successfully"
+        )
+
+        return redirect("checkout")

@@ -125,16 +125,23 @@
                         <th>#</th>
                         <th>User</th>
                         <th>Product</th>
+                        <th>Color</th>
+                        <th>Size</th>
                         <th>Quantity</th>
+                        <th>Product Price</th>
                         <th>Total Price</th>
                         <th>Date Added</th>
                     </tr>
-                </thead>
+                    </thead>
                 <tbody>
                     {% for item in cart_data %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td><strong>{{ item.cart.user.username }}</strong></td>
+
+                        <td>
+                            <strong>{{ item.cart.user.username }}</strong>
+                        </td>
+
                         <td>
                             <div class="product-box">
                                 {% if item.product.images.first %}
@@ -142,18 +149,47 @@
                                 {% else %}
                                 <img src="{% static 'images/no-image.png' %}" class="product-img">
                                 {% endif %}
-                                <span>{{ item.product.name|truncatechars:40 }}</span>
+                                <span>{{ item.product.name|truncatechars:30 }}</span>
                             </div>
                         </td>
+
+                        <!-- Color -->
+                        <td>
+                            {% if item.color %}
+                                <span class="status-badge-blue">{{ item.color }}</span>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <!-- Size -->
+                        <td>
+                            {% if item.size %}
+                                <span class="status-badge-blue">{{ item.size }}</span>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <!-- Quantity -->
                         <td>
                             <span class="status-badge-blue">{{ item.quantity }} Items</span>
                         </td>
-                        <td><strong>₹{{ item.total_price }}</strong></td>
-                        <td>{{ item.created_at|date:"d M Y" }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" class="text-center py-5">No Cart Data Found</td>
+
+                        <!-- Product Price -->
+                        <td>
+                            ₹{{ item.product.final_price }}
+                        </td>
+
+                        <!-- Total Price -->
+                        <td>
+                            <strong>₹{{ item.total_price }}</strong>
+                        </td>
+
+                        <!-- Date -->
+                        <td>
+                            {{ item.created_at|date:"d M Y" }}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

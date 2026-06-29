@@ -1,5 +1,3 @@
-# dashboard/serializers.py
-
 from rest_framework import serializers
 from User.models import *
 
@@ -24,6 +22,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
         fields = [
             'id',
+            'price',
+            
             'product_name',
             'product_image',
             'quantity',
@@ -51,7 +51,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     user_name = serializers.CharField(source='user.username')
     address = serializers.CharField(source='address.address', default='')
-
+    phone = serializers.CharField(source='address.phone', default='')
     rating = serializers.SerializerMethodField()
     items = serializers.SerializerMethodField()
 
@@ -61,6 +61,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'id',
             'user_name',
             'address',
+            'phone',
             'total_price',
             'status',
             'created_at',
@@ -80,3 +81,9 @@ class OrderSerializer(serializers.ModelSerializer):
             many=True,
             context=self.context
         ).data
+        
+class CouponSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Coupon
+        fields = '__all__'

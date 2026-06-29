@@ -1,119 +1,127 @@
 {% extends "base.html" %}
 {% block content %}
 {% load static %}
-<input type="hidden"
-       name="csrfmiddlewaretoken"
-       value="{{ csrf_token }}">
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 <!-- Carousel Start -->
-    <div class="container-fluid mb-3">
-        <div class="row px-xl-5">
-            <div class="col-lg-8">
-                <div id="header-carousel" class="carousel slide carousel-fade mb-30 mb-lg-0" data-ride="carousel">
-                    <ol class="carousel-indicators">
-                        <li data-target="#header-carousel" data-slide-to="0" class="active"></li>
-                        <li data-target="#header-carousel" data-slide-to="1"></li>
-                        <li data-target="#header-carousel" data-slide-to="2"></li>
-                    </ol>
-                    <div class="carousel-inner">
-                        <div class="carousel-item position-relative active" style="height: 430px;">
-                            <img class="position-absolute w-100 h-100" src="{% static 'img/apple.slider.jpeg' %}" style="object-fit: cover;">
-                            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                                <div class="p-3" style="max-width: 700px;">
-                                   <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">
-                                        Big Deals For Smart Shoppers
-                                    </h1>
+<div class="container-fluid mb-3">
+    <div class="row px-xl-5">
+        <div class="col-lg-8">
+            <div id="header-carousel" class="carousel slide carousel-fade mb-30 mb-lg-0" data-ride="carousel">
+                <ol class="carousel-indicators">
+                    <li data-target="#header-carousel" data-slide-to="0" class="active"></li>
+                    <li data-target="#header-carousel" data-slide-to="1"></li>
+                    <li data-target="#header-carousel" data-slide-to="2"></li>
+                </ol>
+                <div class="carousel-inner">
+                    <div class="carousel-item position-relative active" style="height: 430px;">
+                        <img class="position-absolute w-100 h-100" src="{% static 'img/apple.slider.jpeg' %}"
+                            style="object-fit: cover;">
+                        <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                            <div class="p-3" style="max-width: 700px;">
+                                <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">
+                                    Big Deals For Smart Shoppers
+                                </h1>
 
-                                    <p class="mx-md-5 px-5 animate__animated animate__bounceIn">
-                                        Discover trending fashion at unbeatable prices. 
-                                        Premium quality products with fast delivery & easy returns.
-                                    </p>
+                                <p class="mx-md-5 px-5 animate__animated animate__bounceIn">
+                                    Discover trending fashion at unbeatable prices.
+                                    Premium quality products with fast delivery & easy returns.
+                                </p>
 
-                                    <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp" href="#">
-                                        Shop Now
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="carousel-item position-relative" style="height: 430px;">
-                            <img class="position-absolute w-100 h-100" src="{% static 'img/banner-image.jpeg' %}" style="object-fit: cover;">
-                            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                                <div class="p-3" style="max-width: 700px;">
-                                    <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Laptop Deals</h1>
-                                    <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Lorem rebum magna amet lorem magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum diam</p>
-                                    <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp" href="#">Shop Now</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="carousel-item position-relative" style="height: 430px;">
-                            <img class="position-absolute w-100 h-100" src="{% static 'img/carousel-3.jpg' %}" style="object-fit: cover;">
-                            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                                <div class="p-3" style="max-width: 700px;">
-                                    <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Kids Fashion</h1>
-                                    <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Lorem rebum magna amet lorem magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum diam</p>
-                                    <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp" href="#">Shop Now</a>
-                                </div>
+                                <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp"
+                                    href="#">
+                                    Shop Now
+                                </a>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="product-offer mb-30" style="height: 200px;">
-                    <img class="img-fluid" src="{% static 'img/all-laptop.jpg' %}" alt="">
-                    <div class="offer-text">
-                        <h6 class="text-white text-uppercase">Save 20%</h6>
-                        <h3 class="text-white mb-3">Special Offer</h3>
-                        <a href="" class="btn btn-primary">Shop Now</a>
+                    <div class="carousel-item position-relative" style="height: 430px;">
+                        <img class="position-absolute w-100 h-100" src="{% static 'img/banner-image.jpeg' %}"
+                            style="object-fit: cover;">
+                        <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                            <div class="p-3" style="max-width: 700px;">
+                                <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Laptop Deals
+                                </h1>
+                                <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Lorem rebum magna amet lorem
+                                    magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum diam</p>
+                                <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp"
+                                    href="#">Shop Now</a>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="product-offer mb-30" style="height: 200px;">
-                    <img class="img-fluid" src="{% static 'img/banner-image.jpeg' %}" alt="">
-                    <div class="offer-text">
-                        <h6 class="text-white text-uppercase">Save 20%</h6>
-                        <h3 class="text-white mb-3">Special Offer</h3>
-                        <a href="" class="btn btn-primary">Shop Now</a>
+                    <div class="carousel-item position-relative" style="height: 430px;">
+                        <img class="position-absolute w-100 h-100" src="{% static 'img/carousel-3.jpg' %}"
+                            style="object-fit: cover;">
+                        <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                            <div class="p-3" style="max-width: 700px;">
+                                <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Kids Fashion
+                                </h1>
+                                <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Lorem rebum magna amet lorem
+                                    magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum diam</p>
+                                <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp"
+                                    href="#">Shop Now</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- Carousel End -->
-
-
-    <!-- Featured Start -->
-    <div class="container-fluid pt-5">
-        <div class="row px-xl-5 pb-3">
-            <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
-                <div class="d-flex align-items-center bg-light mb-4" style="padding: 30px;">
-                    <h1 class="fa fa-check text-primary m-0 mr-3"></h1>
-                    <h5 class="font-weight-semi-bold m-0">Quality Product</h5>
+        <div class="col-lg-4">
+            <div class="product-offer mb-30" style="height: 200px;">
+                <img class="img-fluid" src="{% static 'img/all-laptop.jpg' %}" alt="">
+                <div class="offer-text">
+                    <h6 class="text-white text-uppercase">Save 20%</h6>
+                    <h3 class="text-white mb-3">Special Offer</h3>
+                    <a href="" class="btn btn-primary">Shop Now</a>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
-                <div class="d-flex align-items-center bg-light mb-4" style="padding: 30px;">
-                    <h1 class="fa fa-shipping-fast text-primary m-0 mr-2"></h1>
-                    <h5 class="font-weight-semi-bold m-0">Free Shipping</h5>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
-                <div class="d-flex align-items-center bg-light mb-4" style="padding: 30px;">
-                    <h1 class="fas fa-exchange-alt text-primary m-0 mr-3"></h1>
-                    <h5 class="font-weight-semi-bold m-0">14-Day Return</h5>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
-                <div class="d-flex align-items-center bg-light mb-4" style="padding: 30px;">
-                    <h1 class="fa fa-phone-volume text-primary m-0 mr-3"></h1>
-                    <h5 class="font-weight-semi-bold m-0">24/7 Support</h5>
+            <div class="product-offer mb-30" style="height: 200px;">
+                <img class="img-fluid" src="{% static 'img/banner-image.jpeg' %}" alt="">
+                <div class="offer-text">
+                    <h6 class="text-white text-uppercase">Save 20%</h6>
+                    <h3 class="text-white mb-3">Special Offer</h3>
+                    <a href="" class="btn btn-primary">Shop Now</a>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Featured End -->
+</div>
+<!-- Carousel End -->
 
 
-    <!-- Categories Start -->
-    <div class="container-fluid pt-5">
+<!-- Featured Start -->
+<div class="container-fluid pt-5">
+    <div class="row px-xl-5 pb-3">
+        <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+            <div class="d-flex align-items-center bg-light mb-4" style="padding: 30px;">
+                <h1 class="fa fa-check text-primary m-0 mr-3"></h1>
+                <h5 class="font-weight-semi-bold m-0">Quality Product</h5>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+            <div class="d-flex align-items-center bg-light mb-4" style="padding: 30px;">
+                <h1 class="fa fa-shipping-fast text-primary m-0 mr-2"></h1>
+                <h5 class="font-weight-semi-bold m-0">Free Shipping</h5>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+            <div class="d-flex align-items-center bg-light mb-4" style="padding: 30px;">
+                <h1 class="fas fa-exchange-alt text-primary m-0 mr-3"></h1>
+                <h5 class="font-weight-semi-bold m-0">14-Day Return</h5>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+            <div class="d-flex align-items-center bg-light mb-4" style="padding: 30px;">
+                <h1 class="fa fa-phone-volume text-primary m-0 mr-3"></h1>
+                <h5 class="font-weight-semi-bold m-0">24/7 Support</h5>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Featured End -->
+
+
+<!-- Categories Start -->
+<div class="container-fluid pt-5">
     <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
         <span class="bg-secondary pr-3">Categories</span>
     </h2>
@@ -123,15 +131,15 @@
         {% for category in categories %}
         <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
             <a class="text-decoration-none" href="">
-                
+
                 <div class="cat-item img-zoom d-flex align-items-center mb-4">
 
                     <!-- IMAGE -->
                     <div class="overflow-hidden" style="width: 100px; height: 100px;">
                         {% if category.image %}
-                            <img class="img-fluid" src="{{ category.image.url }}" alt="">
+                        <img class="img-fluid" src="{{ category.image.url }}" alt="">
                         {% else %}
-                            <img class="img-fluid" src="{% static 'img/default.jpg' %}" alt="">
+                        <img class="img-fluid" src="{% static 'img/default.jpg' %}" alt="">
                         {% endif %}
                     </div>
 
@@ -152,10 +160,10 @@
 
     </div>
 </div>
-    <!-- Categories End -->
+<!-- Categories End -->
 
 
-    <!-- =========================
+<!-- =========================
 FEATURED PRODUCTS START
 ========================= -->
 
@@ -185,29 +193,26 @@ FEATURED PRODUCTS START
                 <div class="product-img position-relative overflow-hidden">
 
                     <!-- PRODUCT IMAGE -->
-                     {% if product.slug %}
+                    {% if product.slug %}
                     <a href="{% url 'product_detail' product.slug %}">
-                    {% else %}
-                    <a href="{% url 'product_detail' product.id %}">
-                    {% endif %}
-                        {% if product.images.first %}
-
-                        <img class="img-fluid w-100"
-                             src="{{ product.images.first.image.url }}"
-                             alt="{{ product.name }}">
-
                         {% else %}
+                        <a href="{% url 'product_detail' product.id %}">
+                            {% endif %}
+                            {% if product.images.first %}
 
-                        <img class="img-fluid w-100"
-                             src="{% static 'img/default.jpg' %}"
-                             alt="">
+                            <img class="img-fluid w-100" src="{{ product.images.first.image.url }}"
+                                alt="{{ product.name }}">
 
-                        {% endif %}
+                            {% else %}
 
-                    </a>
+                            <img class="img-fluid w-100" src="{% static 'img/default.jpg' %}" alt="">
 
-                    <!-- FEATURED BADGE -->
-                    <div style="
+                            {% endif %}
+
+                        </a>
+
+                        <!-- FEATURED BADGE -->
+                        <div style="
                         position:absolute;
                         top:10px;
                         left:10px;
@@ -220,14 +225,14 @@ FEATURED PRODUCTS START
                         z-index:5;
                     ">
 
-                        Featured
+                            Featured
 
-                    </div>
+                        </div>
 
-                    <!-- DISCOUNT BADGE -->
-                    {% if product.discount > 0 %}
+                        <!-- DISCOUNT BADGE -->
+                        {% if product.discount > 0 %}
 
-                    <div style="
+                        <div style="
                         position:absolute;
                         top:10px;
                         right:10px;
@@ -240,16 +245,14 @@ FEATURED PRODUCTS START
                         z-index:5;
                     ">
 
-                        {{ product.discount_percent }}% OFF
+                            {{ product.discount_percent }}% OFF
 
-                    </div>
+                        </div>
 
-                    {% endif %}
+                        {% endif %}
 
-                    <!-- OUT OF STOCK -->
-                    {% if product.stock <= 0 %}
-
-                    <div style="
+                        <!-- OUT OF STOCK -->
+                        {% if product.stock <= 0 %} <div style="
                         position:absolute;
                         inset:0;
                         background:rgba(0,0,0,0.6);
@@ -259,7 +262,7 @@ FEATURED PRODUCTS START
                         z-index:4;
                     ">
 
-                        <span style="
+                            <span style="
                             background:red;
                             color:#fff;
                             padding:10px 18px;
@@ -268,19 +271,19 @@ FEATURED PRODUCTS START
                             font-size:15px;
                         ">
 
-                            OUT OF STOCK
+                                OUT OF STOCK
 
-                        </span>
+                            </span>
 
-                    </div>
+                </div>
 
-                    {% endif %}
+                {% endif %}
 
-                    <!-- ACTION BUTTONS -->
-                    <div class="product-action">
+                <!-- ACTION BUTTONS -->
+                <div class="product-action">
 
-                        <!-- ADD TO CART -->
-                        <a class="btn btn-outline-dark btn-square add-to-cart stock-btn
+                    <!-- ADD TO CART -->
+                    <a class="btn btn-outline-dark btn-square add-to-cart stock-btn
 
                             {% if product.id in cart_product_ids %}
                             active-cart-btn
@@ -290,29 +293,25 @@ FEATURED PRODUCTS START
                             out-of-stock
                             {% endif %}
 
-                            "
-                            href="javascript:void(0)"
-                            data-id="{{ product.id }}"
-                            data-name="{{ product.name }}"
-                            data-colors="{% for c in product.colors.all %}{{ c.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
-                            data-sizes="{% for s in product.sizes.all %}{{ s.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
-                            data-in-cart="{% if product.id in cart_product_ids %}true{% else %}false{% endif %}">
+                            " href="javascript:void(0)" data-id="{{ product.id }}" data-name="{{ product.name }}"
+                        data-colors="{% for c in product.colors.all %}{{ c.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
+                        data-sizes="{% for s in product.sizes.all %}{{ s.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
+                        data-in-cart="{% if product.id in cart_product_ids %}true{% else %}false{% endif %}">
 
-                                <i class="fa fa-shopping-cart"></i>
+                        <i class="fa fa-shopping-cart"></i>
 
-                        </a>
+                    </a>
 
-                        <!-- WISHLIST -->
-                        <a class="btn btn-outline-dark btn-square wishlist-btn
+                    <!-- WISHLIST -->
+                    <a class="btn btn-outline-dark btn-square wishlist-btn
 
                         {% if product.id in wishlist_product_ids %}
                         active
                         {% endif %}
 
-                        "
-                        data-product-id="{{ product.id }}">
+                        " data-product-id="{{ product.id }}">
 
-                            <i class="
+                        <i class="
                             {% if product.id in wishlist_product_ids %}
                             fas
                             {% else %}
@@ -320,153 +319,144 @@ FEATURED PRODUCTS START
                             {% endif %}
                             fa-heart"></i>
 
-                        </a>
+                    </a>
 
-                        <!-- COMPARE -->
-                        <a class="btn btn-outline-dark btn-square" href="">
+                    <!-- COMPARE -->
+                    <a class="btn btn-outline-dark btn-square" href="">
 
-                            <i class="fa fa-sync-alt"></i>
+                        <i class="fa fa-sync-alt"></i>
 
-                        </a>
+                    </a>
 
-                        <!-- DETAIL -->
-                        {% if product.slug %}
+                    <!-- DETAIL -->
+                    {% if product.slug %}
 
-                         <a class="btn btn-outline-dark btn-square"
-                            href="{% url 'product_detail' product.slug %}">
+                    <a class="btn btn-outline-dark btn-square" href="{% url 'product_detail' product.slug %}">
 
-                            <i class="fa fa-search"></i>
-                        </a>
-                        {% else %}
+                        <i class="fa fa-search"></i>
+                    </a>
+                    {% else %}
 
-                         <a class="btn btn-outline-dark btn-square"
-                            href="{% url 'product_detail' product.slug %}">
+                    <a class="btn btn-outline-dark btn-square" href="{% url 'product_detail' product.slug %}">
 
-                            <i class="fa fa-search"></i>
-                        </a>
-                        {% endif %}
-
-                    </div>
+                        <i class="fa fa-search"></i>
+                    </a>
+                    {% endif %}
 
                 </div>
 
-                <!-- CONTENT -->
-                <div class="text-center py-4">
+            </div>
 
-                    <!-- PRODUCT NAME -->
-                        {% if product.slug %}
-                        <a class="h6 text-decoration-none product-name"
-                        href="{% url 'product_detail' product.slug %}">
-    
-                            {{ product.name|truncatechars:45 }}
-                        </a>
-                        {% else %}
-                        
-                    <a class="h6 text-decoration-none product-name"
-                       href="{% url 'product_detail' product.slug %}">
+            <!-- CONTENT -->
+            <div class="text-center py-4">
 
-                        {{ product.name|truncatechars:45 }}
+                <!-- PRODUCT NAME -->
+                {% if product.slug %}
+                <a class="h6 text-decoration-none product-name" href="{% url 'product_detail' product.slug %}">
 
-                    </a>
-{% endif %}
-                    <!-- PRICE -->
-                    <div class="d-flex align-items-center justify-content-center mt-2">
+                    {{ product.name|truncatechars:45 }}
+                </a>
+                {% else %}
 
-                        <!-- FINAL PRICE -->
-                        <h5>
+                <a class="h6 text-decoration-none product-name" href="{% url 'product_detail' product.slug %}">
 
-                            ₹{{ product.final_price }}
+                    {{ product.name|truncatechars:45 }}
 
-                        </h5>
+                </a>
+                {% endif %}
+                <!-- PRICE -->
+                <div class="d-flex align-items-center justify-content-center mt-2">
 
-                        <!-- MRP -->
-                        {% if product.discount > 0 %}
+                    <!-- FINAL PRICE -->
+                    <h5>
 
-                        <h6 class="text-muted ml-2">
+                        ₹{{ product.final_price }}
 
-                            <del>
+                    </h5>
 
-                                ₹{{ product.mrp }}
+                    <!-- MRP -->
+                    {% if product.discount > 0 %}
 
-                            </del>
+                    <h6 class="text-muted ml-2">
 
-                        </h6>
+                        <del>
 
-                        {% endif %}
+                            ₹{{ product.mrp }}
 
-                    </div>
+                        </del>
 
-                    <!-- STOCK STATUS -->
-                    <div class="mt-2">
+                    </h6>
 
-                        {% if product.stock <= 0 %}
+                    {% endif %}
 
-                        <span class="badge badge-danger px-3 py-2">
+                </div>
 
-                            Out Of Stock
+                <!-- STOCK STATUS -->
+                <div class="mt-2">
+
+                    {% if product.stock <= 0 %} <span class="badge badge-danger px-3 py-2">
+
+                        Out Of Stock
 
                         </span>
 
-                        {% elif product.stock <= 3 %}
-
-                        <span class="badge badge-warning px-3 py-2">
+                        {% elif product.stock <= 3 %} <span class="badge badge-warning px-3 py-2">
 
                             Few Items Left
 
-                        </span>
+                            </span>
 
-                        {% endif %}
-
-                    </div>
-
-                    <!-- RATING -->
-                    <div class="d-flex align-items-center justify-content-center mb-1">
-
-                        {% for i in "12345" %}
-                            {% if forloop.counter <= product.average_rating %}
-                                <small class="fa fa-star text-warning mr-1"></small>
-                            {% else %}
-                                <small class="far fa-star text-muted mr-1"></small>
                             {% endif %}
+
+                </div>
+
+                <!-- RATING -->
+                <div class="d-flex align-items-center justify-content-center mb-1">
+
+                    {% for i in "12345" %}
+                    {% if forloop.counter <= product.average_rating %} <small class="fa fa-star text-warning mr-1">
+                        </small>
+                        {% else %}
+                        <small class="far fa-star text-muted mr-1"></small>
+                        {% endif %}
                         {% endfor %}
 
                         <small class="ml-2">
                             {{ product.average_rating }}/5
                             ({{ product.total_reviews }})
                         </small>
-                    </div>
-
                 </div>
 
             </div>
 
         </div>
 
-        {% endfor %}
+    </div>
 
-        {% else %}
+    {% endfor %}
 
-        <!-- EMPTY -->
-        <div class="col-12">
+    {% else %}
 
-            <div class="text-center py-5">
+    <!-- EMPTY -->
+    <div class="col-12">
 
-                <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png"
-                     width="130">
+        <div class="text-center py-5">
 
-                <h4 class="mt-4">
+            <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" width="130">
 
-                    No Featured Products Available
+            <h4 class="mt-4">
 
-                </h4>
+                No Featured Products Available
 
-            </div>
+            </h4>
 
         </div>
 
-        {% endif %}
-
     </div>
+
+    {% endif %}
+
+</div>
 
 </div>
 
@@ -475,77 +465,74 @@ FEATURED PRODUCTS END
 ========================= -->
 
 
-    <!-- Offer Start -->
-    <div class="container-fluid pt-5 pb-3">
-        <div class="row px-xl-5">
-            <div class="col-md-6">
-                <div class="product-offer mb-30" style="height: 300px;">
-                    <img class="img-fluid" src="{% static 'img/offer-1.jpg' %}" alt="">
-                    <div class="offer-text">
-                        <h6 class="text-white text-uppercase">Save 20%</h6>
-                        <h3 class="text-white mb-3">Special Offer</h3>
-                        <a href="" class="btn btn-primary">Shop Now</a>
-                    </div>
+<!-- Offer Start -->
+<div class="container-fluid pt-5 pb-3">
+    <div class="row px-xl-5">
+        <div class="col-md-6">
+            <div class="product-offer mb-30" style="height: 300px;">
+                <img class="img-fluid" src="{% static 'img/offer-1.jpg' %}" alt="">
+                <div class="offer-text">
+                    <h6 class="text-white text-uppercase">Save 20%</h6>
+                    <h3 class="text-white mb-3">Special Offer</h3>
+                    <a href="" class="btn btn-primary">Shop Now</a>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="product-offer mb-30" style="height: 300px;">
-                    <img class="img-fluid" src="{% static 'img/offer-2.jpg' %}" alt="">
-                    <div class="offer-text">
-                        <h6 class="text-white text-uppercase">Save 20%</h6>
-                        <h3 class="text-white mb-3">Special Offer</h3>
-                        <a href="" class="btn btn-primary">Shop Now</a>
-                    </div>
+        </div>
+        <div class="col-md-6">
+            <div class="product-offer mb-30" style="height: 300px;">
+                <img class="img-fluid" src="{% static 'img/offer-2.jpg' %}" alt="">
+                <div class="offer-text">
+                    <h6 class="text-white text-uppercase">Save 20%</h6>
+                    <h3 class="text-white mb-3">Special Offer</h3>
+                    <a href="" class="btn btn-primary">Shop Now</a>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Offer End -->
+</div>
+<!-- Offer End -->
 
 
-    <!-- Products Start -->
-    <div class="container-fluid pt-5 pb-3">
+<!-- Products Start -->
+<div class="container-fluid pt-5 pb-3">
     <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
         <span class="bg-secondary pr-3">Recent Products</span>
     </h2>
 
-        <div class="row px-xl-5">
+    <div class="row px-xl-5">
 
-{% for product in products %}
+        {% for product in products %}
 
-<div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+        <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
 
-    <div class="product-item bg-light mb-4">
+            <div class="product-item bg-light mb-4">
 
-        <!-- IMAGE -->
-        <div class="product-img position-relative overflow-hidden">
+                <!-- IMAGE -->
+                <div class="product-img position-relative overflow-hidden">
 
-            <!-- PRODUCT IMAGE -->
-                {% if product.slug %}
-            <a href="{% url 'product_detail' product.slug %}">
-                {% else %}
-            <a href="{% url 'product_detail' product.slug %}">
-                {% endif %}
-    {% if product.images.first %}
+                    <!-- PRODUCT IMAGE -->
+                    {% if product.slug %}
+                    <a href="{% url 'product_detail' product.slug %}">
+                        {% else %}
+                        <a href="{% url 'product_detail' product.slug %}">
+                            {% endif %}
+                            {% if product.images.first %}
 
-    <img class="img-fluid w-100"
-         src="{{ product.images.first.image.url }}"
-         alt="{{ product.name }}">
+                            <img class="img-fluid w-100" src="{{ product.images.first.image.url }}"
+                                alt="{{ product.name }}">
 
-    {% else %}
+                            {% else %}
 
-    <img class="img-fluid w-100"
-         src="{% static 'img/default.jpg' %}"
-         alt="{{ product.name }}">
+                            <img class="img-fluid w-100" src="{% static 'img/default.jpg' %}" alt="{{ product.name }}">
 
-    {% endif %}
+                            {% endif %}
 
-</a>
+                        </a>
 
-            <!-- DISCOUNT BADGE -->
-            {% if product.discount > 0 %}
+                        <!-- DISCOUNT BADGE -->
+                        {% if product.discount > 0 %}
 
-            <div style="
+                        <div style="
                 position:absolute;
                 top:10px;
                 left:10px;
@@ -556,15 +543,13 @@ FEATURED PRODUCTS END
                 border-radius:5px;
                 font-weight:600;
             ">
-                {{ product.discount_percent }}% OFF
-            </div>
+                            {{ product.discount_percent }}% OFF
+                        </div>
 
-            {% endif %}
-            <!-- STOCK STATUS BADGE -->
+                        {% endif %}
+                        <!-- STOCK STATUS BADGE -->
 
-            {% if product.stock <= 0 %}
-
-            <div style="
+                        {% if product.stock <= 0 %} <div style="
                 position:absolute;
                 top:50px;
                 left:10px;
@@ -576,12 +561,10 @@ FEATURED PRODUCTS END
                 font-weight:700;
                 z-index:2;
             ">
-                Out Of Stock
-            </div>
+                            Out Of Stock
+                </div>
 
-            {% elif product.stock <= 3 %}
-
-            <div style="
+                {% elif product.stock <= 3 %} <div style="
                 position:absolute;
                 top:50px;
                 left:10px;
@@ -594,12 +577,10 @@ FEATURED PRODUCTS END
                 z-index:2;
                 animation: blink 1s infinite;
             ">
-                Few Items Left
+                    Few Items Left
             </div>
 
-            {% elif product.stock <= 7 %}
-
-            <div style="
+            {% elif product.stock <= 7 %} <div style="
                 position:absolute;
                 top:50px;
                 left:10px;
@@ -612,369 +593,135 @@ FEATURED PRODUCTS END
                 z-index:2;
             ">
                 Limited Stock
-            </div>
-            {% endif %}
-            <!-- ACTION BUTTONS -->
-            <div class="product-action">
+        </div>
+        {% endif %}
+        <!-- ACTION BUTTONS -->
+        <div class="product-action">
 
-                <!-- =========================
+            <!-- =========================
                 ADD TO CART BUTTON
                 ========================= -->
-<a class="btn btn-outline-dark btn-square add-to-cart stock-btn
+            <a class="btn btn-outline-dark btn-square add-to-cart stock-btn
 
-{% if product.id in cart_product_ids %}
-active-cart-btn
-{% endif %}
-
-{% if product.stock <= 0 %}
-out-of-stock
-{% endif %}
-
-"
-href="javascript:void(0)"
-data-id="{{ product.id }}"
-data-name="{{ product.name }}"
-data-colors="{% for c in product.colors.all %}{{ c.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
-data-sizes="{% for s in product.sizes.all %}{{ s.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
-data-in-cart="{% if product.id in cart_product_ids %}true{% else %}false{% endif %}">
-
-    <i class="fa fa-shopping-cart"></i>
-
-</a>
-
-                <!-- WISHLIST BUTTON -->
-                <a class="btn btn-outline-dark btn-square wishlist-btn {% if product.id in wishlist_product_ids %}active{% endif %}"
-                    data-product-id="{{ product.id }}">
-                        <i class="{% if product.id in wishlist_product_ids %}fas{% else %}far{% endif %} fa-heart"></i>
-                </a>
-
-                <a class="btn btn-outline-dark btn-square" href="">
-                    <i class="fa fa-sync-alt"></i>
-                </a>
-
-                <!-- DETAIL PAGE -->
-                 {% if product.slug %}
-                <a class="btn btn-outline-dark btn-square"
-                   href="{% url 'product_detail' product.slug %}">
-
-                    <i class="fa fa-search"></i>
-
-                </a>
-                {% else %}
-                <a class="btn btn-outline-dark btn-square"
-                   href="{% url 'product_detail' product.slug %}">
-
-                    <i class="fa fa-search"></i>
-                </a>
+                {% if product.id in cart_product_ids %}
+                active-cart-btn
                 {% endif %}
-            </div>
+
+                {% if product.stock <= 0 %}
+                out-of-stock
+                {% endif %}
+
+                " href="javascript:void(0)" data-id="{{ product.id }}" data-name="{{ product.name }}"
+                data-colors="{% for c in product.colors.all %}{{ c.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
+                data-sizes="{% for s in product.sizes.all %}{{ s.name }}{% if not forloop.last %},{% endif %}{% endfor %}"
+                data-in-cart="{% if product.id in cart_product_ids %}true{% else %}false{% endif %}">
+
+                <i class="fa fa-shopping-cart"></i>
+
+            </a>
+
+            <!-- WISHLIST BUTTON -->
+            <a class="btn btn-outline-dark btn-square wishlist-btn {% if product.id in wishlist_product_ids %}active{% endif %}"
+                data-product-id="{{ product.id }}">
+                <i class="{% if product.id in wishlist_product_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+            </a>
+
+            <a class="btn btn-outline-dark btn-square" href="">
+                <i class="fa fa-sync-alt"></i>
+            </a>
+
+            <!-- DETAIL PAGE -->
+            {% if product.slug %}
+            <a class="btn btn-outline-dark btn-square" href="{% url 'product_detail' product.slug %}">
+
+                <i class="fa fa-search"></i>
+
+            </a>
+            {% else %}
+            <a class="btn btn-outline-dark btn-square" href="{% url 'product_detail' product.slug %}">
+
+                <i class="fa fa-search"></i>
+            </a>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- CONTENT -->
+    <div class="text-center py-4">
+
+        <!-- PRODUCT NAME -->
+        {% if product.slug %}
+        <a class="h6 text-decoration-none product-name" href="{% url 'product_detail' product.slug %}">
+
+            {{ product.name|truncatechars:50 }}
+
+        </a>
+        {% else %}
+        <a class="h6 text-decoration-none product-name" href="{% url 'product_detail' product.slug %}">
+
+            {{ product.name|truncatechars:50 }}
+
+        </a>
+        {% endif %}
+
+        <!-- PRICE -->
+        <div class="d-flex align-items-center justify-content-center mt-2">
+
+            <!-- FINAL PRICE -->
+            <h5>
+
+                ₹{% if product.mrp > 0 %}
+                {{ product.final_price }}
+                {% else %}
+                {{ product.price }}
+                {% endif %}
+
+            </h5>
+
+            <!-- MRP -->
+            {% if product.discount > 0 %}
+
+            <h6 class="text-muted ml-2">
+                <del>₹{{ product.mrp }}</del>
+            </h6>
+
+            {% endif %}
 
         </div>
 
-        <!-- CONTENT -->
-        <div class="text-center py-4">
+        <!-- OFF TEXT -->
+        {% if product.discount > 0 %}
 
-            <!-- PRODUCT NAME -->
-{% if product.slug %}
-    <a class="h6 text-decoration-none product-name"
-       href="{% url 'product_detail' product.slug %}">
+        <div class="text-success font-weight-bold" style="font-size:13px;">
 
-        {{ product.name|truncatechars:50 }}
+            {{ product.discount_percent }}% OFF
 
-    </a>
-{% else %}
-    <a class="h6 text-decoration-none product-name"
-       href="{% url 'product_detail' product.slug %}">
+        </div>
 
-        {{ product.name|truncatechars:50 }}
-
-    </a>
-{% endif %}
-
-            <!-- PRICE -->
-            <div class="d-flex align-items-center justify-content-center mt-2">
-
-                <!-- FINAL PRICE -->
-                <h5>
-
-                    ₹{% if product.mrp > 0 %}
-                        {{ product.final_price }}
-                    {% else %}
-                        {{ product.price }}
-                    {% endif %}
-
-                </h5>
-
-                <!-- MRP -->
-                {% if product.discount > 0 %}
-
-                <h6 class="text-muted ml-2">
-                    <del>₹{{ product.mrp }}</del>
-                </h6>
-
-                {% endif %}
-
-            </div>
-
-            <!-- OFF TEXT -->
-            {% if product.discount > 0 %}
-
-            <div class="text-success font-weight-bold"
-                 style="font-size:13px;">
-
-                {{ product.discount_percent }}% OFF
-
-            </div>
-
-            {% endif %}
-            
-            <div class="d-flex align-items-center justify-content-center mb-1">
-
-    {% for i in "12345" %}
-        {% if forloop.counter <= product.average_rating %}
-            <small class="fa fa-star text-warning mr-1"></small>
-        {% else %}
-            <small class="far fa-star text-muted mr-1"></small>
         {% endif %}
-    {% endfor %}
 
-    <small class="ml-2">
-        {{ product.average_rating }}/5
-        ({{ product.total_reviews }})
-    </small>
+        <div class="d-flex align-items-center justify-content-center mb-1">
 
-</div>  
+            {% for i in "12345" %}
+            {% if forloop.counter <= product.average_rating %} <small class="fa fa-star text-warning mr-1"></small>
+                {% else %}
+                <small class="far fa-star text-muted mr-1"></small>
+                {% endif %}
+                {% endfor %}
+
+                <small class="ml-2">
+                    {{ product.average_rating }}/5
+                    ({{ product.total_reviews }})
+                </small>
 
         </div>
 
     </div>
+
+</div>
 
 </div>
 
 {% endfor %}
-<!-- COLOR SIZE POPUP -->
-
-<div id="variantPopup" class="variant-popup">
-
-    <div class="variant-box">
-         <!-- Close Button -->
-        <button type="button"
-                class="popup-close"
-                onclick="closeVariantPopup()">
-            &times;
-        </button>
-
-        <h5 id="popupProductName"></h5>
-
-        <h6>Select Color</h6>
-
-        <div id="popupColors"></div>
-
-        <h6 class="mt-3">Select Size</h6>
-
-        <div id="popupSizes"></div>
-
-        <button id="continueBtn"
-                class="btn btn-primary mt-4 w-100">
-
-            Continue
-
-        </button>
-
-    </div>
-
-</div>
-</div>
-</div>
-<style>
-    .variant-popup{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.6);
-    z-index:9999;
-    justify-content:center;
-    align-items:center;
-}
-
-.variant-box{
-    background:#fff;
-    width:400px;
-    max-width:95%;
-    padding:25px;
-    border-radius:10px;
-}
-
-.variant-option{
-    display:inline-block;
-    border:1px solid #ddd;
-    padding:8px 14px;
-    margin:4px;
-    cursor:pointer;
-    border-radius:5px;
-}
-
-.variant-option.active{
-    background:#ffd333;
-    border-color:#ffd333;
-}
-.variant-box{
-    background:#fff;
-    width:400px;
-    max-width:95%;
-    padding:25px;
-    border-radius:10px;
-    position:relative;
-}
-
-.popup-close{
-    position:absolute;
-    top:10px;
-    right:10px;
-    width:35px;
-    height:35px;
-    border:none;
-    background:#f1f1f1;
-    border-radius:50%;
-    font-size:24px;
-    line-height:1;
-    cursor:pointer;
-}
-
-.popup-close:hover{
-    background:#ddd;
-}
-</style>
-<script>
-    document.addEventListener("click", function(e){
-
-    const btn =
-        e.target.closest(".add-to-cart");
-
-    if(!btn){
-        return;
-    }
-     if(btn.classList.contains("active-cart-btn")){
-        return; // popup open na karo
-    }
-        e.preventDefault();
-
-
-    const hasColors =
-        btn.dataset.colors &&
-        btn.dataset.colors.trim() !== "";
-
-    const hasSizes =
-        btn.dataset.sizes &&
-        btn.dataset.sizes.trim() !== "";
-
-    if(!hasColors && !hasSizes){
-        return;
-    }
-
-    e.preventDefault();
-    e.stopImmediatePropagation();
-
-    popupProductId =
-        btn.dataset.id;
-
-    document.getElementById(
-        "popupProductName"
-    ).innerText =
-        btn.dataset.name;
-
-    const colorsDiv =
-        document.getElementById(
-            "popupColors"
-        );
-
-    const sizesDiv =
-        document.getElementById(
-            "popupSizes"
-        );
-
-    colorsDiv.innerHTML = "";
-    sizesDiv.innerHTML = "";
-
-    (btn.dataset.colors || "")
-    .split(",")
-
-    .forEach(color=>{
-
-        color = color.trim();
-
-        if(color){
-
-            colorsDiv.innerHTML += `
-                <span class="variant-option">
-                    ${color}
-                </span>
-            `;
-
-        }
-
-    });
-
-    (btn.dataset.sizes || "")
-    .split(",")
-
-    .forEach(size=>{
-
-        size = size.trim();
-
-        if(size){
-
-            sizesDiv.innerHTML += `
-                <span class="variant-option">
-                    ${size}
-                </span>
-            `;
-
-        }
-
-    });
-
-    document
-    .getElementById(
-        "variantPopup"
-    )
-    .style.display = "flex";
-
-});
-document.addEventListener("click", function(e){
-
-    if(
-        e.target.classList.contains(
-            "variant-option"
-        )
-    ){
-
-        const parent =
-            e.target.parentElement;
-
-        parent
-        .querySelectorAll(
-            ".variant-option"
-        )
-        .forEach(x=>{
-
-            x.classList.remove(
-                "active"
-            );
-
-        });
-
-        e.target.classList.add(
-            "active"
-        );
-
-    }
-
-});
-</script>
-<script>
-function closeVariantPopup(){
-    document.getElementById("variantPopup").style.display = "none";
-}
-</script>
 {% endblock content %}

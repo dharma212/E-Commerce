@@ -307,3 +307,544 @@
     .mega-view-all { display: block; text-align: center; padding: 12px; background: #ffd333; color: #222; font-weight: 600; text-decoration: none; transition: 0.3s; }
     .mega-view-all:hover { background: #222; color: #ffd333; text-decoration: none; }
     @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+
+       .profile-icon{
+    font-size:30px;
+    color:#3D464D;
+    transition:.3s;
+}
+
+.profile-icon:hover{
+    color:#FFD333;
+}
+
+.profile-menu{
+    width:280px;
+    border-radius:20px;
+    overflow:hidden;
+    padding:0;
+    margin-top:15px;
+}
+
+.menu-header{
+    background:linear-gradient(135deg,#FFD333,#ffb700);
+    padding:25px 15px;
+    color:#3D464D;
+}
+
+.avatar{
+    width:65px;
+    height:65px;
+    background:white;
+    border-radius:50%;
+    margin:auto;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:28px;
+    margin-bottom:10px;
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
+}
+
+.dropdown-item{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding:15px 20px;
+    transition:.3s;
+}
+
+.dropdown-item:hover{
+    background:#f8f9fa;
+    transform:translateX(8px);
+}
+
+.menu-icon{
+    width:45px;
+    height:45px;
+    border-radius:12px;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:18px;
+}
+
+.dropdown-item span{
+    display:block;
+    font-weight:600;
+    color:#333;
+}
+
+.dropdown-item small{
+    color:#999;
+}
+.profile-icon {
+    font-size: 24px;
+    color: #f8f9fa;
+    display: inline-block;
+}
+
+.profile-menu {
+    min-width: 250px;
+    padding: 15px;
+}
+
+.menu-header .avatar {
+    width: 50px;
+    height: 50px;
+    background: #f0f0f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    font-size: 20px;
+    color: #555;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.menu-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: white;
+}
+
+.dropdown-item > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdown-item small {
+    color: #888;
+    font-size: 12px;
+}
+
+/* ===== Navigation ===== */
+.navbar-nav.mr-auto{
+    gap: 5px;
+}
+
+/* Links */
+.navbar-nav.mr-auto .nav-link{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 18px 16px !important;
+    color: #e5e5e5 !important;
+    font-size: 15px;
+    font-weight: 500;
+    position: relative;
+    transition: .3s ease;
+}
+
+/* Icons */
+.navbar-nav.mr-auto .nav-link i{
+    font-size: 15px;
+    color: #FFD333 ;
+    transition: .3s ease;
+}
+
+/* Hover */
+.navbar-nav.mr-auto .nav-link:hover{
+    color: #fff !important;
+}
+
+.navbar-nav.mr-auto .nav-link:hover i{
+    color: #fff;
+}
+
+/* Underline Effect */
+.navbar-nav.mr-auto .nav-link::after{
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 10px;
+    width: 0;
+    height: 2px;
+    background: #FFD333 ;
+    border-radius: 20px;
+    transform: translateX(-50%);
+    transition: .3s ease;
+}
+
+.navbar-nav.mr-auto .nav-link:hover::after,
+.navbar-nav.mr-auto .nav-link.active::after{
+    width: 70%;
+}
+
+/* Active Link */
+.navbar-nav.mr-auto .nav-link.active{
+    color: #fff !important;
+}
+
+.navbar-nav.mr-auto .nav-link.active i{
+    color: #FFD333;
+}
+
+/* Responsive */
+@media(max-width:991px){
+
+    .navbar-nav.mr-auto .nav-link{
+        padding: 14px 0 !important;
+    }
+
+    .navbar-nav.mr-auto .nav-link::after{
+        display: none;
+    }
+
+}
+/* ===== Search Container ===== */
+.position-relative.w-100{
+    max-width: 500px;
+}
+
+/* Input Group */
+.input-group{
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 50px;
+    overflow: hidden;
+    transition: all .3s ease;
+}
+
+/* Focus Effect */
+.input-group:focus-within{
+    border-color: #FFD333;
+    box-shadow: 0 0 0 4px rgba(255,106,0,.12);
+}
+
+/* Search Input */
+#search-input-mobile{
+    height: 48px;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 20px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #222;
+    background: transparent;
+}
+
+/* Placeholder */
+#search-input-mobile::placeholder{
+    color: #9ca3af;
+}
+
+/* Search Button */
+.input-group-append .input-group-text{
+    background: #fff;
+    border: none;
+    padding: 0 20px;
+    cursor: pointer;
+    transition: .3s ease;
+}
+
+/* Search Icon */
+.input-group-append i{
+    color: #FFD333;
+    font-size: 16px;
+    transition: .3s ease;
+}
+
+/* Hover */
+.input-group-append:hover .input-group-text{
+    background: #FFD333;
+}
+
+.input-group-append:hover i{
+    color: #fff;
+}
+
+/* Search Suggestions Box */
+.custom-search-results{
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.08);
+    border: 1px solid #f1f1f1;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+/* Responsive */
+@media (max-width: 991px){
+
+    #search-input-mobile{
+        height: 44px;
+        font-size: 13px;
+    }
+
+    .input-group{
+        border-radius: 14px;
+    }
+
+}
+/* ==========================
+   SEARCH RESULTS DROPDOWN
+========================== */
+.custom-search-results{
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #ececec;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0,0,0,.08);
+    overflow: hidden;
+    z-index: 9999;
+    max-height: 400px;
+    overflow-y: auto;
+    display: none; /* Remove if JS handles this */
+}
+
+/* Scrollbar */
+.custom-search-results::-webkit-scrollbar{
+    width: 6px;
+}
+
+.custom-search-results::-webkit-scrollbar-thumb{
+    background: #d4d4d4;
+    border-radius: 10px;
+}
+
+.custom-search-results::-webkit-scrollbar-track{
+    background: transparent;
+}
+
+/* Each Result Item */
+.custom-search-results .search-item{
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 18px;
+    text-decoration: none;
+    color: #222;
+    background: #fff;
+    transition: .25s ease;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.custom-search-results .search-item:last-child{
+    border-bottom: none;
+}
+
+/* Product Image */
+.custom-search-results .search-item img{
+    width: 55px;
+    height: 55px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: #fafafa;
+}
+
+/* Product Info */
+.custom-search-results .search-info{
+    flex: 1;
+}
+
+.custom-search-results .search-title{
+    font-size: 14px;
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 4px;
+}
+
+.custom-search-results .search-category{
+    font-size: 12px;
+    color: #888;
+}
+
+/* Price */
+.custom-search-results .search-price{
+    font-size: 15px;
+    font-weight: 600;
+    color: #ff6a00;
+}
+
+/* Hover */
+.custom-search-results .search-item:hover{
+    background: #f9fafb;
+}
+
+/* No Result */
+.custom-search-results .no-result{
+    padding: 20px;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+}
+/* =================================
+   HEADER ICONS
+================================= */
+
+.navbar-nav .btn,
+.profile-icon{
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: .3s ease;
+    text-decoration: none;
+}
+
+.navbar-nav .btn:hover,
+.profile-icon:hover{
+    background: #FFD333;
+    transform: translateY(-2px);
+}
+
+.navbar-nav .btn i,
+.profile-icon i{
+    font-size: 20px;
+    color: #FFD333 !important;
+    transition: .3s ease;
+}
+
+.navbar-nav .btn:hover i,
+.profile-icon:hover i{
+    color: #222 !important;
+}
+
+/* Badge */
+.navbar-nav .badge{
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 20px;
+    height: 20px;
+    background: #FFD333;
+    color: #222 !important;
+    border: none !important;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* =================================
+   PROFILE DROPDOWN
+================================= */
+
+.profile-menu{
+    width: 300px;
+    border-radius: 18px;
+    border: none !important;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,.12) !important;
+    margin-top: 15px;
+}
+
+/* Header */
+.menu-header{
+    padding: 25px 20px;
+    background: #fff;
+}
+
+.avatar{
+    width: 65px;
+    height: 65px;
+    background: #FFD333;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar i{
+    color: #222;
+    font-size: 28px;
+}
+
+.menu-header h6{
+    font-weight: 700;
+    color: #222;
+}
+
+.menu-header small{
+    color: #777;
+}
+
+/* Items */
+
+.profile-menu .dropdown-item{
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: .3s;
+}
+
+.profile-menu .dropdown-item:hover{
+    background: #fafafa;
+}
+
+/* Icon Box */
+
+.menu-icon{
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    background: #FFD333 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.menu-icon i{
+    color: #222;
+    font-size: 18px;
+}
+
+/* Text */
+
+.profile-menu .dropdown-item span{
+    display: block;
+    color: #222;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.profile-menu .dropdown-item small{
+    color: #888;
+    font-size: 12px;
+}
+/* હેડરને ટ્રાન્સપરન્ટ બનાવવા માટે */
+.header-wrapper {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    background: transparent !important; /* શરૂઆતમાં પારદર્શક */
+    transition: background 0.3s ease;
+}
+
+/* જ્યારે સ્ક્રોલ થાય ત્યારે હેડરનો કલર (Sticky mode) */
+.header-wrapper.sticky {
+    position: fixed;
+    background: #343a40 !important; /* સ્ક્રોલ પછીનો ઘાટો રંગ */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}

@@ -1,6 +1,6 @@
 <div id="main-header">
     <!-- TOPBAR (LAPTOP ONLY) -->
-    <div class="container-fluid">
+    {% comment %} <div class="container-fluid">
         <div class="row bg-secondary py-1 px-xl-5 d-none d-lg-flex">
             <div class="col-lg-6 d-none d-lg-block">
                 <div class="d-inline-flex align-items-center h-100">
@@ -18,7 +18,7 @@
                     <button class="btn btn-sm btn-danger" onclick="logout()">Logout</button>
                     {% else %}
                     <button class="btn btn-sm btn-primary" onclick="openLoginModal()">Login</button>
-                    {% endif %}
+                    <button class="btn btn-sm btn-success ml-2" onclick="openSignupModal()">Sign Up</button>                    {% endif %}
                 </div>
             </div>
         </div>
@@ -71,7 +71,7 @@
                             </span>
                         </div>
                     </div>
-                    <div id="search-result-box"></div>
+                    <div id="search-result-box"></div>  
                 </div>
             </div>
             <div class="col-lg-4 text-right">
@@ -79,7 +79,7 @@
                 <h5 class="m-0">+012 345 6789</h5>
             </div>
         </div>
-    </div>
+    </div> {% endcomment %}
 
     <!-- MAIN NAVBAR ROW -->
     <div class="container-fluid bg-dark mobile-hide-navbar-row" id="navbar-sticky">
@@ -105,11 +105,12 @@
                                     <div class="mega-product-dropdown">
                                         <div class="mega-product-header">{{ type.name }} Products</div>
                                         {% for product in type.product_set.all|slice:":6" %}
-{% if product.slug %}
-    <a href="{% url 'product_detail' product.slug %}">
-{% else %}
-    <a href="{% url 'product_detail' product.slug %}">
-{% endif %}                                            <div class="mega-product-info">
+                                            {% if product.slug %}
+                                                <a href="{% url 'product_detail' product.slug %}">
+                                            {% else %}
+                                                <a href="{% url 'product_detail' product.slug %}">
+                                            {% endif %}                                            
+                                            <div class="mega-product-info">
                                                 <div class="mega-product-name">{{ product.name }}</div>
                                             </div>
                                         </a>
@@ -123,31 +124,53 @@
                             </div>
                         </div>
                         {% endfor %}
+                        
                     </div>
+               
                 </nav>
+                
             </div>
 
             <div class="col-lg-9 d-none d-lg-block">
                 <nav class="navbar navbar-expand-lg bg-dark navbar-dark py-3 py-lg-0 px-0 d-flex justify-content-between">
                     <div class="navbar-nav mr-auto py-0">
-                        <a href="{% url 'index' %}" class="nav-item nav-link">Home</a>
-                        <a href="{% url 'shop' %}" class="nav-item nav-link">Shop</a>
-                        
-                        <div class="nav-item dropdown">
+                        {% if request.user.is_authenticated %}
+                        <a href="{% url 'index' %}" class="nav-item nav-link">
+                            <i class="fas fa-home"></i> Home</a>
+                        <a href="{% url 'shop' %}" class="nav-item nav-link">
+                            <i class="fas fa-store"></i>Shop</a>
+                        {% else %}
+                        <a href="javascript:void(0)" onclick="openLoginModal()" class="nav-item nav-link">Home</a>
+                        <a href="javascript:void(0)" onclick="openLoginModal()" class="nav-item nav-link">Shop</a>
+                        {% endif %}
+                        {% comment %} <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages <i class="fa fa-angle-down ml-1"></i></a>
                             <div class="dropdown-menu bg-primary rounded-0 border-0 m-0">
                                 <a href="{% url 'cart' %}" class="dropdown-item">Shopping Cart</a>
                                 <a href="{% url 'checkout' %}" class="dropdown-item">Checkout</a>
                             </div>
-                        </div>
-                        <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
+                        </div> {% endcomment %}
+                        <a href="{% url 'contact' %}" class="nav-item nav-link">
+                            <i class="fas fa-envelope"></i>Contact</a>
                         
-                        <a href="{% url 'my_orders' %}" class="nav-item nav-link">Order</a>
-                        {% if request.user.is_authenticated and request.user.is_superuser %}
-                        <a href="{% url 'dashboard' %}" class="nav-item nav-link">Dashboard</a>
-                        {% endif %}
+                        {% comment %} <a href="{% url 'my_orders' %}" class="nav-item nav-link">Order</a> {% endcomment %}
                     </div>
                     
+                   
+                    <div class="mobile-search-container">
+                        <div class="position-relative w-100">
+                            <div class="input-group">
+                                <input type="text" id="search-input-mobile" class="form-control" placeholder="Search brands, products..." autocomplete="off">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <!-- INSTANT AJAX INPUT SUGGESTIONS -->
+                            <div id="search-result-box-mobile" class="custom-search-results"></div>
+                        </div>
+                    </div>
                     <div class="navbar-nav ml-auto py-0">
                         {% if request.user.is_authenticated %}
                         <a href="{% url 'wishlist' %}" class="btn px-0">
@@ -158,6 +181,50 @@
                             <i class="fas fa-shopping-cart text-primary"></i>
                             <span id="cart-count" class="badge text-secondary border border-secondary rounded-circle" style="padding-bottom:2px;">{{ cart_count|default:0 }}</span>
                         </a>
+                        <div class="dropdown profile-dropdown ml-3">
+                            <a href="#" class="profile-icon" data-toggle="dropdown">
+                                <i class="fas fa-user-circle"></i>
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-right profile-menu shadow border-0">
+
+                                <div class="menu-header text-center">
+                                    <div class="avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <h6 class="mb-0">My Account</h6>
+                                    <small>Manage your account</small>
+                                </div>
+
+                                <div class="dropdown-divider"></div>
+
+                                <a href="{% url 'profile' %}" class="dropdown-item">
+                                    <div class="menu-icon bg-primary">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <span>My Profile</span>
+                                        <small>Personal information</small>
+                                    </div>
+                                </a>
+
+                                <a href="{% url 'my_orders' %}" class="dropdown-item">
+                                    <div class="menu-icon bg-success">
+                                        <i class="fas fa-box"></i>
+                                    </div>
+                                    <div>
+                                        <span>My Orders</span>
+                                        <small>Track your purchases</small>
+                                    </div>
+                                </a>
+
+                            </div>
+                        </div>
+                        {% if request.user.is_staff or request.user.is_superuser %}
+                            <a href="{% url 'dashboard' %}" class="btn px-0 ml-3">
+                                <i class="fas fa-chart-line text-primary"></i>
+                            </a>
+                        {% endif %}
                         {% else %}
                         <a href="javascript:void(0)" onclick="openLoginModal()" class="btn px-0">
                             <i class="fas fa-heart text-primary"></i>
@@ -167,10 +234,16 @@
                             <i class="fas fa-shopping-cart text-primary"></i>
                             <span class="badge text-secondary border border-secondary rounded-circle" style="padding-bottom:2px;">0</span>
                         </a>
+                           <a href="javascript:void(0)" onclick="openLoginModal()" class="btn px-0 ml-3">
+                            <i class="fas fa-user-alt"></i>
+                            {% comment %} <span class="badge text-secondary border border-secondary rounded-circle" style="padding-bottom:2px;">0</span> {% endcomment %}
+                        </a>
                         {% endif %}
                     </div>
                 </nav>
+            
             </div>
+            
         </div>
     </div>
 

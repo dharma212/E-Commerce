@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<style>
+.auth-wrapper {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #ccc;
+}
+
+.auth-box {
+    width: 350px;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.auth-box input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    outline: none;
+}
+
+.auth-box button {
+    width: 100%;
+    padding: 10px;
+    background: #28a745; /* લીલો કલર સાઇનઅપ માટે */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+</style>
+
+<div class="auth-wrapper">
+<div class="auth-box">
+
+    <h3>Create New Account (Sign Up)</h3>
+    <p class="text-muted small">નવું એકાઉન્ટ બનાવવા માટે વિગત ભરો</p>
+
+    <div id="step1">
+        <input type="text" id="username" placeholder="Enter Username (નવું નામ લખો)">
+        <input type="text" id="email" placeholder="Enter Email or Phone">
+        <button onclick="sendOTP()">Sign Up & Send OTP</button>
+        
+        <div style="margin-top: 15px;">
+            <a href="/login/" class="small" style="text-decoration: none; color: #007bff;">ઓલરેડી એકાઉન્ટ છે? લોગિન કરો</a>
+        </div>
+    </div>
+
+    <div id="step2" style="display:none;">
+        <input type="text" id="otp" placeholder="Enter OTP">
+        <button onclick="verifyOTP()" style="background: #007bff;">Verify & Register</button>
+    </div>
+
+</div>
+</div>
+
+<script>
+function getCSRFToken() {
+    return document.cookie.split('; ')
+        .find(row => row.startsWith('csrftoken'))
+        ?.split('=')[1];
+}
+
+// ✅ SEND OTP (સાઇનઅપ માટે)
+function sendOTP(){
+    let username = document.getElementById("username").value.trim();
+    let email = document.getElementById("email").value.trim();
+
+    if(!username || !email){
+        alert("Username અને Email/Phone બંને જરૂરી છે!");
+        return;
+    }
+
+    fetch('/api/send-otp/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            username: username,
+            email: email
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === "success"){
+            alert("OTP: " + data.otp + " (Check console 😎)"); 
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+        } else {
+            alert(data.message);
+        }
+    });
+}
+
+// ✅ VERIFY OTP
+function verifyOTP(){
+    let email = document.getElementById("email").value.trim();
+    let otp = document.getElementById("otp").value.trim();
+
+    fetch('/api/verify-otp/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            email: email,
+            otp: otp
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === "success"){
+            alert("Signup અને Login સફળ રહ્યું! 🎉");
+            window.location.href = data.redirect_url; // બેકએન્ડથી આવતી લિંક પર મોકલશે
+        } else {
+            alert(data.message);
+        }
+    });
+}
+
+</script>
+
+{% endblock %}

@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from User.models import *
 from User.serializers import ProductSerializer
+from rest_framework import status
 import json
 
 class SearchProductView(View):
@@ -36,6 +37,8 @@ class SearchProductView(View):
             product_list.append({
 
                 "id": product.id,
+                
+                "slug": product.slug,
 
                 "name": product.name,
 
@@ -147,6 +150,19 @@ class ShopView(TemplateView):
                 key=lambda x: x.final_price(),
                 reverse=True
             )
+        for product in products:
+
+            reviews = Review.objects.filter(
+                order__items__product=product
+            )
+
+            avg_rating = reviews.aggregate(
+                Avg("rating")
+            )["rating__avg"] or 0
+
+            product.avg_rating = round(avg_rating, 1)
+
+            product.total_reviews = reviews.count()
 
         # =========================
         # PAGINATION
@@ -223,10 +239,6 @@ class ShopView(TemplateView):
         return self.render_to_response(context)
 
 
-from django.views import View
-from django.shortcuts import get_object_or_404, render
-from django.db.models import Avg, Count
-
 class ProductDetailView(View):
 
     def get(self, request, slug):
@@ -282,6 +294,15 @@ class ProductDetailView(View):
             id=product.id
         )[:8]
 
+        for rp in related_products:
+
+            rp.avg_rating = Review.objects.filter(
+                order__items__product_id=rp.id
+            ).aggregate(
+                avg=Avg("rating")
+            )["avg"] or 0
+
+            rp.avg_rating = round(float(rp.avg_rating), 1)
         # =========================
         # DEFAULT VALUES
         # =========================
@@ -457,7 +478,6 @@ class ProductListAPI(APIView):
 
         return Response(data)
 
-from rest_framework import status
 class ProductDeleteAPI(APIView):
 
     def delete(self, request, pk):
@@ -852,7 +872,6 @@ class detailview(TemplateView):
 
         return context
     
-from django.views import View
 
 class BuyNowAPI(View):
     def post(self, request):

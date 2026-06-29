@@ -15,93 +15,132 @@ from User.models import *
 # ====================================
 class LoginPageView(TemplateView):
     template_name = "login.html"
+
+class SignupPageView(TemplateView):
+    template_name = "signup.html"
     
 # ====================================
 # Send OTP View
 # ====================================
 class SendOTPView(View):
-
     def post(self, request):
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Invalid JSON format"}, status=400)
 
-        data = json.loads(request.body)
+        username = data.get('username', '').strip()
+        email = data.get('email', '').strip()
+        first_name = data.get('first_name', '').strip()
+        last_name = data.get('last_name', '').strip()
+        phone = data.get('phone', '').strip()
+        is_signup = data.get('is_signup', False)
 
-        username = data.get('username')
-
-        email = data.get('email')
-
-        # REQUIRED
         if not username or not email:
+            return JsonResponse({"status": "error", "message": "Username and Email are required"}, status=400)
+
+        # ==================================================================
+        # ૧. HANDLE FRESH REGISTRATION FLOW 
+        # ==================================================================
+        if is_signup:
+            if User.objects.filter(username=username).exists():
+                return JsonResponse({"status": "error", "message": "Username is already taken"}, status=400)
+            if User.objects.filter(email=email).exists():
+                return JsonResponse({"status": "error", "message": "Email is already registered"}, status=400)
+
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                first_name=first_name,
+                last_name=last_name
+            )
+            
+            profile, created = Profile.objects.get_or_create(user=user)
+            profile.phone = phone
+            profile.save()
+
+            otp_code = str(random.randint(100000, 999999))
+            OTP.objects.create(
+                username=username,
+                email=email,
+                otp=otp_code
+            )
+
+            print(f"=== SECURITY LOG: SIGNUP OTP FOR [{username}] IS {otp_code} ===")
 
             return JsonResponse({
-
-                "status": "error",
-
-                "message": "Username and Email required"
-
+                "status": "success",
+                "message": "Account created successfully! Proceeding to Verification.",
+                "otp": otp_code  
             })
 
-        # GENERATE OTP
-        otp_code = str(random.randint(100000, 999999))
+        # ==================================================================
+        # ૨. HANDLE STANDARD LOGIN VERIFICATION REQUEST 
+        # ==================================================================
+        else:
+            try:
+                user = User.objects.get(username=username, email=email)
+            except User.DoesNotExist:
+                return JsonResponse({
+                    "status": "error", 
+                    "message": "Account not found. Please signup first!"
+                }, status=400) 
 
-        # SAVE OTP
-        OTP.objects.create(
+            otp_code = str(random.randint(100000, 999999))
+            OTP.objects.create(
+                username=username,
+                email=email,
+                otp=otp_code
+            )
 
-            username=username,
+            print(f"=== SECURITY LOG: LOGIN OTP FOR [{username}] IS {otp_code} ===")
 
-            email=email,
-
-            otp=otp_code
-
-        )
-
-        # RETURN OTP
-        return JsonResponse({
-
-            "status": "success",
-
-            "message": "OTP sent successfully",
-
-            "otp": otp_code
-
-        })
+            return JsonResponse({
+                "status": "success",
+                "message": "OTP sent successfully",
+                "otp": otp_code
+            })
 
 # ====================================
-# Verify OTP View
+# VERIFY OTP VIEW (PERFORMS SESSION LOGIN)
 # ====================================
 class VerifyOTPView(View):
-
     def post(self, request):
-        data = json.loads(request.body)
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Invalid JSON format"}, status=400)
 
-        email = data.get('email')
-        otp = data.get('otp')
+        email = data.get('email', '').strip()
+        otp = data.get('otp', '').strip()
 
         if not email or not otp:
-            return JsonResponse({"status": "error", "message": "All fields required"})
+            return JsonResponse({"status": "error", "message": "All fields are required"}, status=400)
 
         record = OTP.objects.filter(email=email).last()
 
         if not record:
-            return JsonResponse({"status": "error", "message": "OTP not found"})
+            return JsonResponse({"status": "error", "message": "OTP record not found"}, status=404)
 
         if record.is_expired():
-            return JsonResponse({"status": "error", "message": "OTP expired"})
+            return JsonResponse({"status": "error", "message": "OTP has expired"}, status=400)
 
         if record.otp != otp:
-            return JsonResponse({"status": "error", "message": "Invalid OTP"})
+            return JsonResponse({"status": "error", "message": "Invalid OTP code provided"}, status=400)
 
-        user, created = User.objects.get_or_create(
-            username=record.username,      
-            defaults={'email': record.email}
-        )
-
+        user = User.objects.get(username=record.username)
         login(request, user)
-
-        messages.success(request, "Login Successfully")
+        messages.success(request, "Logged in successfully")
         
+        if user.is_staff or user.is_superuser:
+            redirect_url = "/dashboard/settings/"
+        else:
+            redirect_url = "/"
+
         return JsonResponse({
             "status": "success",
-            "message": "Login successful"
+            "message": "Login successful",
+            "redirect_url": redirect_url
         })
         
 # ==================================== 
@@ -324,7 +363,11 @@ class ProfileView(
         context["addresses"] = Address.objects.filter(
             user=self.request.user
         ).order_by("-id")
-
+        context["used_coupons"] = Order.objects.filter(
+            user=self.request.user
+        ).exclude(
+            earned_coupons=None
+        ).order_by("-id").prefetch_related('items__product')
         return context
 
 # ====================================
@@ -468,12 +511,10 @@ class SetDefaultAddressView(LoginRequiredMixin, View):
                 user=request.user
             )
 
-            # remove old default address
             Address.objects.filter(
                 user=request.user
             ).update(is_default=False)
 
-            # set new default
             address.is_default = True
             address.save()
 
@@ -489,95 +530,50 @@ class SetDefaultAddressView(LoginRequiredMixin, View):
             })
             
 class IndexView(TemplateView):
-
     template_name = "index.html"
 
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
-
         context['categories'] = Category.objects.all()
 
         context['products'] = Product.objects.filter(
             is_featured=False
-        ).prefetch_related(
-            "images"
-        ).all()
+        ).prefetch_related("images", "colors", "sizes").all()
 
         # =========================
         # DEFAULTS
         # =========================
         featured_products = Product.objects.filter(
             is_featured=True
-        ).order_by("-id")[:8]
+        ).prefetch_related("images", "colors", "sizes").order_by("-id")[:8]
         
         wishlist_product_ids = []
-
         wishlist_count = 0
-
         cart_product_ids = []
-
         cart_count = 0
-
 
         # =========================
         # USER LOGIN
         # =========================
-
         if self.request.user.is_authenticated:
-
             # WISHLIST
-
-            wishlist_items = Wishlist.objects.filter(
-                user=self.request.user
-            )
-
-            wishlist_product_ids = list(
-
-                wishlist_items.values_list(
-                    "product_id",
-                    flat=True
-                )
-
-            )
-
+            wishlist_items = Wishlist.objects.filter(user=self.request.user)
+            wishlist_product_ids = list(wishlist_items.values_list("product_id", flat=True))
             wishlist_count = wishlist_items.count()
 
-
             # CART
-
-            cart, created = Cart.objects.get_or_create(
-                user=self.request.user
-            )
-
-            cart_items = CartItem.objects.filter(
-                cart=cart
-            )
-
-            cart_product_ids = list(
-
-                cart_items.values_list(
-                    "product_id",
-                    flat=True
-                )
-
-            )
-
+            cart, created = Cart.objects.get_or_create(user=self.request.user)
+            cart_items = CartItem.objects.filter(cart=cart)
+            cart_product_ids = list(cart_items.values_list("product_id", flat=True))
             cart_count = cart_items.count()
-
 
         # =========================
         # CONTEXT
         # =========================
-
         context["wishlist_product_ids"] = wishlist_product_ids
-
         context["wishlist_count"] = wishlist_count
-
         context["cart_product_ids"] = cart_product_ids
-
         context["cart_count"] = cart_count
-        
         context["featured_products"] = featured_products
 
         return context

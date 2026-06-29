@@ -1,0 +1,404 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8fafc;
+    }
+    .main-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+    .table-responsive {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #f1f5f9;
+    }
+    .custom-table thead {
+        background-color: #f8fafc;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    .custom-table th {
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding: 14px 16px;
+    }
+    .custom-table td {
+        padding: 16px;
+        color: #334155;
+        font-size: 0.875rem;
+    }
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: #e0e7ff;
+        color: #4f46e5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+    .badge-admin {
+        background-color: #fef2f2;
+        color: #ef4444;
+        border: 1px solid #fee2e2;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    .badge-user {
+        background-color: #eff6ff;
+        color: #3b82f6;
+        border: 1px solid #dbeafe;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    .pulse-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #10b981;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+        animation: pulseAnimation 2s infinite;
+    }
+    @keyframes pulseAnimation {
+        0% { transform: scale(0.9); opacity: 1; }
+        50% { transform: scale(1.2); opacity: 0.5; }
+        100% { transform: scale(0.9); opacity: 1; }
+    }
+    .form-control:focus, .btn-check:checked + .btn-outline-primary {
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        border-color: #4f46e5;
+    }
+</style>
+
+<div class="container-fluid py-4 px-md-4">
+
+    <div class="row mb-4 g-3 align-items-center">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary text-white rounded-4 p-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 60px; height: 60px;">
+                    <i class="fas fa-shield-halved fa-2x"></i>
+                </div>
+                <div>
+                    <h4 class="fw-bold text-dark mb-1">User Management Dashboard</h4>
+                    <p class="text-muted mb-0 sm-text">
+                        Logged in as: <span class="fw-semibold text-dark">{{ admin.username }}</span> 
+                        <span class="mx-2 text-slate-300">|</span> 
+                        <i class="far fa-envelope"></i> {{ admin.email }}
+                        <span class="mx-2 text-slate-300">|</span>
+                        <small><i class="far fa-clock"></i> Last Login: {{ admin.last_login|default:"Just now" }}</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <button type="button" class="btn btn-primary btn-lg shadow-sm px-4 rounded-3" style="background-color: #4f46e5; border-color: #4f46e5;" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="fas fa-user-plus me-2"></i>Add New User
+            </button>
+        </div>
+    </div>
+
+    <div class="card main-card p-4 mb-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+                <h5 class="fw-bold text-dark mb-1">All Registered Users</h5>
+                <p class="text-muted small mb-0">Overview of all system accounts and their level of privileges</p>
+            </div>
+            <span class="badge bg-slate-100 text-dark border px-3 py-2 rounded-pill fw-semibold">Total: {{ users|length }} Users</span>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table custom-table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">ID</th>
+                        <th>User Identity</th>
+                        <th>Email Address</th>
+                        <th>Role / Access Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td><span class="text-muted fw-semibold">#{{ u.id }}</span></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="user-avatar">
+                                    {{ u.username|slice:":2"|upper }}
+                                </div>
+                                <div>
+                                    <span class="fw-semibold text-dark d-block">{{ u.username }}</span>
+                                    <small class="text-muted">Joined: {{ u.date_joined|date:"M d, Y" }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><i class="far fa-envelope text-muted me-2"></i>{{ u.email }}</td>
+                        <td>
+                            {% if u.is_staff %}
+                                <span class="badge-admin"><i class="fas fa-user-gear me-1"></i> Admin (Full Access)</span>
+                            {% else %}
+                                <span class="badge-user"><i class="fas fa-user me-1"></i> Front-end ({{ u.profile.role|default:"Customer" }})</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-5 text-muted">
+                            <i class="fas fa-users-slash fa-3x mb-3 text-light"></i>
+                            <p class="mb-0 fw-medium">No users registered in the database yet.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card main-card p-4">
+        <div class="mb-3">
+            <h5 class="fw-bold text-dark mb-1">Login Activity logs</h5>
+            <p class="text-muted small mb-0">Real-time tracking of administrative and customer login sessions</p>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table custom-table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>User Account</th>
+                        <th>Login Timestamp</th>
+                        <th>Session Termination</th>
+                        <th>Network IP Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="far fa-user-circle text-muted fa-lg"></i>
+                                <span class="fw-semibold">{{ log.user.username }}</span>
+                            </div>
+                        </td>
+                        <td><i class="far fa-calendar-check text-muted me-1"></i> {{ log.login_time }}</td>
+                        <td>
+                            {% if log.logout_time %}
+                                <i class="far fa-calendar-minus text-muted me-1"></i> {{ log.logout_time }}
+                            {% else %}
+                                <span class="text-success fw-medium d-inline-flex align-items-center">
+                                    <span class="pulse-dot"></span>Active Session
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td><code class="px-2 py-1 bg-light rounded text-dark border">{{ log.ip_address }}</code></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-muted">
+                            <i class="fas fa-terminal fa-2x mb-2 text-light"></i>
+                            <p class="mb-0 small">No recent activity tracking logs available.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="addUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; width:100%; max-width: 500px;">
+            <div class="modal-header border-0 px-4 pt-4 pb-2">
+                <div>
+                    <h5 class="modal-title fw-bold text-dark" id="addUserModalLabel">Create User Account</h5>
+                    <p class="text-muted small mb-0">Provide details to register a new verified account</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addUserForm">
+                {% csrf_token %}
+                <div class="modal-body px-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-secondary small">Username</label>
+                        <div class="input-group shadow-sm rounded-3">
+                            <span class="input-group-text bg-white border-end-0"><i class="far fa-user text-muted"></i></span>
+                            <input class="form-control border-start-0 ps-1" name="username" placeholder="e.g., johndoe12" style="border-top-right-radius: 8px; border-bottom-right-radius: 8px;" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-secondary small">Email Address</label>
+                        <div class="input-group shadow-sm rounded-3">
+                            <span class="input-group-text bg-white border-end-0"><i class="far fa-envelope text-muted"></i></span>
+                            <input class="form-control border-start-0 ps-1" type="email" name="email" placeholder="name@example.com" style="border-top-right-radius: 8px; border-bottom-right-radius: 8px;" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-secondary small">Secure Password</label>
+                        <div class="input-group shadow-sm rounded-3">
+                            <span class="input-group-text bg-white border-end-0"><i class="fas fa-lock text-muted"></i></span>
+                            <input class="form-control border-start-0 ps-1" type="password" name="password" placeholder="••••••••" style="border-top-right-radius: 8px; border-bottom-right-radius: 8px;" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <label class="form-label d-block fw-semibold text-secondary small">Assign System Role</label>
+                        <div class="btn-group w-100 p-1 bg-light rounded-3 shadow-sm" role="group">
+                            <input type="radio" class="btn-check" name="role" value="Admin" id="roleAdmin" autocomplete="off">
+                            <label class="btn btn-outline-primary border-0 rounded-2 py-2 small fw-semibold" for="roleAdmin"><i class="fas fa-user-shield me-1"></i> Admin</label>
+
+                            <input type="radio" class="btn-check" name="role" value="Customer" id="roleCustomer" autocomplete="off" checked>
+                            <label class="btn btn-outline-primary border-0 rounded-2 py-2 small fw-semibold" for="roleCustomer"><i class="fas fa-shopping-bag me-1"></i> Customer</label>
+
+                            <input type="radio" class="btn-check" name="role" value="Seller" id="roleSeller" autocomplete="off">
+                            <label class="btn btn-outline-primary border-0 rounded-2 py-2 small fw-semibold" for="roleSeller"><i class="fas fa-store me-1"></i> Seller</label>
+                        </div>
+                        
+                        <div id="roleAlertBox" class="alert alert-warning border-0 mt-3 p-2 rounded-3 d-flex align-items-start gap-2 transition-all" style="font-size: 0.78rem; background-color: #eff6ff; color: #1d4ed8;">
+                            <i class="fas fa-info-circle mt-1"></i>
+                            <span id="roleAlertText">Selecting <b>Customer</b> creates a standard shopper profile with basic marketplace access permissions.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light px-4 py-3" style="border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
+                    <button type="button" class="btn btn-light px-3 border rounded-3 fw-semibold text-muted" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" id="submitbtn" class="btn btn-primary px-4 fw-semibold rounded-3 shadow-sm" style="background-color: #4f46e5; border-color: #4f46e5;">Save & Deploy Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+    <div id="liveToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body d-flex align-items-center gap-2">
+                <i id="toastIcon" class="fas"></i>
+                <span id="toastMessage"></span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function showToast(message, type = 'success') {
+    const toastEl = document.getElementById('liveToast');
+    const toastMessage = document.getElementById('toastMessage');
+    const toastIcon = document.getElementById('toastIcon');
+    
+    toastMessage.textContent = message;
+    
+    if (type === 'success') {
+        toastEl.className = "toast align-items-center text-white bg-success border-0";
+        toastIcon.className = "fas fa-check-circle";
+    } else {
+        toastEl.className = "toast align-items-center text-white bg-danger border-0";
+        toastIcon.className = "fas fa-exclamation-triangle";
+    }
+    
+    const bsToast = new bootstrap.Toast(toastEl, { delay: 3000 });
+    bsToast.show();
+}
+
+const roleRadios = document.querySelectorAll('input[name="role"]');
+const roleAlertBox = document.getElementById('roleAlertBox');
+const roleAlertText = document.getElementById('roleAlertText');
+
+const roleMessages = {
+    Admin: {
+        text: "Selecting <b>Admin</b> grants full staff privileges with complete dashboard environment permissions.",
+        bg: "#fffbeb",
+        color: "#b45309"
+    },
+    Customer: {
+        text: "Selecting <b>Customer</b> creates a standard shopper profile with basic marketplace access permissions.",
+        bg: "#eff6ff",
+        color: "#1d4ed8"
+    },
+    Seller: {
+        text: "Selecting <b>Seller</b> grants intermediate partner privileges with access to store management metrics.",
+        bg: "#f0fdf4",
+        color: "#15803d"
+    }
+};
+
+roleRadios.forEach(radio => {
+    radio.addEventListener('change', function() {
+        const selectedRole = this.value;
+        if (roleMessages[selectedRole]) {
+            roleAlertText.innerHTML = roleMessages[selectedRole].text;
+            roleAlertBox.style.backgroundColor = roleMessages[selectedRole].bg;
+            roleAlertBox.style.color = roleMessages[selectedRole].color;
+        }
+    });
+});
+
+document.getElementById("addUserForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+    let formData = new FormData(this);
+    const submitbtn = document.getElementById("submitbtn");
+    
+    submitbtn.disabled = true;
+    submitbtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Deploying...`;
+
+    try {
+        const response = await fetch("/api/users/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken")
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showToast(data.message, 'success'); 
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        } else {
+            showToast(data.message || "Failed to create user account.", 'danger');
+            submitbtn.disabled = false;
+            submitbtn.textContent = "Save & Deploy Account";
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        showToast("Critical server error encountered.", 'danger');
+        submitbtn.disabled = false;
+        submitbtn.textContent = "Save & Deploy Account";
+    }
+});
+</script>
+
+{% endblock %}

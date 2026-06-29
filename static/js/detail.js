@@ -216,24 +216,32 @@ $(".popup-size-box").click(function(){
 $("#continueVariantBtn").click(function(){ handleFinalAction(); });
 
 function handleFinalAction(){
-    let qty = $(".details-quantity-input").val() || 1;
-    let csrfToken = $("input[name=csrfmiddlewaretoken]").val();
 
     if(actionType == "cart"){
-        $.ajax({
-            url: "/cart/add/" + currentProductId + "/",
-            type: "POST",
-            contentType: "application/json",
-            headers: { "X-CSRFToken": csrfToken, "X-Requested-With": "XMLHttpRequest" },
-            data: JSON.stringify({ quantity: qty, color: selectedColor, size: selectedSize }),
-            success:function(response){
-                $("#variantModal").fadeOut();
-                typeof showToast === "function" ? showToast("Added To Cart") : alert("Added To Cart");
-            }
-        });
-    } else {
-        let checkoutUrl = "{% url 'checkout' %}?buy_now=" + currentProductId +
-    "&qty=" + qty + "&color=" + encodeURIComponent(selectedColor) + "&size=" + encodeURIComponent(selectedSize);
+
+        $("#variantModal").fadeOut();
+
+        const cartBtn =
+            document.querySelector(".add-to-cart");
+
+        if(cartBtn){
+
+            cartBtn.click();
+
+        }
+
+    }else{
+
+        let qty =
+            $(".details-quantity-input").val() || 1;
+
+        let checkoutUrl =
+            "/checkout/?buy_now=" +
+            currentProductId +
+            "&qty=" + qty +
+            "&color=" + encodeURIComponent(selectedColor) +
+            "&size=" + encodeURIComponent(selectedSize);
+
         window.location.href = checkoutUrl;
     }
 }

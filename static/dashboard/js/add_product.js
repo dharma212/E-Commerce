@@ -36,7 +36,7 @@ function showToast(
     const container =
         getToastContainer();
 
-    if(!container){
+    if (!container) {
         return;
     }
 
@@ -63,31 +63,31 @@ function showToast(
     let icon =
         `<i class="bi bi-check-circle-fill"></i>`;
 
-    if(type === "error"){
+    if (type === "error") {
 
         icon =
             `<i class="bi bi-x-circle-fill"></i>`;
     }
 
-    if(type === "warning"){
+    if (type === "warning") {
 
         icon =
             `<i class="bi bi-exclamation-triangle-fill"></i>`;
     }
 
-    if(type === "success"){
+    if (type === "success") {
 
         toast.style.background = "#4CAF50";
 
-    }else if(type === "error"){
+    } else if (type === "error") {
 
         toast.style.background = "#e74c3c";
 
-    }else if(type === "warning"){
+    } else if (type === "warning") {
 
         toast.style.background = "#f39c12";
 
-    }else{
+    } else {
 
         toast.style.background = "#333";
     }
@@ -149,16 +149,16 @@ function getCSRFToken() {
 function clearErrors() {
 
     document.querySelectorAll(".error-text")
-    .forEach(el => {
+        .forEach(el => {
 
-        el.innerText = "";
-    });
+            el.innerText = "";
+        });
 
     document.querySelectorAll(".form-control")
-    .forEach(el => {
+        .forEach(el => {
 
-        el.classList.remove("input-error");
-    });
+            el.classList.remove("input-error");
+        });
 }
 
 function showError(inputId, message) {
@@ -198,16 +198,16 @@ function setupSearch(
     const hiddenInput =
         document.getElementById(hiddenId);
 
-    if(
+    if (
         !input ||
         !resultBox ||
         !hiddenInput
-    ){
+    ) {
         return;
     }
 
     // ================= FOCUS =================
-    input.addEventListener("focus", function(){
+    input.addEventListener("focus", function () {
 
         resultBox.style.display = "block";
 
@@ -222,7 +222,7 @@ function setupSearch(
     });
 
     // ================= SEARCH =================
-    input.addEventListener("input", function(){
+    input.addEventListener("input", function () {
 
         const value =
             this.value.toLowerCase().trim();
@@ -238,13 +238,13 @@ function setupSearch(
 
             const name =
                 (item.dataset.name || "")
-                .toLowerCase();
+                    .toLowerCase();
 
-            if(name.includes(value)){
+            if (name.includes(value)) {
 
                 item.style.display = "block";
 
-            }else{
+            } else {
 
                 item.style.display = "none";
             }
@@ -254,76 +254,76 @@ function setupSearch(
     });
 
     // ================= CLICK =================
-    resultBox.addEventListener("click", function(e){
+    resultBox.addEventListener("click", function (e) {
 
         const item =
             e.target.closest(".search-item");
 
-// ================= SELECT =================
-if(item){
+        // ================= SELECT =================
+        if (item) {
 
-    const selectedName =
-        item.innerText.trim();
+            const selectedName =
+                item.innerText.trim();
 
-    const selectedId =
-        item.dataset.id;
+            const selectedId =
+                item.dataset.id;
 
-    // CURRENT VALUES
-    let currentNames =
-        input.value
-        ? input.value.split(",").map(v => v.trim())
-        : [];
+            // CURRENT VALUES
+            let currentNames =
+                input.value
+                    ? input.value.split(",").map(v => v.trim())
+                    : [];
 
-    let currentIds =
-        hiddenInput.value
-        ? hiddenInput.value.split(",").map(v => v.trim())
-        : [];
+            let currentIds =
+                hiddenInput.value
+                    ? hiddenInput.value.split(",").map(v => v.trim())
+                    : [];
 
-    // AVOID DUPLICATE
-    if(!currentIds.includes(selectedId)){
+            // AVOID DUPLICATE
+            if (!currentIds.includes(selectedId)) {
 
-        currentNames.push(selectedName);
+                currentNames.push(selectedName);
 
-        currentIds.push(selectedId);
-    }
+                currentIds.push(selectedId);
+            }
 
-    // SET VALUES
-    input.value =
-        currentNames.join(", ");
+            // SET VALUES
+            input.value =
+                currentNames.join(", ");
 
-    hiddenInput.value =
-        currentIds.join(",");
+            hiddenInput.value =
+                currentIds.join(",");
 
-    resultBox.style.display = "none";
+            resultBox.style.display = "none";
 
-    // CATEGORY => LOAD TYPE
-    if(hiddenId === "category"){
+            // CATEGORY => LOAD TYPE
+            if (hiddenId === "category") {
 
-        const typeField =
-            document.getElementById("type");
+                const typeField =
+                    document.getElementById("type");
 
-        const typeInput =
-            document.getElementById("typeInput");
+                const typeInput =
+                    document.getElementById("typeInput");
 
-        if(typeField){
-            typeField.value = "";
+                if (typeField) {
+                    typeField.value = "";
+                }
+
+                if (typeInput) {
+                    typeInput.value = "";
+                }
+
+                loadTypes(selectedId);
+            }
+
+            return;
         }
-
-        if(typeInput){
-            typeInput.value = "";
-        }
-
-        loadTypes(selectedId);
-    }
-
-    return;
-}
 
         // ================= ADD NEW =================
         const addBtn =
             e.target.closest(".search-add-more");
 
-        if(addBtn){
+        if (addBtn) {
 
             const type =
                 addBtn.dataset.type;
@@ -331,7 +331,7 @@ if(item){
             const value =
                 input.value.trim();
 
-            if(!value){
+            if (!value) {
 
                 showToast(
                     `Please enter ${type} name`,
@@ -346,12 +346,12 @@ if(item){
             };
 
             // TYPE NEED CATEGORY
-            if(type === "type"){
+            if (type === "type") {
 
                 const categoryId =
                     document.getElementById("category")?.value;
 
-                if(!categoryId){
+                if (!categoryId) {
 
                     showToast(
                         "Please select category first",
@@ -383,81 +383,89 @@ if(item){
 
             })
 
-            .then(res => res.json())
+                .then(async res => {
 
-            .then(data => {
+                    let data = await res.json();
 
-                if(data.error){
+                    console.log("STATUS:", res.status);
+                    console.log("RESPONSE:", data);
+
+                    return data;
+
+                })
+                .then(data => {
+
+                    if (data.error) {
+
+                        showToast(
+                            data.error,
+                            "error"
+                        );
+
+                        return;
+                    }
+
+                    const div =
+                        document.createElement("div");
+
+                    div.className =
+                        "search-item";
+
+                    div.setAttribute(
+                        "data-id",
+                        data.id
+                    );
+
+                    div.setAttribute(
+                        "data-name",
+                        data.name.toLowerCase()
+                    );
+
+                    div.innerText =
+                        data.name;
+
+                    resultBox.insertBefore(
+                        div,
+                        addBtn
+                    );
+
+                    input.value =
+                        data.name;
+
+                    hiddenInput.value =
+                        data.id;
+
+                    resultBox.style.display =
+                        "none";
 
                     showToast(
-                        data.error,
+                        `${type} added successfully`,
+                        "success"
+                    );
+
+                })
+
+                .catch(() => {
+
+                    showToast(
+                        `Failed to add ${type}`,
                         "error"
                     );
 
-                    return;
-                }
-
-                const div =
-                    document.createElement("div");
-
-                div.className =
-                    "search-item";
-
-                div.setAttribute(
-                    "data-id",
-                    data.id
-                );
-
-                div.setAttribute(
-                    "data-name",
-                    data.name.toLowerCase()
-                );
-
-                div.innerText =
-                    data.name;
-
-                resultBox.insertBefore(
-                    div,
-                    addBtn
-                );
-
-                input.value =
-                    data.name;
-
-                hiddenInput.value =
-                    data.id;
-
-                resultBox.style.display =
-                    "none";
-
-                showToast(
-                    `${type} added successfully`,
-                    "success"
-                );
-
-            })
-
-            .catch(() => {
-
-                showToast(
-                    `Failed to add ${type}`,
-                    "error"
-                );
-
-            });
+                });
 
         }
 
     });
 
     // ================= OUTSIDE CLICK =================
-    document.addEventListener("click", function(e){
+    document.addEventListener("click", function (e) {
 
-        if(
+        if (
             !resultBox.contains(e.target)
             &&
             e.target !== input
-        ){
+        ) {
 
             resultBox.style.display = "none";
         }
@@ -467,28 +475,28 @@ if(item){
 }
 
 // ================= LOAD CATEGORY =================
-function loadCategories(){
+function loadCategories() {
 
     fetch('/api/categories/')
 
-    .then(res => res.json())
+        .then(res => res.json())
 
-    .then(data => {
+        .then(data => {
 
-        const resultBox =
-            document.getElementById(
-                "categoryResult"
-            );
+            const resultBox =
+                document.getElementById(
+                    "categoryResult"
+                );
 
-        if(!resultBox){
-            return;
-        }
+            if (!resultBox) {
+                return;
+            }
 
-        resultBox.innerHTML = "";
+            resultBox.innerHTML = "";
 
-        data.forEach(item => {
+            data.forEach(item => {
 
-            resultBox.innerHTML += `
+                resultBox.innerHTML += `
 
                 <div class="search-item"
                      data-id="${item.id}"
@@ -499,9 +507,9 @@ function loadCategories(){
                 </div>
 
             `;
-        });
+            });
 
-        resultBox.innerHTML += `
+            resultBox.innerHTML += `
 
             <div class="search-add-more"
                  data-type="category">
@@ -512,46 +520,46 @@ function loadCategories(){
 
         `;
 
-    })
+        })
 
-    .catch(() => {
+        .catch(() => {
 
-        showToast(
-            "Failed to load categories",
-            "error"
-        );
+            showToast(
+                "Failed to load categories",
+                "error"
+            );
 
-    });
+        });
 
 }
 
 // ================= LOAD TYPES =================
-function loadTypes(categoryId){
+function loadTypes(categoryId) {
 
-    if(!categoryId){
+    if (!categoryId) {
         return;
     }
 
     fetch(`/api/types/${categoryId}/`)
 
-    .then(res => res.json())
+        .then(res => res.json())
 
-    .then(data => {
+        .then(data => {
 
-        const typeResult =
-            document.getElementById(
-                "typeResult"
-            );
+            const typeResult =
+                document.getElementById(
+                    "typeResult"
+                );
 
-        if(!typeResult){
-            return;
-        }
+            if (!typeResult) {
+                return;
+            }
 
-        typeResult.innerHTML = "";
+            typeResult.innerHTML = "";
 
-        data.forEach(item => {
+            data.forEach(item => {
 
-            typeResult.innerHTML += `
+                typeResult.innerHTML += `
 
                 <div class="search-item"
                      data-id="${item.id}"
@@ -562,9 +570,9 @@ function loadTypes(categoryId){
                 </div>
 
             `;
-        });
+            });
 
-        typeResult.innerHTML += `
+            typeResult.innerHTML += `
 
             <div class="search-add-more"
                  data-type="type">
@@ -575,16 +583,16 @@ function loadTypes(categoryId){
 
         `;
 
-    })
+        })
 
-    .catch(() => {
+        .catch(() => {
 
-        showToast(
-            "Failed to load types",
-            "error"
-        );
+            showToast(
+                "Failed to load types",
+                "error"
+            );
 
-    });
+        });
 
 }
 
@@ -611,7 +619,7 @@ function calculateDiscount() {
         const discountField =
             document.getElementById('discount');
 
-        if(discountField){
+        if (discountField) {
             discountField.value = "";
         }
 
@@ -623,8 +631,8 @@ function calculateDiscount() {
 
     let percent =
         mrp
-        ? ((discount / mrp) * 100).toFixed(2)
-        : 0;
+            ? ((discount / mrp) * 100).toFixed(2)
+            : 0;
 
     const finalPriceField =
         document.getElementById('final_price');
@@ -632,13 +640,13 @@ function calculateDiscount() {
     const percentField =
         document.getElementById('discount_percent');
 
-    if(finalPriceField){
+    if (finalPriceField) {
 
         finalPriceField.value =
             finalPrice;
     }
 
-    if(percentField){
+    if (percentField) {
 
         percentField.value =
             percent + "%";
@@ -646,14 +654,14 @@ function calculateDiscount() {
 }
 
 // ================= RENDER IMAGES =================
-function renderImages(){
+function renderImages() {
 
     let container =
         document.getElementById(
             "previewContainer"
         );
 
-    if(!container){
+    if (!container) {
         return;
     }
 
@@ -671,17 +679,17 @@ function renderImages(){
         let img =
             document.createElement("img");
 
-        if(file.isOld){
+        if (file.isOld) {
 
             img.src = file.preview;
 
-        }else{
+        } else {
 
             img.src =
                 URL.createObjectURL(file.file);
         }
 
-        if(index === 0){
+        if (index === 0) {
 
             let badge =
                 document.createElement("div");
@@ -739,37 +747,37 @@ function renderImages(){
         actions.appendChild(del);
 
         div.appendChild(img);
-if(file.color || file.size){
+        if (file.color || file.size) {
 
-    let info =
-        document.createElement("div");
+            let info =
+                document.createElement("div");
 
-    info.style.position = "absolute";
-    info.style.bottom = "5px";
-    info.style.left = "5px";
-    info.style.background = "rgba(0,0,0,0.7)";
-    info.style.color = "#fff";
-    info.style.padding = "3px 8px";
-    info.style.fontSize = "11px";
-    info.style.borderRadius = "4px";
+            info.style.position = "absolute";
+            info.style.bottom = "5px";
+            info.style.left = "5px";
+            info.style.background = "rgba(0,0,0,0.7)";
+            info.style.color = "#fff";
+            info.style.padding = "3px 8px";
+            info.style.fontSize = "11px";
+            info.style.borderRadius = "4px";
 
-    info.innerHTML =
-        `Color: ${file.color}<br>Size: ${file.size}`;
+            info.innerHTML =
+                `Color: ${file.color}<br>Size: ${file.size}`;
 
-    div.appendChild(info);
-}
+            div.appendChild(info);
+        }
         div.appendChild(actions);
 
         div.addEventListener(
             "dragstart",
             (e) => {
 
-            e.dataTransfer.setData(
-                "index",
-                index
-            );
+                e.dataTransfer.setData(
+                    "index",
+                    index
+                );
 
-        });
+            });
 
         div.addEventListener(
             "dragover",
@@ -780,29 +788,29 @@ if(file.color || file.size){
             "drop",
             (e) => {
 
-            e.preventDefault();
+                e.preventDefault();
 
-            let from =
-                e.dataTransfer.getData("index");
+                let from =
+                    e.dataTransfer.getData("index");
 
-            let to = index;
+                let to = index;
 
-            let item =
-                selectedImages.splice(from, 1)[0];
+                let item =
+                    selectedImages.splice(from, 1)[0];
 
-            selectedImages.splice(
-                to,
-                0,
-                item
-            );
+                selectedImages.splice(
+                    to,
+                    0,
+                    item
+                );
 
-            renderImages();
+                renderImages();
 
-            showToast(
-                "Image reordered"
-            );
+                showToast(
+                    "Image reordered"
+                );
 
-        });
+            });
 
         container.appendChild(div);
 
@@ -811,7 +819,7 @@ if(file.color || file.size){
 }
 
 // ================= EDIT IMAGE =================
-function editImage(index){
+function editImage(index) {
 
     let input =
         document.createElement("input");
@@ -820,12 +828,12 @@ function editImage(index){
 
     input.accept = "image/*";
 
-    input.onchange = function(e){
+    input.onchange = function (e) {
 
         let file =
             e.target.files[0];
 
-        if(file){
+        if (file) {
 
             selectedImages[index] =
                 file;
@@ -844,110 +852,110 @@ function editImage(index){
 }
 
 // ================= LOAD EDIT PRODUCT =================
-function loadEditProduct(id){
+function loadEditProduct(id) {
 
     fetch(`/api/add-product/?id=${id}`)
 
-    .then(res => res.json())
+        .then(res => res.json())
 
-    .then(data => {
+        .then(data => {
 
-        console.log(data);
+            console.log(data);
 
-        // ================= BASIC =================
-        document.getElementById("name").value =
-            data.name || "";
+            // ================= BASIC =================
+            document.getElementById("name").value =
+                data.name || "";
 
-        document.getElementById("mrp").value =
-            data.mrp || "";
+            document.getElementById("mrp").value =
+                data.mrp || "";
 
-        document.getElementById("discount").value =
-            data.discount || "";
+            document.getElementById("discount").value =
+                data.discount || "";
 
-        document.getElementById("stock").value =
-            data.stock || "";
+            document.getElementById("stock").value =
+                data.stock || "";
 
-        document.getElementById("description").value =
-            data.description || "";
-        document.getElementById("is_featured").checked =
-            data.is_featured || false;
-        // ================= CATEGORY =================
-        document.getElementById("category").value =
-            data.category || "";
+            document.getElementById("description").value =
+                data.description || "";
+            document.getElementById("is_featured").checked =
+                data.is_featured || false;
+            // ================= CATEGORY =================
+            document.getElementById("category").value =
+                data.category || "";
 
-        document.getElementById("categoryInput").value =
-            data.category_name || "";
+            document.getElementById("categoryInput").value =
+                data.category_name || "";
 
-        // ================= COLOR =================
-document.getElementById("color").value =
-    data.colors
-    ? data.colors.join(",")
-    : "";
+            // ================= COLOR =================
+            document.getElementById("color").value =
+                data.colors
+                    ? data.colors.join(",")
+                    : "";
 
-document.getElementById("colorInput").value =
-    data.color_names
-    ? data.color_names.join(", ")
-    : "";
+            document.getElementById("colorInput").value =
+                data.color_names
+                    ? data.color_names.join(", ")
+                    : "";
 
-        // ================= SIZE =================
-document.getElementById("size").value =
-    data.sizes
-    ? data.sizes.join(",")
-    : "";
+            // ================= SIZE =================
+            document.getElementById("size").value =
+                data.sizes
+                    ? data.sizes.join(",")
+                    : "";
 
-document.getElementById("sizeInput").value =
-    data.size_names
-    ? data.size_names.join(", ")
-    : "";
+            document.getElementById("sizeInput").value =
+                data.size_names
+                    ? data.size_names.join(", ")
+                    : "";
 
-        // ================= TYPE =================
-        loadTypes(data.category);
+            // ================= TYPE =================
+            loadTypes(data.category);
 
-        setTimeout(() => {
+            setTimeout(() => {
 
-            document.getElementById("type").value =
-                data.type || "";
+                document.getElementById("type").value =
+                    data.type || "";
 
-            document.getElementById("typeInput").value =
-                data.type_name || "";
+                document.getElementById("typeInput").value =
+                    data.type_name || "";
 
-        }, 500);
+            }, 500);
 
-        // ================= CALCULATE =================
-        calculateDiscount();
+            // ================= CALCULATE =================
+            calculateDiscount();
 
-        // ================= IMAGES =================
-        selectedImages = [];
+            // ================= IMAGES =================
+            selectedImages = [];
 
-        if(data.images){
+            if (data.images) {
 
-            data.images.forEach(img => {
+                data.images.forEach(img => {
 
-                selectedImages.push({
-    preview: img.image,
-    color: img.color || "",
-    size: img.size || "",
-    isOld: true
-});
+                    selectedImages.push({
+                        preview: img.image,
+                        color: img.color || "",
+                        size: img.size || "",
+                        isOld: true
+                    });
 
-            });
+                });
 
-        }
+            }
 
-        renderImages();
+            renderImages();
 
-    })
+        })
 
-    .catch((error) => {
+        .catch((error) => {
 
-        console.log(error);
+            console.log(error);
 
-        showToast(
-            "Failed to load product",
-            "error"
-        );
+            showToast(
+                "Failed to load product",
+                "error"
+            );
 
-    });
+        });
 
 }
 
@@ -956,524 +964,530 @@ document.addEventListener(
     "DOMContentLoaded",
     function () {
 
-    // ================= SEARCH INIT =================
-    setupSearch(
-        "categoryInput",
-        "categoryResult",
-        "category"
-    );
-
-    setupSearch(
-        "typeInput",
-        "typeResult",
-        "type"
-    );
-
-    setupSearch(
-        "colorInput",
-        "colorResult",
-        "color"
-    );
-
-    setupSearch(
-        "sizeInput",
-        "sizeResult",
-        "size"
-    );
-
-    loadCategories();
-
-    // ================= EDIT MODE =================
-    const params =
-        new URLSearchParams(
-            window.location.search
+        // ================= SEARCH INIT =================
+        setupSearch(
+            "categoryInput",
+            "categoryResult",
+            "category"
         );
 
-    editProductId =
-        params.get("edit");
+        setupSearch(
+            "typeInput",
+            "typeResult",
+            "type"
+        );
 
-    if(editProductId){
+        setupSearch(
+            "colorInput",
+            "colorResult",
+            "color"
+        );
 
-        isEditMode = true;
+        setupSearch(
+            "sizeInput",
+            "sizeResult",
+            "size"
+        );
 
-        const heading =
-            document.querySelector("h3");
+        loadCategories();
 
-        if(heading){
+        // ================= EDIT MODE =================
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
 
-            heading.innerText =
-                "Edit Product";
+        editProductId =
+            params.get("edit");
+
+        if (editProductId) {
+
+            isEditMode = true;
+
+            const heading =
+                document.querySelector("h3");
+
+            if (heading) {
+
+                heading.innerText =
+                    "Edit Product";
+            }
+
+            const submitBtnText =
+                document.getElementById(
+                    "submitBtn"
+                );
+
+            if (submitBtnText) {
+
+                submitBtnText.innerText =
+                    "Update Product";
+            }
+
+            loadEditProduct(editProductId);
         }
 
-        const submitBtnText =
+        const fileInput =
+            document.getElementById("imageInput");
+
+        const uploadBox =
+            document.querySelector(
+                ".image-upload-box"
+            );
+
+        // ================= DISCOUNT =================
+        document.getElementById('mrp')
+            ?.addEventListener(
+                'input',
+                calculateDiscount
+            );
+
+        document.getElementById('discount')
+            ?.addEventListener(
+                'input',
+                calculateDiscount
+            );
+
+        // ================= HANDLE FILES (UNLIMITED) =================
+        function handleFiles(files) {
+            const color = document.getElementById("imageColor").value;
+            const size = document.getElementById("imageSize").value;
+
+            if (!color || !size) {
+                showToast("Please select image color and size first", "warning");
+                return;
+            }
+
+            for (let i = 0; i < files.length; i++) {
+                if (!files[i].type.startsWith("image/")) {
+                    showToast("Only images allowed", "error");
+                    continue;
+                }
+                selectedImages.push({
+                    file: files[i],
+                    color: color,
+                    size: size
+                });
+            }
+
+            renderImages();
+            showToast("Images added successfully");
+        }
+
+        // ================= FILE CLICK =================
+        if (uploadBox && fileInput) {
+
+            uploadBox.addEventListener(
+                "click",
+                () => fileInput.click()
+            );
+        }
+
+        // ================= FILE CHANGE =================
+        if (fileInput) {
+
+            fileInput.addEventListener(
+                "change",
+                function (e) {
+
+                    handleFiles(e.target.files);
+
+                    this.value = "";
+
+                });
+
+        }
+
+        // ================= DRAG DROP =================
+        if (uploadBox) {
+
+            uploadBox.addEventListener(
+                "dragover",
+                (e) => {
+
+                    e.preventDefault();
+
+                    uploadBox.classList.add(
+                        "dragover"
+                    );
+
+                });
+
+            uploadBox.addEventListener(
+                "dragleave",
+                () => {
+
+                    uploadBox.classList.remove(
+                        "dragover"
+                    );
+
+                });
+
+            uploadBox.addEventListener(
+                "drop",
+                (e) => {
+
+                    e.preventDefault();
+
+                    uploadBox.classList.remove(
+                        "dragover"
+                    );
+
+                    handleFiles(
+                        e.dataTransfer.files
+                    );
+
+                });
+
+        }
+
+        // ================= INPUT ERROR REMOVE =================
+        const formControls =
+            document.querySelectorAll(
+                ".form-control"
+            );
+
+        formControls.forEach(input => {
+
+            input.addEventListener(
+                "input",
+                () => {
+
+                    input.classList.remove(
+                        "input-error"
+                    );
+
+                    let error =
+                        document.getElementById(
+                            `error-${input.id}`
+                        );
+
+                    if (error) {
+
+                        error.innerText = "";
+                    }
+
+                });
+
+        });
+
+        // ================= SUBMIT =================
+        const submitBtn =
             document.getElementById(
                 "submitBtn"
             );
 
-        if(submitBtnText){
-
-            submitBtnText.innerText =
-                "Update Product";
-        }
+        if (submitBtn) {
 
-        loadEditProduct(editProductId);
-    }
+            submitBtn.addEventListener(
+                "click",
+                function (e) {
 
-    const fileInput =
-        document.getElementById("imageInput");
+                    e.preventDefault();
 
-    const uploadBox =
-        document.querySelector(
-            ".image-upload-box"
-        );
+                    clearErrors();
 
-    // ================= DISCOUNT =================
-    document.getElementById('mrp')
-    ?.addEventListener(
-        'input',
-        calculateDiscount
-    );
+                    let name =
+                        document.getElementById('name')
+                            ?.value.trim();
 
-    document.getElementById('discount')
-    ?.addEventListener(
-        'input',
-        calculateDiscount
-    );
+                    let category =
+                        document.getElementById('category')
+                            ?.value;
 
-// ================= HANDLE FILES (UNLIMITED) =================
-    function handleFiles(files) {
-        const color = document.getElementById("imageColor").value;
-        const size = document.getElementById("imageSize").value;
+                    let type =
+                        document.getElementById('type')
+                            ?.value;
 
-        if(!color || !size){
-            showToast("Please select image color and size first", "warning");
-            return;
-        }
+                    let color =
+                        document.getElementById('color')
+                            ?.value;
 
-        for(let i = 0; i < files.length; i++){
-            if(!files[i].type.startsWith("image/")){
-                showToast("Only images allowed", "error");
-                continue;
-            }
-            selectedImages.push({
-                file: files[i],
-                color: color,
-                size: size
-            });
-        }
+                    let size =
+                        document.getElementById('size')
+                            ?.value;
 
-        renderImages();
-        showToast("Images added successfully");
-    }
+                    let stock =
+                        document.getElementById('stock')
+                            ?.value;
 
-    // ================= FILE CLICK =================
-    if(uploadBox && fileInput){
+                    let description =
+                        document.getElementById('description')
+                            ?.value;
 
-        uploadBox.addEventListener(
-            "click",
-            () => fileInput.click()
-        );
-    }
+                    let mrp =
+                        document.getElementById('mrp')
+                            ?.value;
 
-    // ================= FILE CHANGE =================
-    if(fileInput){
+                    let discount =
+                        document.getElementById('discount')
+                            ?.value;
 
-        fileInput.addEventListener(
-            "change",
-            function (e) {
+                    let isValid = true;
 
-            handleFiles(e.target.files);
+                    if (!name) {
 
-            this.value = "";
+                        showError(
+                            "name",
+                            "Product name is required"
+                        );
 
-        });
+                        isValid = false;
+                    }
 
-    }
+                    if (!category) {
 
-    // ================= DRAG DROP =================
-    if(uploadBox){
+                        showError(
+                            "category",
+                            "Please select category"
+                        );
 
-        uploadBox.addEventListener(
-            "dragover",
-            (e) => {
+                        isValid = false;
+                    }
 
-            e.preventDefault();
+                    if (!type) {
 
-            uploadBox.classList.add(
-                "dragover"
-            );
+                        showError(
+                            "type",
+                            "Please select type"
+                        );
 
-        });
+                        isValid = false;
+                    }
 
-        uploadBox.addEventListener(
-            "dragleave",
-            () => {
+                    if (!color) {
 
-            uploadBox.classList.remove(
-                "dragover"
-            );
+                        showError(
+                            "color",
+                            "Please select color"
+                        );
 
-        });
+                        isValid = false;
+                    }
 
-        uploadBox.addEventListener(
-            "drop",
-            (e) => {
+                    if (!size) {
 
-            e.preventDefault();
+                        showError(
+                            "size",
+                            "Please select size"
+                        );
 
-            uploadBox.classList.remove(
-                "dragover"
-            );
+                        isValid = false;
+                    }
 
-            handleFiles(
-                e.dataTransfer.files
-            );
+                    if (!mrp) {
 
-        });
-
-    }
-
-    // ================= INPUT ERROR REMOVE =================
-    const formControls =
-        document.querySelectorAll(
-            ".form-control"
-        );
-
-    formControls.forEach(input => {
-
-        input.addEventListener(
-            "input",
-            () => {
-
-            input.classList.remove(
-                "input-error"
-            );
-
-            let error =
-                document.getElementById(
-                    `error-${input.id}`
-                );
-
-            if(error){
-
-                error.innerText = "";
-            }
-
-        });
-
-    });
-
-    // ================= SUBMIT =================
-    const submitBtn =
-        document.getElementById(
-            "submitBtn"
-        );
-
-    if(submitBtn){
-
-        submitBtn.addEventListener(
-            "click",
-            function(e){
-
-            e.preventDefault();
-
-            clearErrors();
-
-            let name =
-                document.getElementById('name')
-                ?.value.trim();
-
-            let category =
-                document.getElementById('category')
-                ?.value;
-
-            let type =
-                document.getElementById('type')
-                ?.value;
-
-            let color =
-                document.getElementById('color')
-                ?.value;
-
-            let size =
-                document.getElementById('size')
-                ?.value;
-
-            let stock =
-                document.getElementById('stock')
-                ?.value;
-
-            let description =
-                document.getElementById('description')
-                ?.value;
-
-            let mrp =
-                document.getElementById('mrp')
-                ?.value;
-
-            let discount =
-                document.getElementById('discount')
-                ?.value;
-
-            let isValid = true;
-
-            if (!name) {
-
-                showError(
-                    "name",
-                    "Product name is required"
-                );
-
-                isValid = false;
-            }
-
-            if (!category) {
-
-                showError(
-                    "category",
-                    "Please select category"
-                );
-
-                isValid = false;
-            }
-
-            if (!type) {
-
-                showError(
-                    "type",
-                    "Please select type"
-                );
-
-                isValid = false;
-            }
-
-            if (!color) {
-
-                showError(
-                    "color",
-                    "Please select color"
-                );
-
-                isValid = false;
-            }
-
-            if (!size) {
-
-                showError(
-                    "size",
-                    "Please select size"
-                );
-
-                isValid = false;
-            }
-
-            if (!mrp) {
-
-                showError(
-                    "mrp",
-                    "MRP is required"
-                );
-
-                isValid = false;
-            }
-
-            if (discount === "") {
-
-                showError(
-                    "discount",
-                    "Discount is required"
-                );
-
-                isValid = false;
-            }
-
-            if (!stock) {
-
-                showError(
-                    "stock",
-                    "Stock is required"
-                );
-
-                isValid = false;
-            }
-
-            if (!description) {
-
-                showError(
-                    "description",
-                    "Description is required"
-                );
-
-                isValid = false;
-            }
-
-            // ================= IMAGE VALIDATION =================
-            if (
-                !isEditMode &&
-                selectedImages.length === 0
-            ) {
-
-                showToast(
-                    "Please upload at least 1 image",
-                    "warning"
-                );
-
-                isValid = false;
-            }
-
-            if (!isValid) {
-
-                showToast(
-                    "Please fix errors before submitting",
-                    "warning"
-                );
-
-                return;
-            }
-
-            let formData =
-                new FormData();
-
-            formData.append('name', name);
-            formData.append('category', category);
-            formData.append('type', type);
-// COLORS
-color.split(",").forEach(id => {
-
-    formData.append(
-        "colors",
-        id.trim()
-    );
-
-});
-
-// SIZES
-size.split(",").forEach(id => {
-
-    formData.append(
-        "sizes",
-        id.trim()
-    );
-
-});
-            formData.append('stock', stock);
-            formData.append('description', description);
-            formData.append('mrp', mrp);
-            formData.append('discount', discount);
-            let isFeatured =
-                document.getElementById("is_featured")
-                ?.checked;
-
-            formData.append(
-                "is_featured",
-                isFeatured
-            );
-
-            // ================= EDIT ID =================
-            if(isEditMode){
-                formData.append("id", editProductId);
-            }
-
-            selectedImages.forEach(item => {
-                if(!item.isOld){
-                    formData.append("images", item.file);
-                    
-                    formData.append("image_colors", item.color || "");
-                    formData.append("image_sizes", item.size || "");
-                }
-            });
-
-            showToast(
-
-                isEditMode
-                ? "Updating product..."
-                : "Uploading product...",
-
-                "warning"
-            );
-
-            fetch('/api/add-product/', {
-
-                method:
-                    isEditMode
-                    ? 'PATCH'
-                    : 'POST',
-
-                headers: {
-
-                    'X-CSRFToken':
-                        getCSRFToken()
-
-                },
-
-                body: formData
-
-            })
-
-            .then(res => res.json())
-
-            .then(data => {
-
-                if(data.success === false){
+                        showError(
+                            "mrp",
+                            "MRP is required"
+                        );
+
+                        isValid = false;
+                    }
+
+                    if (discount === "") {
+
+                        showError(
+                            "discount",
+                            "Discount is required"
+                        );
+
+                        isValid = false;
+                    }
+
+                    if (!stock) {
+
+                        showError(
+                            "stock",
+                            "Stock is required"
+                        );
+
+                        isValid = false;
+                    }
+
+                    if (!description) {
+
+                        showError(
+                            "description",
+                            "Description is required"
+                        );
+
+                        isValid = false;
+                    }
+
+                    // ================= IMAGE VALIDATION =================
+                    if (
+                        !isEditMode &&
+                        selectedImages.length === 0
+                    ) {
+
+                        showToast(
+                            "Please upload at least 1 image",
+                            "warning"
+                        );
+
+                        isValid = false;
+                    }
+
+                    if (!isValid) {
+
+                        showToast(
+                            "Please fix errors before submitting",
+                            "warning"
+                        );
+
+                        return;
+                    }
+
+                    let formData =
+                        new FormData();
+
+                    formData.append('name', name);
+                    formData.append('category', category);
+                    formData.append('type', type);
+                    // COLORS
+                    color.split(",").forEach(id => {
+
+                        formData.append(
+                            "colors",
+                            id.trim()
+                        );
+
+                    });
+
+                    // SIZES
+                    size.split(",").forEach(id => {
+
+                        formData.append(
+                            "sizes",
+                            id.trim()
+                        );
+
+                    });
+                    formData.append('stock', stock);
+                    formData.append('description', description);
+                    formData.append('mrp', mrp);
+                    formData.append('discount', discount);
+                    let isFeatured =
+                        document.getElementById("is_featured")
+                            ?.checked;
+
+                    formData.append(
+                        "is_featured",
+                        isFeatured ? 1 : 0
+                    );
+
+                    // ================= EDIT ID =================
+                    if (isEditMode) {
+                        formData.append("id", editProductId);
+                    }
+
+                    selectedImages.forEach(item => {
+                        if (!item.isOld) {
+                            formData.append("images", item.file);
+
+                            formData.append("image_colors", item.color || "");
+                            formData.append("image_sizes", item.size || "");
+                        }
+                    });
 
                     showToast(
-                        data.message ||
-                        "Something went wrong",
-                        "error"
+
+                        isEditMode
+                            ? "Updating product..."
+                            : "Uploading product...",
+
+                        "warning"
                     );
 
-                    return;
-                }
+                    fetch('/api/add-product/', {
 
-                showToast(
+                        method: isEditMode ? 'PATCH' : 'POST',
 
-                    isEditMode
-                    ? "Product updated successfully 🎉"
-                    : "Product added successfully 🎉",
+                        headers: {
+                            'X-CSRFToken': getCSRFToken()
+                        },
 
-                    "success"
-                );
+                        body: formData
 
-                if(isEditMode){
+                    })
 
-                    setTimeout(() => {
+                        .then(async res => {
 
-                        window.location.href =
-                            "/dashboard/product-list/";
+                            let data = await res.json();
 
-                    }, 1200);
+                            console.log("STATUS =", res.status);
+                            console.log("SERVER RESPONSE =", data);
 
-                    return;
-                }
+                            if (!res.ok) {
+                                throw data;
+                            }
 
-                const form =
-                    document.getElementById(
-                        "productForm"
-                    );
+                            return data;
 
-                if(form){
-                    form.reset();
-                }
+                        })
 
-                selectedImages = [];
+                        .then(data => {
+                            if (data.success === false) {
 
-                renderImages();
+                                showToast(
+                                    data.message ||
+                                    "Something went wrong",
+                                    "error"
+                                );
 
-            })
+                                return;
+                            }
 
-            .catch((error) => {
+                            showToast(
 
-                console.log(error);
+                                isEditMode
+                                    ? "Product updated successfully 🎉"
+                                    : "Product added successfully 🎉",
 
-                showToast(
-                    "Something went wrong!",
-                    "error"
-                );
+                                "success"
+                            );
 
-            });
+                            if (isEditMode) {
 
-        });
+                                setTimeout(() => {
 
-    }
+                                    window.location.href =
+                                        "/dashboard/product-list/";
 
-});
+                                }, 1200);
+
+                                return;
+                            }
+
+                            const form =
+                                document.getElementById(
+                                    "productForm"
+                                );
+
+                            if (form) {
+                                form.reset();
+                            }
+
+                            selectedImages = [];
+
+                            renderImages();
+
+                        })
+
+                        .catch((error) => {
+
+                            console.log("FULL ERROR =", error);
+
+                            showToast(
+                                JSON.stringify(error),
+                                "error"
+                            );
+
+                        });
+
+                });
+
+        }
+
+    });

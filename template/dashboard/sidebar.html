@@ -35,12 +35,12 @@
 
           <div class="profile-name">
 
-            <h5 class="mb-0 font-weight-normal">
-              Admin
+            <h5 class="mb-0 font-weight-normal" style="color: white;">
+              {{ request.user.username }}
             </h5>
 
-            <span>
-              Store Manager
+            <span style="color: white;">
+              Store Management
             </span>
 
           </div>
@@ -54,7 +54,7 @@
     <!-- TITLE -->
     <li class="nav-item nav-category">
 
-      <span class="nav-link">
+      <span class="nav-link" style="color: white;">
         E-Commerce
       </span>
 
@@ -87,7 +87,7 @@
      aria-expanded="{% if request.resolver_match.url_name == 'add_product_page' or request.resolver_match.url_name == 'product_list' or request.resolver_match.url_name == 'add_type' or request.resolver_match.url_name == 'add_category' %}true{% else %}false{% endif %}">
 
     <span class="menu-icon">
-      <i class="mdi mdi-cart"></i>
+      <i class="mdi mdi-package-variant"></i>
     </span>
 
     <span class="menu-title">
@@ -271,28 +271,50 @@
     </li>
 
     <!-- PAYMENTS -->
-    <li class="nav-item menu-items {% if request.resolver_match.url_name == 'payments' %}active{% endif %}">
+<!-- COUPONS -->
+<li class="nav-item menu-items {% if  request.resolver_match.url_name == 'coupon_list' %}active{% endif %}">
 
-      <a class="nav-link"
-         href="#">
+    <a class="nav-link"
+       data-toggle="collapse"
+       href="#coupon-menu">
 
         <span class="menu-icon">
-          <i class="mdi mdi-cash"></i>
+            <i class="mdi mdi-ticket-percent"></i>
         </span>
 
         <span class="menu-title">
-          Payments
+            Coupons
         </span>
 
-      </a>
+        <i class="menu-arrow"></i>
 
-    </li>
+    </a>
+
+    <div class="collapse"
+         id="coupon-menu">
+
+        <ul class="nav flex-column sub-menu">
+
+            <li class="nav-item">
+
+                <a class="nav-link"
+                   href="{% url 'coupon_list' %}">
+                    Coupon List
+                </a>
+
+            </li>
+
+        </ul>
+
+    </div>
+
+</li>
 
     <!-- SETTINGS -->
     <li class="nav-item menu-items {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
 
       <a class="nav-link"
-         href="#">
+         href="{% url 'settings' %}">
 
         <span class="menu-icon">
           <i class="mdi mdi-settings"></i>

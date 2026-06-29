@@ -157,97 +157,65 @@
             NOTIFICATION DROPDOWN
             ========================= -->
 
-            <li class="nav-item dropdown border-left">
-
-                <a class="nav-link count-indicator dropdown-toggle"
-                   id="notificationDropdown"
-                   href="#"
-                   data-toggle="dropdown"
-                   aria-expanded="false">
-
-                    <i class="mdi mdi-bell"></i>
-
-                    <span class="count bg-danger"></span>
-
-                </a>
-
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
-                     aria-labelledby="notificationDropdown">
-
-                    <h6 class="p-3 mb-0">
-
-                        Notifications
-
-                    </h6>
-
-                    <div class="dropdown-divider"></div>
-
-                    <a class="dropdown-item preview-item">
-
-                        <div class="preview-thumbnail">
-
-                            <div class="preview-icon bg-dark rounded-circle">
-
-                                <i class="mdi mdi-calendar text-success"></i>
-
-                            </div>
-
-                        </div>
-
-                        <div class="preview-item-content">
-
-                            <p class="preview-subject mb-1">
-
-                                Event Today
-
-                            </p>
-
-                            <p class="text-muted ellipsis mb-0">
-
-                                Dashboard updated successfully
-
-                            </p>
-
-                        </div>
-
+                <li class="nav-item dropdown border-left">
+                    <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
+                        <i class="mdi mdi-bell {% if unread_count > 0 %}bell-animation{% endif %}" id="bellIcon"></i>
+                        
+                        {% if unread_count > 0 %}
+                            <span class="count bg-danger" id="navRedDot"></span>
+                        {% endif %}
                     </a>
 
-                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
+                        aria-labelledby="notificationDropdown" style="min-width: 320px; max-height: 400px; overflow-y: auto;">
+                        
+                        <h6 class="p-3 mb-0" style="color: #fff; font-weight: 600; background-color: #2c2e33;">Notifications</h6>
+                        <div class="dropdown-divider" style="border-color: #2c2e33;"></div>
 
-                    <a class="dropdown-item preview-item">
+                        {% if notifications %}
+                            {% for notification in notifications %}
+                                <a class="dropdown-item preview-item {% if not notification.is_read %}unread-bg{% endif %}" 
+                                style="border-bottom: 1px solid #2c2e33; padding: 12px 15px;">
+                                    <div class="preview-thumbnail" style="margin-right: 12px;">
+                                        <div class="preview-icon bg-dark rounded-circle" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                            {% if "logged out" in notification.message|lower or "logout" in notification.message|lower %}
+                                                <i class="mdi mdi-account-off text-danger" style="font-size: 18px;"></i>
+                                            {% else %}
+                                                <i class="mdi mdi-account-key text-success" style="font-size: 18px;"></i>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="preview-item-content" style="width: 100%;">
+                                        {% if "logged out" in notification.message|lower or "logout" in notification.message|lower %}
+                                            <p class="preview-subject mb-1" style="color: #fff; font-weight: bold; font-size: 14px;">Admin Logout Alert</p>
+                                        {% else %}
+                                            <p class="preview-subject mb-1" style="color: #fff; font-weight: bold; font-size: 14px;">Admin Login Alert</p>
+                                        {% endif %}
+                                        
+                                        <p class="text-muted mb-0" style="white-space: normal; font-size: 12px; line-height: 1.4; color: #aeaeae !important;">
+                                            {{ notification.message }}
+                                        </p>
+                                        <small class="text-muted dynamic-time" data-timestamp="{{ notification.created_at|date:'c' }}">Calculating...</small>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted text-center p-3 mb-0" style="font-size: 14px;">No new alerts</p>
+                        {% endif %}
+                    </div>
+                </li>
 
-                        <div class="preview-thumbnail">
-
-                            <div class="preview-icon bg-dark rounded-circle">
-
-                                <i class="mdi mdi-bell-ring text-warning"></i>
-
-                            </div>
-
-                        </div>
-
-                        <div class="preview-item-content">
-
-                            <p class="preview-subject mb-1">
-
-                                Server Notification
-
-                            </p>
-
-                            <p class="text-muted ellipsis mb-0">
-
-                                Backup completed
-
-                            </p>
-
-                        </div>
-
-                    </a>
-
+                <div id="whatsappToast" class="whatsapp-toast-container d-none">
+                    <div class="whatsapp-toast-header">
+                        <span id="toastIcon">
+                            <i class="mdi mdi-bell-ring text-success mr-2"></i>
+                        </span>
+                        <strong class="mr-auto" id="toastTitle">New System Alert</strong>
+                        <small class="text-muted" id="toastTime">Just now</small>
+                        <button type="button" class="ml-2 mb-1 close text-white" onclick="closeToast()">&times;</button>
+                    </div>
+                    <div class="whatsapp-toast-body" id="toastMessage"></div>
                 </div>
-
-            </li>
-
             <!-- =========================
             PROFILE / LOGIN
             ========================= -->
@@ -563,3 +531,189 @@ $("#dashboardLogoutForm").submit(function(e){
 });
 
 </script>
+<script>
+    function timeAgo(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const seconds = Math.floor((now - date) / 1000);
+
+        if (seconds < 60) return "Just now";
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes} mins ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours} hours ago`;
+        const days = Math.floor(hours / 24);
+        return `${days} days ago`;
+    }
+
+    function updateAllDynamicTimes() {
+        document.querySelectorAll(".dynamic-time").forEach(el => {
+            const timestamp = el.getAttribute("data-timestamp");
+            if (timestamp) el.innerText = timeAgo(timestamp);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        updateAllDynamicTimes();
+        setInterval(updateAllDynamicTimes, 30000); 
+
+        const unreadBellCount = parseInt("{{ unread_count|default:0 }}");
+        let latestNotificationId = "0";
+        {% if notifications %} latestNotificationId = "{{ notifications.0.id }}"; {% endif %}
+
+        const lastSeenId = sessionStorage.getItem("last_seen_bell_id");
+        if (latestNotificationId !== lastSeenId) {
+            sessionStorage.removeItem("admin_toast_shown");
+            sessionStorage.setItem("last_seen_bell_id", latestNotificationId);
+        }
+
+        const isToastShown = sessionStorage.getItem("admin_toast_shown");
+        
+        if (!isToastShown && unreadBellCount > 0) {
+            {% if notifications %}
+                const msgText = "{{ notifications.0.message|escapejs }}";
+                const alertTime = "{{ notifications.0.created_at|date:'c' }}";
+                
+                const toastBox = document.getElementById("whatsappToast");
+                const toastMsgBody = document.getElementById("toastMessage");
+                const toastTimeEl = document.getElementById("toastTime");
+                const toastTitle = document.getElementById("toastTitle");
+                const toastIcon = document.getElementById("toastIcon");
+                
+                toastMsgBody.innerText = "🔔 " + msgText;
+                if (toastTimeEl) toastTimeEl.innerText = timeAgo(alertTime);
+                
+                if (msgText.toLowerCase().includes("logged out") || msgText.toLowerCase().includes("logout")) {
+                    toastTitle.innerText = "Admin Logout Alert";
+                    toastIcon.innerHTML = '<i class="mdi mdi-account-off text-danger mr-2"></i>';
+                    toastBox.style.borderColor = "#ff4d4d"; 
+                } else {
+                    toastTitle.innerText = "Admin Login Alert";
+                    toastIcon.innerHTML = '<i class="mdi mdi-account-key text-success mr-2"></i>';
+                    toastBox.style.borderColor = "#ffb822"; 
+                }
+                
+                toastBox.classList.remove("d-none");
+                sessionStorage.setItem("admin_toast_shown", "true");
+                
+                setTimeout(closeToast, 5000);
+            {% endif %}
+        }
+    });
+
+    function closeToast() {
+        const toastBox = document.getElementById("whatsappToast");
+        if (toastBox) {
+            toastBox.style.opacity = '0';
+            toastBox.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                toastBox.classList.add("d-none");
+                toastBox.style.opacity = '1';
+            }, 500);
+        }
+    }
+
+    function clearBellNotification() {
+        const redDot = document.getElementById("navRedDot");
+        const bellIcon = document.getElementById("bellIcon");
+        
+        if (bellIcon) bellIcon.classList.remove("bell-animation");
+        if (redDot) redDot.remove();
+
+        fetch(window.location.pathname, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCsrfTokenFromCookie(),
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ action: 'bell' })
+        })
+        .then(response => response.json())
+        .then(data => console.log("Success:", data))
+        .catch(error => console.error("Error:", error));
+    }
+
+    const bellBtn = document.getElementById("notificationDropdown");
+    if (bellBtn) {
+        bellBtn.addEventListener("click", clearBellNotification);
+        if (window.jQuery) {
+            window.jQuery('#notificationDropdown').on('show.bs.dropdown', clearBellNotification);
+        }
+    }
+
+    function getCsrfTokenFromCookie() {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, 10) === ('csrftoken=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(10));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+<style>
+    .dropdown-item.preview-item:hover {
+        background-color: #191c24 !important;
+    }
+    
+    .whatsapp-toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        width: 320px;
+        background-color: #191c24;
+        border: 2px solid #ffb822; 
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        animation: slideInRight 0.5s ease-in-out;
+    }
+    
+    .whatsapp-toast-header {
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        background-color: #0f1116;
+        color: #fff;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        font-size: 14px;
+    }
+    
+    .whatsapp-toast-body {
+        padding: 15px;
+        color: #e4e6eb;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    .bell-animation {
+        display: inline-block;
+        animation: ringBell 2s ease-in-out infinite;
+        transform-origin: top center;
+        color: #ffb822 !important;
+        text-shadow: 0 0 10px rgba(255, 184, 34, 0.6);
+    }
+
+    @keyframes ringBell {
+        0% { transform: rotate(0); }
+        5% { transform: rotate(15deg); }
+        10% { transform: rotate(-15deg); }
+        15% { transform: rotate(10deg); }
+        20% { transform: rotate(-10deg); }
+        25% { transform: rotate(5deg); }
+        30% { transform: rotate(-5deg); }
+        35% { transform: rotate(0); }
+        100% { transform: rotate(0); }
+    }
+</style>

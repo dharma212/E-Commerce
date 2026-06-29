@@ -1,0 +1,39 @@
+{% block content %}
+<div id="variantPopup" class="variant-popup">
+    <div class="variant-box">
+        <button type="button" class="popup-close" onclick="closeVariantPopup()">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="product-preview-header d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+            <div class="product-img-wrapper">
+                <img id="popupProductImage" src="" alt="Product" class="img-fluid">
+            </div>
+            <div class="product-info-wrapper text-start">
+                <span class="badge bg-light text-primary fw-bold px-2 py-1 rounded mb-1" style="font-size: 0.65rem;">QUICK ADD</span>
+                <h5 id="popupProductName" class="fw-bold text-dark mb-0 product-short-title"></h5>
+            </div>
+        </div>
+        <div class="popup-body">
+            <div class="variant-section mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold text-dark small mb-0 d-flex align-items-center">
+                        <i class="fas fa-circle-palette me-2 text-primary"></i> Available Colors
+                    </h6>
+                </div>
+                <div id="popupColors" class="color-grid-layout"></div>
+            </div>
+            <div class="variant-section mb-2">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold text-dark small mb-0 d-flex align-items-center">
+                        <i class="fas fa-shirt me-2 text-primary"></i> Available Sizes
+                    </h6>
+                </div>
+                <div id="popupSizes" class="size-flex-layout"></div>
+            </div>
+        </div>
+        <button id="continueBtn" class="btn btn-continue w-100 mt-4 py-3 fw-bold shadow">
+            Confirm & Add to Cart <i class="fas fa-shopping-bag ms-2 small"></i>
+        </button>
+    </div>
+</div>
+{% endblock content %} 

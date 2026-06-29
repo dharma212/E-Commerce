@@ -78,4 +78,5 @@ path(
     SetDefaultAddressView.as_view(),
     name='set_default_address'
 ),
+path('signup/', SignupPageView.as_view(), name='signup'),
 ]

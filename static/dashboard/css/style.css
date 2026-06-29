@@ -12307,7 +12307,7 @@ a.close.disabled {
   flex-direction: column;
   width: 100%;
   pointer-events: auto;
-  background-color: #000000;
+  /* background-color: #000000; */
   background-clip: padding-box;
   border: 1px solid #2c2e33;
   border-radius: 0.3rem;
